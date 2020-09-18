@@ -1,0 +1,169 @@
+%%% Filename : ml.sty
+%%% Date     : 13.1.1997
+%%% Contents : General TeX commands for the MULTLOG system; included by "ml.tex"
+%%% Author   : Gernot Salzer
+%%% Interface:
+
+\newcommand\TVs{V}   % metavariable for the set of truth values
+
+\newcount\ml@tmp
+\newcommand\FOR{}
+\newcommand\@FOR{}
+\newcommand\@FORnext{}
+\def\FOR#1{\newcommand#1{}\@FOR#1}
+\long\def\@FOR#1=#2\TO#3\DO#4\ENDFOR
+   {\edef#1{#2}%
+    \ifnum#1>#3%
+       \let\@FORnext\relax
+       \let#1\relax
+    \else
+       \ml@tmp=#2%
+       \advance\ml@tmp by 1%
+       \def\@FORnext{\@FOR#1=\number\ml@tmp\TO#3\DO#4\ENDFOR}%
+       #4%
+    \fi
+    \@FORnext
+   }
+
+\newcommand\TV     [1]{\csname TV\romannumeral#1\endcsname}
+\newcommand\Opname [1]{\csname Opname\romannumeral#1\endcsname}
+\newcommand\Oparity[1]{\csname Oparity\romannumeral#1\endcsname}
+\newcommand\Optab  [1]{\csname Optab\romannumeral#1\endcsname}
+\newcommand\Opconcl[2]{\csname Opconcl\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\Opprems[2]{\csname Opprems\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\NDOpconcl[2]{\csname NDOpconcl\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\NDOpprems[2]{\csname NDOpprems\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ClOpconcl[2]{\csname ClOpconcl\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ClOpprem [2]{\csname ClOpprem\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\PnfOpL[2]{\csname PnfOpL\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\PnfOpR[2]{\csname PnfOpR\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\Quname [1]{\csname Quname\romannumeral#1\endcsname}
+\newcommand\Qutab  [1]{\csname Qutab\romannumeral#1\endcsname}
+\newcommand\Quconcl[2]{\csname Quconcl\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\Quprems[2]{\csname Quprems\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\NDQuconcl[2]{\csname NDQuconcl\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\NDQuprems[2]{\csname NDQuprems\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ClQuconcl[2]{\csname ClQuconcl\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ClQuprem [2]{\csname ClQuprem\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\PnfQuL[2]{\csname PnfQuL\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\PnfQuR[2]{\csname PnfQuR\romannumeral#1X\romannumeral#2\endcsname}
+
+\newcommand\PS[1]{\ifnum#1>1s\fi}            % Plural "s"
+\newcommand\ARE[1]{\ifnum#1>1are\else is\fi}
+
+\newcommand\IfIsDTV[1]{\csname ifTV\romannumeral #1IsDTV\endcsname}
+\newcommand\NDEI[1]{\IfIsDTV{#1}I\else E\fi}
+
+\newcommand\ClauseSet{{\cal C}}
+\newcommand\Clause{C}
+\newcommand\MEMO[1]{\typeout{*** #1 ***}}
+
+
+%%% xtradef.sty contains all the nifty stuff I already found useful
+%%% for my thesis. There might be one or two redundant because unused
+%%% defs. You may discard or as well ignore them.
+%%%
+%%% - Wolfram Nix, sometime Nov 1997
+
+% Theorem def's
+
+\def\newtheorem{\@ifnextchar[{\@ftheorem}{\@newtheorem{}}}
+\def\@ftheorem[#1]{\@newtheorem{#1}}
+
+\def\@newtheorem#1#2{\@ifnextchar[{\@othm{#1}{#2}}{\@nthm{#1}{#2}}}
+
+\def\@nthm#1#2#3{%
+\@ifnextchar[{\@xnthm{#1}{#2}{#3}}{\@ynthm{#1}{#2}{#3}}}
+
+\def\@xnthm#1#2#3[#4]{\expandafter\@ifdefinable\csname #2\endcsname
+{\@definecounter{#2}\@addtoreset{#2}{#4}%
+\expandafter\xdef\csname the#2\endcsname{\expandafter\noexpand
+  \csname the#4\endcsname \@thmcountersep \@thmcounter{#2}}%
+\global\@namedef{#2}{\@thm{#1}{#2}{#3}}\global\@namedef{end#2}{\@endtheorem}}}
+
+\def\@ynthm#1#2#3{\expandafter\@ifdefinable\csname #2\endcsname
+{\@definecounter{#2}%
+\expandafter\xdef\csname the#2\endcsname{\@thmcounter{#2}}%
+\global\@namedef{#2}{\@thm{#1}{#2}{#3}}\global\@namedef{end#2}{\@endtheorem}}}
+
+\def\@othm#1#2[#3]#4{\expandafter\@ifdefinable\csname #2\endcsname
+  {\global\@namedef{the#2}{\@nameuse{the#3}}%
+\global\@namedef{#2}{\@thm{#1}{#3}{#4}}%
+\global\@namedef{end#2}{\@endtheorem}}}
+
+\def\@thm#1#2#3{\refstepcounter
+    {#2}\@ifnextchar[{\@ythm{#1}{#2}{#3}}{\@xthm{#1}{#2}{#3}}}
+
+\def\@xthm#1#2#3{\@begintheorem{#1}{#3}{\csname the#2\endcsname}\ignorespaces}
+\def\@ythm#1#2#3[#4]{\@opargbegintheorem{#1}{#3}{\csname
+       the#2\endcsname}{#4}\ignorespaces}
+
+\def\@begintheorem#1#2#3{#1\trivlist \item[\hskip \labelsep{\small\bf #3.}\ {\sc #2}]}
+\def\@opargbegintheorem#1#2#3#4{#1 \trivlist
+      \item[\hskip \labelsep{\small\bf #3.}\ {\sc #2}\ {\rm (#4)}]}
+\def\@endtheorem{\endtrivlist}
+
+\newtheorem[\em]{theorem}{Theorem}[section]
+\newtheorem[\em]{lemma}[theorem]{Lemma}
+\newtheorem[\em]{proposition}[theorem]{Proposition}
+\newtheorem[\em]{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{remark}[theorem]{Remark}
+
+%%% Some say "formulae", some say "formulas". I leave it to higher instances
+%%% to decide which to use. Just alter these definitions :-)
+\def\formulae{formulae}
+\def\Formulae{Formulae}
+
+\def\imm#1{{\relax\ifmmode #1\else $#1$\fi}}
+
+\def\qedchar{\quad\vrule height7pt width5pt depth-1pt}
+
+\def\tbox{\widetilde{\vphantom{l}\Box}}
+\def\tdiamond{\widetilde{\vphantom{l}\Diamond}}
+\def\toperator{\widetilde{\vphantom{l}\operator}}
+\def\tquantor{\widetilde{\vphantom{l}\quantor}}
+
+\def\sand{\mathbin{\land\mskip-10mu \land}}
+\def\sor{\mathbin{\lor\mskip-10mu\lor}}
+\def\bigsand{\mathop{\bigwedge\mskip-19mu \bigwedge\,}}
+\def\bigsor{\mathop{\bigvee\mskip-19mu\bigvee\,}}
+\def\sneg{\mathord{\smash{\raise.5pt\hbox{$\neg$}}\mskip-12mu\lower.5pt \hbox{$\neg$}}}
+\def\sex{\mathop{\exists\mskip-8mu\exists}}
+\def\sall{\mathop{\forall\mskip-8mu\forall}}
+
+\def\simpl{\mathbin{\supset\mskip-11mu\supset}}
+\def\Sor{\mathop{\bigvee\mathchoice{\mkern-19mu}%
+                               {\mkern-21mu}%
+                               {\mkern-18mu}%
+                               {\mkern-20mu}\bigvee\,}}
+\def\Sand{\mathop{\bigwedge\mathchoice{\mkern-19mu}%
+                               {\mkern-21mu}%
+                               {\mkern-18mu}%
+                               {\mkern-20mu}\bigwedge\,}}
+\def\sequ{\equiv}
+
+\def\C{\imm{\cal C}}
+\def\D{\imm{\cal D}}
+\def\E{\imm{\cal E}}
+\def\cally#1{\imm{\cal #1}}
+\def\H{{\bf H}}
+\def\I{{\bf I}}
+\def\SC{{\bf SC}}
+\def\ISC{{\bf ISC}}
+\def\LK{{\bf LK}}
+\def\PL{{\bf PL}}
+\def\Form{{\rm Form}}
+
+\let\impl\supset
+\def\M{\imm{\cal M}}
+\def\val{{\rm val}}
+
+\def\quantor{{\imm{\sf Q}}}
+\def\operator{\imm{\Box}}
+\def\LL{\imm{\cal L}}
+
+\def\ifprop{\ifnum\NoQus=0}    % Is the logic purely propositional?
+\def\ifnotprop{\ifnum\NoQus>0}
+\newcommand\defeq{\stackrel{\rm def}=}

@@ -1,0 +1,317 @@
+%%% Filename : goedel.lgc
+%%% Date     : 3.3.1998
+%%% Contents : Specification of the textual interface to MUltlog,
+%%%            exemplified by the Goedel logic.
+%%%            This file can be directly used as an input to MUltlog.
+%%% Author   : Gernot Salzer
+
+
+%  Comments follow the conventions of prolog:
+%  - Everything between /* and */ is ignored.
+%  - Everything between % and the end of the line is ignored.
+
+
+
+/* Note:
+   This specification of the textual interface to MUltlog puts no restrictions
+   on any of the following items:
+   - number of truth values
+   - number of orderings
+   - number of operators
+   - arity of operators
+   - number of quantifiers
+   - total number of entries per mapping
+   - ???
+
+   Any program based on this specification, like MUltlog itself or one of its
+   interfaces, may impose its own limits on these numbers, depending on its
+   capacities. It is also free to check these limits or just to run into an
+   overflow (though, of course, the first alternative is the preferred one).
+*/
+
+
+/* The name of the logic. Mandatory.
+
+   Syntax:
+      logic "<logname>".
+   where <logname> is a string described by the regular expression
+      RE1 = ([ !#$%&'()*+,./0-9:;<=>?@A-Z[\\]^_`a-z{|}~-]|"")*
+   of up to 20 characters. (In other words, the string may consist
+   of any printable ASCII character, where quotes (") have to be doubled.)
+*/
+logic "G\""odel".
+
+
+
+/* The truth values. Mandatory.
+   The particular order of the values is of no significance as indicated
+   by the braces. Every truth value may appear only once.
+
+   Syntax:
+      truth_values { <v 1>, ..., <v n> }.
+   where each of the truth values <v 1>, ..., <v n>  (n>=2) is described by
+   the regular expression
+      RE2 = ([a-z][A-Za-z0-9_]*|[-+*^<>=~?@#$&]+|0|[1-9][0-9]*)
+   The truth values may consist of up to 10 characters.
+*/
+truth_values {f,*,t}.
+
+
+
+/* Designated truth values. Mandatory.
+   The designated truth values are usually those representing "true".
+   The particular order of the values is of no significance as indicated
+   by the braces. Every truth value may appear at most once.
+
+   Syntax:
+      designated_truth_values { <v 1>, ..., <v n> }.
+   where each of the truth values <v 1>, ..., <v n>  (n>0) is described by
+   the regular expression RE2 above and may consist of up to 10 characters.
+*/
+designated_truth_values {t}.
+
+
+
+/* Orderings on the truth values. Optional.
+   Allows to declare an operator as being the "inf" (greatest lower bound)
+   or "sup" (least upper bound) operator wrt. an ordering.
+
+   Syntax:
+      ordering(<ordname>, "<ordspec>").
+
+      <ordname> is defined according to RE2 above and may consist of up to
+         10 characters.
+      <ordspec> is a string of up to 200 characters satisfying RE1 above.
+         Additionally, the string has to be an element of the language generated
+         by the context-free grammar (V, T, P, S), where
+         V = {OrdSpec, OrdEl, OrdSpecs, TV}
+         T = {'<', '{', '}', ','} + set of truth values
+         P = { OrdSpec  ==> OrdEl | OrdEl '<' OrdSpec ,
+               OrdEl    ==> TV | '{' OrdSpecs '}' ,
+               OrdSpecs ==> OrdSpec | OrdSpec ',' OrdSpecs ,
+               TV       ==> RE2
+             }
+         S = OrdSpec
+         In order to avoid ambiguities spaces may be used to separate the '<' sign
+         from truth values (which may also contain the character '<').
+
+   Semantics:
+      Chains like "a<b<c<d<..." are interpreted as an abbreviation
+      for "a<b, b<c, c<d, d<...". Independent chains are collected in
+      sets: "{a<b, c<d<e, ...}". Sets and chains can be nested.
+      E.g., "a<{b,c<d}<e" is the same as "{a<b, a<c, c<d, b<e, d<e}".
+      Let R be the relation defined by this specification.
+      The ordering induced by R is the smallest reflexive, anti_symmetric
+      and transitive relation containing R.
+      Note that truth values with different names are treated as being
+      different from each other. Hence a specification containing
+      a<b and b<a induces no ordering, since anti-symmetry would imply a=b.
+*/
+ordering(linear, "f < * < t").
+
+
+
+/* The definition of operators. Optional; but what's a logic without
+   operators?
+   In its simplest and most general form, each operator is specified by its
+   name and the mapping of input to output values.  Again braces are used
+   to indicate that the order in which the input tuples are assigned output
+   values is of no significance.  The definitions should be complete:
+   every k-tuple has to be assigned exactly one value, where k>0 is the arity
+   of the operator.
+   There may be several operators with the same <opname> but with different
+   <arities>.
+
+   Syntax:
+      operator(<opname>/<arity>, mapping { <ass 1>, ..., <ass m> }).
+
+      <opname> is defined according to RE2 above and may consist of up to
+         10 characters.
+      <arity> is a non-negative integer.
+      <ass 1>,...,<ass m> are assignments of the form
+         ( <v 1>, ..., <v k> ) : <v>,
+         where <v 1>,...,<v k>,<v> are truth values.
+         For k = 0, the mapping consists of a single truth value.
+*/
+%/*
+operator(true /0, mapping { t }).
+operator(false/0, mapping { f }).
+%*/
+%/*
+operator(neg  /1, mapping { (t): f,
+                            (*): f,
+                            (f): t
+                          }
+        ).
+%*/
+%/*
+operator(and  /2, mapping { (t,t): t,
+                            (t,*): *,
+                            (t,f): f,
+                            (*,t): *,
+                            (*,*): *,
+                            (*,f): f,
+                            (f,t): f,
+                            (f,*): f,
+                            (f,f): f
+                          }
+        ).
+operator(or   /2, mapping { (t,t): t,
+                            (t,*): t,
+                            (t,f): t,
+                            (*,t): t,
+                            (*,*): *,
+                            (*,f): *,
+                            (f,t): t,
+                            (f,*): *,
+                            (f,f): f
+                          }
+        ).
+%*/
+%/*
+operator(imp  /2, mapping { (t,t): t,
+                            (t,*): *,
+                            (t,f): f,
+                            (*,t): t,
+                            (*,*): t,
+                            (*,f): f,
+                            (f,t): t,
+                            (f,*): t,
+                            (f,f): t
+                          }
+        ).
+%*/
+
+/* Binary operators can be also specified as tables.  Since the order of
+   truth values in the table is significant, brackets are used instead of braces.
+
+   Syntax:
+      operator(<opname>/2, table [ <v 1>, ..., <v m> ]).
+
+      <opname> is defined according to RE2 above and may consist of up to
+          10 characters.
+      <v 1>,...,<v m> are truth values. The number of elements in the
+          table, m, has to be equal to (n+1)^2-1, where n is the number of different
+          truth values.
+*/
+/*
+operator(and/2, table   [     t, *, f,
+                          t,  t, *, f,
+                          *,  *, *, f,
+                          f,  f, f, f
+                        ]
+        ).
+operator(or /2, table   [     t, *, f,
+                          t,  t, t, t,
+                          *,  t, *, *,
+                          f,  t, *, f
+                        ]
+        ).
+operator(imp/2, table   [     f, *, t,
+                          f,  t, t, t,
+                          *,  f, t, t,
+                          t,  f, *, t
+                        ]
+        ).
+%*/
+
+/* Operators may also be declared to be the infimum (greatest lower
+   bound) or supremum (least upper bound) wrt.
+   to some user-defined ordering.
+
+   Syntax:
+      operator(<opname>/<arity>, sup(<ordname>)).
+      operator(<opname>/<arity>, inf(<ordname>)).
+
+      <opname>  is defined according to RE2 above and may consist of up to
+          10 characters.
+      <arity>   is a non-negative integer greater than one.
+      <ordname> is the name of an appropriate ordering defined by an
+                "ordering"-statement.
+
+   Semantics:
+      "sup" stands for the least-upper-bound (= supremum)
+      operation w.r.t. the given ordering.
+      "inf" stands for the greatest-lower-bound (= infimum)
+      operation w.r.t. the given ordering.
+      The ordering has to define a unique supremum/infimum for any two
+      truth values.
+*/
+/*
+operator(and  /2, inf(linear)).
+operator(or   /2, sup(linear)).
+%*/
+
+
+
+/* The definition of (distribution) quantifiers. Optional.
+   In its simplest and most general form, each quantifier is specified by
+   its name and a mapping assigning a truth value to each non-empty subset
+   of the truth values.  The definitions should be complete:
+   *every* non-empty subset should be assigned exactly one value.
+
+   Syntax:
+      quantifier(<quname>, mapping { <ass 1>, ..., <ass m> }).
+
+      <quname> is defined according to RE2 above and may consist of up to
+         10 characters.
+      <ass 1>,...,<ass m> are assignments of the form
+         { <v 1>, ..., <v k> } : <v>,
+         where <v 1>,...,<v k>,<v> are truth values. k has to be greater
+         than one.
+*/
+%/*
+quantifier(forall, mapping { {t}    : t,
+                             {t,*}  : *,
+                             {t,f}  : f,
+                             {t,*,f}: f,
+                             {*}    : *,
+                             {*,f}  : f,
+                             {f}    : f
+                           }
+          ).
+quantifier(exists, mapping { {t}    : t,
+                             {t,*}  : t,
+                             {t,f}  : t,
+                             {t,*,f}: t,
+                             {*}    : *,
+                             {*,f}  : *,
+                             {f}    : f
+                           }
+          ).
+%*/
+
+/* The definition of induced quantifiers in a more comfortable and less
+   error-prone form.  Quantifiers can only be induced by operators which
+   are associative, commutative and idempotent.
+
+   Syntax:
+      quantifier(<quname>, induced_by <opname>/<arity>).
+
+      <quname> is defined according to RE2 above and may consist of up to
+         10 characters.
+      <opname> is defined according to RE2 above and may consist of up to
+         10 characters.
+      <arity> is an integer greater than one.
+*/
+/*
+quantifier(forall, induced_by and/2).
+quantifier(exists, induced_by or/2).
+%*/
+
+/* Quantifiers can also be induced by a lub/glb operator.
+
+   Syntax:
+      quantifier(<quname>, induced_by <bop>(<ordname>)).
+
+      <quname> is defined according to RE2 above and may consist of up to
+         10 characters.
+      <bop> is either sup or inf.
+      <ordname> is the name of an appropriate ordering defined by an
+         "ordering"-statement.
+*/
+/*
+quantifier(forall, induced_by inf(linear)).
+quantifier(exists, induced_by sup(linear)).
+%*/
+

@@ -1,0 +1,16 @@
+#!/bin/sh
+#################  ilc - the application-frame   \
+exec @wish@ "$0" "$@"  
+
+set ILCPATH @ilcpath@/
+
+# for  user-specific configuration, the user can copy
+#   this script and modify the line below to include
+#   a file of his choice
+source ${ILCPATH}config.tcl
+
+
+# Now start working ... 
+source ${ILCPATH}mainfrm.tcl
+
+return

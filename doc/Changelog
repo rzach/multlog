@@ -1,0 +1,18 @@
+1.10, 11.7.2001:
+- Bug fix in ml_compactrepr.pl that made 1.09 unusable.
+- Bug fix in installation script regarding lgc2pdf
+- Installation/Deinstallation scripts changed
+1.09:
+- New implementation of propositional minimization routines.
+- Script "lgc2pdf" added for direct generation of PDF paper.
+1.08:
+- Minimization of operators (propres.pl) replaced by a more stable
+  algorithm (hopefully).
+1.07:
+- Bug: Operators defined as supremum or infimum wrt. an ordering
+  were always assumed to be binary, regardless of the specified arity
+  (reported by Chris Fermueller).
+1.06:
+- installation script improved: support for adding Prolog options,
+  version number and date in separate file "Version"
+- deinstallation script added

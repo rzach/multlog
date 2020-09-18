@@ -1,0 +1,9 @@
+#!/bin/sh
+
+PROLOG='@prolog@'
+MLPATH='@mlpath@'
+
+$PROLOG >/dev/null 2>&1 <<EndPROLOG
+['$MLPATH/ilc'].
+lgc2ilc('$1.lgc','$1.ilc').
+EndPROLOG

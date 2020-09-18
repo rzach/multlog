@@ -1,0 +1,251 @@
+#!/bin/sh
+
+oldIFS="$IFS"
+IFS=":"
+path=`echo $PATH`
+IFS="$oldIFS"
+path="$path /usr/local/bin /usr/local/sbin /usr/bin /usr/sbin /bin /sbin"
+ucmds="false true awk basename chmod cp dirname grep mkdir pwd rm sed"
+tcmds="latex bibtex"
+ppcmdsa="pdflatex"
+ppcmdsb="dvips ps2pdf"
+ttcmds="wish"
+pcmds="pl sicstus bp swipl"
+extravars="prolog mlpath ilcpath ml_version ml_date ml_ver ilc_version ilc_date \
+      ltx ltxpdf pspdf"
+
+prefix=/usr/local
+
+set_cmd(){
+  for c in $*
+  do
+    notfound=$true
+    for p in $path
+    do
+      if [ -x $p/$c ]
+      then
+        eval $c=$p/$c
+        notfound=$false
+        break
+      fi
+    done
+    if $notfound
+    then
+      eval $c=$c
+      return 1
+    fi
+  done
+  return 0
+}
+
+is_prolog(){
+  echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' \
+  | ($* 2>&1) \
+  | $grep -q gernot
+}
+
+read_dir(){
+  while $true
+  do
+    eval echo -n \"Directory for $1 [\$$2]: \"
+    read a
+    a=`echo $a | $sed 's|~|'$HOME'|;s|$HOME|'$HOME'|'`
+    if [ ! "$a" ]
+    then
+      eval a=\$$2
+    fi
+    if (echo $a | $grep -q '^/')
+    then
+      :
+    else
+      a=`$pwd`/$a
+    fi
+    if [ -d $a ]
+    then
+      eval $2=$a
+      break
+    else
+      echo "   Error: directory $a does not exist."
+    fi
+  done
+}
+
+
+
+# Searching for some Unix commands
+if set_cmd $ucmds
+then
+  :
+else
+  echo "Error: could not find Unix command $c."
+  exit 1
+fi
+
+# Searching for TeX
+if set_cmd $tcmds
+then
+  ltx=$true
+else
+  echo "Warning: could not find TeX command $c."
+  echo "You do not need TeX to run MUltlog,"
+  echo "but its output will be hard to read without TeX."
+  ltx=$false
+fi
+
+# Searching for pdf converters
+if set_cmd $ppcmdsa
+then
+  ltxpdf=$true
+  pspdf=$false
+elif set_cmd $ppcmdsb
+then
+  ltxpdf=$false
+  pspdf=$true
+else
+  echo "Warning: couldn't find any PDF converters,"
+  echo "neither pdflatex nor dvips&ps2pdf."
+  echo "You do not need PDF converters to run MUltlog,"
+  echo "but you will not be able to generate PDF directly."
+  ltxpdf=$false
+  pspdf=$false
+fi
+
+# Searching for Tcl/Tk
+if set_cmd $ttcmds
+then
+  tcltk=$true
+else
+  echo "Warning: could not find Tcl/Tk command $c."
+  echo "You do not need Tcl/Tk to run MUltlog,"
+  echo "but you will not be able to use the editor 'ilc'"
+  echo "for writing the specification of your logic."
+  tcltk=$false
+fi
+
+# Searching for Prolog
+for x in $pcmds
+do
+  if set_cmd $x && is_prolog $x
+  then
+    eval prolog=\$$x
+    break
+  fi
+done
+
+while $true
+do
+  echo -n "Prolog to be used [$prolog]: "
+  read a
+  a=`echo $a | $sed 's|~|'$HOME'|;s|$HOME|'$HOME'|'`
+  if [ ! "$a" ]
+  then
+    break
+  fi
+  aa=`echo "$a" | $sed 's/ .*//'`
+  if [ -x "$aa" ]
+  then
+    if is_prolog $a
+    then
+      prolog=$a
+      break
+    else
+      echo "   Error: $a does not behave like Prolog."
+    fi
+  else
+    echo "   Error: $aa does not exist or has no execute permission."
+  fi
+done
+
+bindir=$prefix/bin
+read_dir executables bindir
+prefix=`dirname $bindir`
+
+libdir=$prefix/lib
+read_dir library libdir
+
+docdir=$prefix/doc
+read_dir documentation docdir
+
+mlbin=$bindir
+mldoc=$docdir/multlog
+mllib=$libdir/multlog
+mlpath=$mllib/ml
+ilcpath=$mllib/ilc
+
+distdir=`$dirname $0`
+cd $distdir
+distdir=`$pwd`
+
+cd bin
+deinstall=ml_deinstall
+echo '#!/bin/sh' > $deinstall
+echo "echo 'Deleting ...'" >> $deinstall
+for d in $mldoc $mllib
+do
+  echo "echo '   directory $d'" >> $deinstall
+  echo "$rm -rf $d" >> $deinstall
+done
+for f in *
+do
+  echo "echo '   file $mlbin/$f'" >> $deinstall
+  echo "$rm $mlbin/$f" >> $deinstall
+done
+echo "echo 'Deinstallation done.'" >> $deinstall
+cd ..
+
+VERSION=$distdir/Version
+ml_version=`$awk 'BEGIN{FS=";"}$1=="ml"{print $2}' $VERSION`
+ml_date=`$awk 'BEGIN{FS=";"}$1=="ml"{print $3}' $VERSION`
+ml_ver=`echo $ml_version | $sed 's/\.//g'`
+ilc_version=`$awk 'BEGIN{FS=";"}$1=="ilc"{print $2}' $VERSION`
+ilc_date=`$awk 'BEGIN{FS=";"}$1=="ilc"{print $3}' $VERSION`
+
+sedscript=$distdir/sedscript
+$rm -f $sedscript
+for c in $ucmds $tcmds $ttcmds $extravars $ppcmdsa $ppcmdsb
+do
+  eval echo "s\|@$c@\|\$$c\|g" >> $sedscript
+done
+
+echo ""
+
+for d in $mldoc $mllib $mlpath $ilcpath
+do
+  if [ ! -d "$d" ]
+  then
+    $mkdir $d
+    echo "Creating directory $d"
+  fi
+done
+
+echo "Installing ..."
+for d in bin doc ilc ml
+do
+  mode=644
+  case "$d" in
+    bin) dest=$mlbin;mode=755;;
+    doc) dest=$mldoc;;
+    ilc) dest=$ilcpath;;
+    ml)  dest=$mlpath;;
+  esac
+  cd $distdir/$d
+  for f in *
+  do
+    if [ $f = "lgc2ilc" ]
+    then
+       m=755
+    else
+       m=$mode
+    fi
+    echo "   $f to $dest, mode $m"
+    $sed -f $sedscript $f > $dest/$f
+    chmod $m $dest/$f
+  done
+done
+
+$rm -f $sedscript
+$rm -f $distdir/bin/$deinstall
+
+echo "Installation done."
+echo ""
+echo "In case of problems, send e-mail to multlog@logic.at."

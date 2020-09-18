@@ -1,0 +1,937 @@
+%%% Filename : ml.tex
+%%% Date     : 13.1.1997
+%%% Contents : Main file of TeX paper
+%%% Author   : Gernot Salzer
+%%%
+%%% ***
+%%% Upgrade  : Wolfram Nix
+%%% Date     : ??.11.1997
+%%%            preliminaries, lots of definitions, theorems etc added.
+
+\iffalse
+\documentstyle[ml,\jobname,proof]{article}  % Headline for the old version of LaTeX (2.09)
+\fi
+\documentclass{article}
+\usepackage{latexsym}
+\usepackage{ml}       % General TeX commands for MUltlog
+\usepackage{\jobname} % TeX commands specific to the particular logic; written by "ml_tex.pl".
+\usepackage{proof}    % Package by Makoto Tatsuta for typesetting Gentzen style proofs
+
+\title{Calculi for the \NameOfLogic\ Logic}
+\author{M.~Ultlog}
+
+\begin{document}
+\bibliographystyle{plain}
+\maketitle
+
+\begin{abstract}
+This paper introduces the reader to the 
+\NameOfLogic\ logic and to several
+related calculi.
+\end{abstract}
+
+\section{Introduction}
+
+Within the last years multiple-valued logics, introduced in the 1920's
+independently by {\L}ukasiewicz and Post, have attracted considerable
+attention by the computer science community due to their potential in the
+verification of soft- and hardware, in modelling epistemic states of
+knowledge in knowledge base systems etc.~\cite{Haehnle:93}.
+The practical success of a logic depends crucially on the availability of
+computational calculi for this logic.  Without such calculi, the study of
+a logic in relation to its application in computer science and artificial
+intelligence is destined to remain purely theoretical. In the case of
+many-valued logics, computational calculi can be given.
+
+Analytic calculi for many-valued logics have been known for quite some time.
+Sequent systems similar to those presented here have also been introduced by
+Schr\"oter~\cite{Schroeter:55}, Rousseau~\cite{Rousseau:67},
+Takahashi~\cite{Takahashi:67}, and Carnielli~\cite{Carnielli:91};
+equivalent tableaux formulations were given by Surma~\cite{Surma:77} and
+Carnielli~\cite{Carnielli:87} (H\"ahnle's work is based on the
+latter~\cite{Haehnle:91,Haehnle:92,Haehnle:93}). Many-valued natural deduction
+systems have been investigated in Baaz, Ferm\"uller and
+Zach~\cite{BaazFermZach93SMVL}. Calculi for automated theorem proving in
+many-valued logics are also legion.  Apart from H\"ahnle's work on
+tableaux-based theorem proving, various resolution methods have been proposed,
+e.g., by O'Hearn and Stachniak~\cite{StachniakOHearn:92} or Baaz and
+Ferm\"uller~\cite{BaazFerm92LPAR,BaazFerm95JSC}. For more detailed surveys of
+the work done in these areas see~\cite{Haehnle:93,Zach93DA}.
+
+In this paper we present optimized calculi for the \NoTVs-valued
+\NameOfLogic\ logic, applying the algorithms developed in
+Salzer~\cite{Salzer96CADE,Salzer96KGS}. After defining basic notions and
+notations in the next section, we define the \NameOfLogic\ logic in
+Section~\ref{sec:matrix}. The following sections are devoted to calculi
+for this logic: Section~\ref{sec:sequent} describes a sequent calculus, and
+Section~\ref{sec:natural} gives a natural deduction system. The paper
+concludes with an outlook on future research topics.
+
+\section{The Syntax of the \NameOfLogic\ Logic}\label{sec:prelim}
+
+
+%%% Language, Terms, Formulae, Conventions
+\begin{definition}
+
+% Giving different defs for propositional logic
+\ifprop
+   The {\em propositional language~\LL\/} for the \NameOfLogic\ logic
+   consists of
+   \begin{enumerate}
+   \item propositional variables: $x_0, x_1, x_2, \ldots$
+   \ifnum\NoOps>0
+   \item
+         \ifnum\NoOps>1
+            propositional connectives,
+         \else
+            one propositional connective,
+         \fi
+         arity given in parenthesis:
+         $\Opname1 (\Oparity1)$
+         \FOR \n=2 \TO \NoOps \DO
+            \ifnum\n=\NoOps 
+               ,~and~%
+            \else
+               ,
+            \fi 
+            $\Opname\n$\ ($\Oparity\n$)%
+         \ENDFOR\
+   \fi 
+   \item auxiliary symbols: ``('', ``)'' and ``,''
+   \end{enumerate}
+
+   \ifnum\NoOps=0 
+      Every propositional variable and every propositional connective of
+      arity 0, called a propositional constant, is a {\em formula}. It is
+      called {\em atomic} or an {\em atom}. The \NameOfLogic\ logic only
+      contains atomic \formulae.
+   \else
+      {\em \Formulae\/} are defined inductively:
+      \begin{enumerate}
+      \item Every propositional variable and every propositional connective of
+            arity 0, called a propositional constant, is a formula. It is
+            called {\em atomic} or an {\em atom}.
+      \item If $A_1,\ldots,A_n$ are \formulae\ and $\operator^n$ is
+            a propositional connective of arity~$n$, then
+            $\operator^n(A_1,\ldots,A_n)$ is a formula.
+      \end{enumerate}
+   \fi 
+\else
+   The {\em first order language~\LL\/} for the \NameOfLogic\ logic
+   consists of
+   \begin{enumerate}
+   \item free variables: $a_0, a_1, a_2, \ldots$
+   \item bound variables: $x_0, x_1, x_2, \ldots$
+   \item function symbols of arity $i (i \in {\bf N})$, including constants:
+         $f_0^i, f_1^i, f_2^i, \ldots$
+   \item predicate constants of arity $i (i \in {\bf N})$:
+         $P_0^i, P_1^i, P_2^i, \ldots$
+   \ifnum\NoOps>0 
+   \item
+         \ifnum\NoOps>1 
+            propositional connectives,
+         \else
+            one propositional connective,
+         \fi 
+         arity given in parenthesis:
+         $\Opname1 (\Oparity1)$
+         \FOR \n=2 \TO \NoOps \DO
+            \ifnum\n=\NoOps 
+               ~and~%
+            \else
+               ,
+            \fi 
+            $\Opname\n$\ ($\Oparity\n$)%
+         \ENDFOR\
+   \fi 
+   \ifnum\NoQus>0 
+   \item
+         \ifnum\NoQus=1 
+            one quantifier:
+         \else
+            quantifiers:
+         \fi 
+         $\Quname1$
+         \FOR \n=2 \TO \NoQus \DO
+            \ifnum\n=\NoQus
+               ~and~%
+            \else
+               ,
+            \fi 
+            $\Quname\n$
+         \ENDFOR\
+   \fi 
+   \item auxiliary symbols: ``('', ``)'' and ``,''
+   \end{enumerate}
+
+   {\em Terms\/} are defined inductively: Every individual constant, free
+   or bound variable is a term. If $f^n$ is a function symbol of arity~$n$,
+   and $t_1,\dots,t_n$ are terms, then~$f^n(t_1,\ldots,t_n)$ is a term.
+
+   {\em \Formulae\/} are also defined inductively:
+   \begin{enumerate}
+   \item If $P^n$ is a predicate symbol of arity~$n$, and
+         $t_1,\ldots,t_n$ are terms, then $P^n(t_1,\ldots,t_n)$ is
+         a formula. It is called {\em atomic} or an {\em atom}.
+   \ifnum\NoOps>0 
+      \item If $A_1,\ldots,A_n$ are \formulae\ and $\operator^n$ is
+            a propositional connective of arity~$n$, then
+            $\operator^n(A_1,\ldots,A_n)$ is a formula.
+   \fi 
+   \item If~$A$ is a formula not containing the bound
+         variable~$x$, $a$~is a free variable and $\quantor$ is a quantifier,
+         then $(\quantor x)A(x)$, where $A(x)$ is obtained from $A$ by
+         replacing $a$ by~$x$ at every occurrence of~$a$ in~$A$, is a formula.
+   \end{enumerate}
+   A formula is called {\em open}, if it contains free variables, and
+   {\em closed} otherwise.  A formula without quantifiers is called {\em
+   quantifier-free}.
+
+%The {\em depth\/} of a formula~$A$, or its {\em degree}~$\deg(A)$,
+%is inductively defined as follows:
+%\[
+%   \deg(A) = \Biggl\{ \begin{array}{ll}
+%            0 & $if $ A $ is atomic$ \\
+%            1 + \sum_{i = 1}^n \deg(A_i)
+%            & $if $ A \equiv \operator(A_1,\ldots,A_n) \\
+%            \deg(B)+1 & $if $ \equiv (\quantor x)B(x) \end{array}
+%\]
+\fi % 0 End of different defs for prop and non-prop logic.
+\end{definition}
+
+
+As a notational convention, lowercase letters
+\ifprop 
+   will be used to denote variables, possibly indexed.
+\else
+   from the beginning of the alphabet ($a, b, c,\ldots$) will be used
+   to denote free variables, $f, g, h, \ldots$ for function symbols and
+   constants, $x, y, z, \ldots$ for bound variables,
+   all possibly indexed.
+\fi 
+Uppercase letters $A, B, C, \ldots$ will stand
+for \formulae, greek letters $\Gamma, \Delta, \Lambda, \ldots$ for
+sequences and sets of
+\ifprop 
+   \formulae.
+\else
+   \formulae, $t$ and $s$ for terms.
+\fi
+\ifnum\NoOps>0 
+   \ifnum\NoQus>0
+      The symbols $\operator$ and $\quantor$ stand for general propositional
+      connectives and quantifiers, respectively.
+   \else
+      The symbol $\operator$ stands for general propositional connectives.
+   \fi
+\else
+   \ifnum\NoQus>0
+      The symbol $\quantor$ stands for general quantifiers.
+   \fi
+\fi
+
+\ifnotprop
+   \begin{definition}
+   We will use $\alpha$ as a variable for free variables ({\em eigenvariable})
+   and $\tau$ as a variable for terms ({\em term variable}). A formula
+   consisting of some formula variables, eigenvariables and term variables is
+   called a schema.
+
+   A {\em pre-instance\/} $A'$ of a schema $A$ is an actual formula from the
+   \formulae\ of $\LL$ which contains occurrences of the eigenvariables and
+   term variables of~$A$.
+
+   An {\em instance\/} $A''$ of $A$ is a pre-instance $A'$ of $A$, where the
+   eigenvariables and term variables have been replaced by free variables and
+   terms not occurring in $A'$.
+%%% Example wanted?
+% E.g.\ $A(\alpha,\tau)$ is a schema, $B_1(\alpha,x)\lor B_2(\alpha,\tau,y)$
+% is a pre-instance of $A$ and $B_1(z,x)\lor B_2(z,f_1(x),y)$ is an instance.
+\end{definition}
+\fi
+
+
+\section{The Semantics of the \NameOfLogic\ Logic}\label{sec:matrix}
+
+%%% Matrix
+\begin{definition}
+The {\em matrix\/} for the language $\LL$ of the \NameOfLogic\ logic
+is given by:
+\begin{enumerate}
+\item the set of {\em truth values\/}
+      $\TVs=\{\TV1\FOR\n=2\TO\NoTVs\DO,\TV\n\ENDFOR\}$,
+\item a subset $\TVs^+ \subseteq \TVs$ of {\em designated truth values},
+%\item for every propositional connective~\operator\ of arity $i$ and every
+%      quantifier~\quantor\ an associated truth function
+%      $\toperator \colon \TVs^i \to \TVs$ and
+%      $\widetilde{\quantor}\colon \wp(\TVs) \setminus \{\emptyset\} \to \TVs$
+%      respectively.
+\ifnum\NoOps>0
+   \item \ifnum\NoOps=1
+            for the propositional connective~$\Opname1$ the
+         \else
+            for every propositional connective~\operator\ an
+         \fi
+         associated truth function, as given below.
+\fi
+\ifnum\NoQus>0
+   \item \ifnum\NoQus=1
+            for the quantifier~$\Quname1$ the
+         \else
+            for every quantifier~\quantor\ an
+         \fi
+         an associated truth function, as given below.
+\fi
+\end{enumerate}
+\end{definition}
+
+
+%%% ***
+%%% Since we are now definitely distinguishing between prop and non-prop
+%%% logics the lines for no operators/no quantifiers have been removed
+%%% resp. commented out for now.
+
+% ----------- The Operators ------------
+\ifnum\NoOps=0
+   \ifnum\NoQus=0
+%      It is a very simple logic, as it contains neither
+%      operators nor quantifiers.
+   \else
+%      It contains no operators.
+   \fi
+\else
+   The truth function\PS{\NoOps} for connective\PS{\NoOps}
+   $\Opname1$%
+   \FOR \n=2 \TO \NoOps \DO
+      \ifnum\n=\NoOps
+         ~and~%
+      \else
+         ,
+      \fi
+      $\Opname\n$%
+   \ENDFOR\
+   \ARE{\NoOps} defined by
+   \begin{center}
+      $\Optab1$
+      \FOR \n=2 \TO \NoOps \DO
+         \hfill
+         $\Optab\n$
+      \ENDFOR
+   \end{center}
+\fi
+% ----------- The Quantifiers ------------
+\ifnum\NoQus=0
+   \ifnum\NoOps=0
+   \else
+%      The \NameOfLogic\ logic is purely propositional: it contains no
+%      quantifiers.
+   \fi
+\else
+   The truth function\PS{\NoQus} for quantifier\PS{\NoQus}
+   $\Quname1$%
+   \FOR \n=2 \TO \NoQus \DO
+      \ifnum\n=\NoQus
+         ~and~%
+      \else
+         ,
+      \fi
+      $\Quname\n$%
+   \ENDFOR\
+   \ARE{\NoQus} defined by
+   \begin{center}
+      $\Qutab1$
+      \FOR \n=2 \TO \NoQus \DO
+         \hfill
+         $\Qutab\n$
+      \ENDFOR
+   \end{center}
+\fi
+
+
+%%% Structure, Interpretation, Satisfiability
+
+\ifprop
+   \begin{definition}
+   Let $A$ be a formula and $x_0, x_1, \ldots, x_k$ the variables occurring
+   in $A$. Then an {\em interpretation\/} \I\ of $A$ is an assignment of truth
+   values to the variables.
+   \end{definition}
+
+   \ifnum\NoOps>0
+      \begin{definition}
+      Given an interpretation \I, we define the {\em valuation\/} $\val_{\I}$
+      for \formulae\ $A$ to truth values as follows:
+      \begin{enumerate}
+      \item If $A$ is atomic, then $\val_{\I}(A)$ simply is the interpretation
+            of $A$.
+      \item If $A=\operator(A_1,\ldots,A_n)$,
+            where $A_1,\ldots,A_n$ are \formulae, and $\toperator$ is the
+            associated truth function to $\operator$, then
+            $\val_{\I}(A)=\toperator\bigl(\val_{\I}(A_1),\ldots,\val_{\I}(A_n)\bigr)$.
+      \end{enumerate}
+      \end{definition}
+   \fi
+   \begin{definition}
+   A formula $A$ is called {\em satisfiable\/} iff there is an
+   interpretation~\I\ so that $\val_{\I}(A)\in \TVs^+$, in symbols $\I\models A$,
+   and {\em unsatisfiable\/} otherwise.
+   $A$ is called a {\em many-valued tautology\/} iff it is
+   satisfiable for every interpretation \I.
+   \end{definition}
+\else
+   \begin{definition}
+   A {\em structure\/} $\M = \langle D,\Phi_{\M}\rangle$ for
+   a language~\LL\ (an~\LL-structure) consists of the following:
+   \begin{enumerate}
+   \item A nonempty set $D$, called the {\em domain\/} (elements of $D$
+         are called {\em individuals}).
+   \item A mapping $\Phi_{\M}$ satisfying the following:
+         \begin{enumerate}
+         \item Each free variable of \LL\ is mapped to an element of $D$.
+         \item Each $n$-ary function symbol $f$ of \LL\ is mapped to a
+               function $f_{\M}:D^n \to D$, or to an element of $D$ if $n=0$.
+               Additionally, $\Phi_{\M}$ maps elements of $D$ to themselves.
+         \item Each $n$-ary predicate symbol $P$ of \LL\ is mapped to a
+               function $P_{\M}:D^n \to \TVs$, or to a element of $\TVs$ if $n=0$.
+         \end{enumerate}
+   \end{enumerate}
+   \end{definition}
+
+   \begin{definition}
+   Let \M\ be an \LL-structure. An {\em assignment\/}~$s$ is a mapping from
+   the free variables of \LL to individuals.
+
+   An {\em interpretation} $\I=\langle \M,s\rangle$ is an \LL-structure
+   $\M = \langle D,\Phi_{\M}\rangle$ together with an assignment $s$.
+   The mapping $\Phi_{\M}$ can be extended in the obvious way to a mapping
+   $\Phi_{\I}$ from terms to individuals:
+   \begin{enumerate}
+   \item If $t$ is a free variable, then $\Phi_{\I}\colon = s(t)$.
+   \item If $t$ is of the form $f(t_1,\ldots,t_k)$, where $f$ is a $k$-ary
+         function symbol and $t_1,\ldots,t_k$ are terms, then
+         $\Phi_{\I} := f_{\M}\bigl(\Phi_{\I}(t_1),\ldots,\Phi_{\I}(t_k)\bigr)$.
+   \end{enumerate}
+   \end{definition}
+
+   \begin{definition}
+   Given an interpretation $\I=\langle \M,s\rangle$, we define the
+   {\em valuation\/} $\val_{\I}$ for \formulae\ $A$ to truth values as follows:
+   \begin{enumerate}
+   \item If $A$ is atomic, $A=P(t_1,\ldots,t_n)$, where $P$ is
+         an $n$-ary predicate symbol and $t_1,\ldots,t_n$ are terms, then let
+         $\val_{\I}(A)=P_{\M}\bigl(\Phi_{\I}(t_1),\ldots,\Phi_{\I}(t_n)\bigr)$.
+   \ifnum\NoOps>0
+      \item If $A=\operator(A_1,\ldots,A_n)$,
+            where $A_1,\ldots,A_n$ are \formulae, and $\toperator$ is the
+            associated truth function to $\operator$, then
+            $\val_{\I}(A)=\toperator\bigl(\val_{\I}(A_1),\ldots,\val_{\I}(A_n)\bigr)$.
+   \fi
+   \item If $A=(\quantor x)(B(x))$, and $\tquantor$ is the
+         associated truth function to $\quantor$, then
+         $\val_{\I}(A)=\widetilde\quantor\bigl\{\val_{\I}(B(d))|d\in D\}\bigr)$.
+   \end{enumerate}
+   \end{definition}
+
+   \begin{definition}
+   A formula $A$ is called {\em satisfiable\/} iff there is an
+   interpretation~\I\ so that $\val_{\I}(A)\in \TVs^+$, in symbols $\I\models A$,
+   and {\em unsatisfiable\/} otherwise. $A$ is called a
+   {\em many-valued tautology\/} iff it is satisfiable for every
+   interpretation \I.
+   \end{definition}
+\fi
+
+%%% Signed Formulae
+
+\subsection*{Signed \Formulae}
+
+The truth of many-valued \formulae\ can be expressed by means of the
+truth of \formulae\ in two-valued logic:
+We ``sign'' a formula $A$ with a truth value~$v$ writing it as
+its exponent. The intended meaning is: $A^v$ is considered true
+if $A$ takes the truth value $v$ and false otherwise.
+
+\begin{definition}
+A {\em signed formula\/} is an expression of the form $A^v$, where $A$ is
+a many-valued formula and $v$ a truth value. A {\em signed formula
+expression\/} (sfe) is a formula built up from signed \formulae\
+using~$\sneg$, $\sor$, $\sand$, $\sall$ and $\sex$.
+
+A signed formula expression of the form $A^v$ or $\sneg A^v$ is called a
+{\em signed literal}. It is called an {\em atomic literal} iff $A$ is
+atomic or {\em signed atom}.
+\end{definition}
+
+Thus the logic of signed formula experssions is nothing but classical
+logic based on signed \formulae.
+
+% Thus signed formula expressions are Boolean expressions in the signed
+% \formulae\ and every interpretation defines a Boolean truth value assignment
+% to the signed \formulae\ and hence to the whole expression.
+
+%%% Do you want some more?...
+% \begin{definition}
+% An sfe $\Gamma$ is called satisfiable iff there is an interpretation so
+% that $\Gamma$ is true in the induced valuation. It is called {\em valid\/}
+% iff $\Gamma$ is satisfied by every interpretation.
+% \end{definition}
+
+% It is easy to see that $\sand$ and $\sor$ are associative, commutative
+% and that the distribution law holds. We therefore omit parenthesis with
+% the usual conventions: binary operators associate to the right and precedence
+% is given in the decreasing order $\sneg,\sand,\sor$.
+% If $A_1,\ldots,A_n$ are sfe, let $\bigsand_{i=1}^n A_i$
+% ($\bigsor_{i=1}^n A_i$) denote the sfe $A_1\sand \ldots \sand A_n$
+% ($A_1\sor \ldots \sor A_n$, respectively).
+
+
+
+\section{A Sequent Calculus for the \NameOfLogic\ Logic}\label{sec:sequent}
+
+
+%%% Syntax & Semantics of Sequents, Sequent Calculus
+
+\begin{definition}[Syntax of Sequents]
+A {\em sequent $\Gamma$\/} of {\bf L} is
+\ifnum\NoTVs=2
+   an ordered pair
+\else \ifnum\NoTVs=3
+      a triple
+\else \ifnum\NoTVs=4
+   a quadruple
+\else
+   a $\NoTVs$-tuple
+\fi
+\fi
+\fi
+%%% Idea: If we are dealing with excessively many TVs, we could insert
+%%% some dots instead of listing them all.
+$\Gamma_{\TV1} \FOR\n=2 \TO \NoTVs \DO | \Gamma_{\TV\n} \ENDFOR$,
+of finite sequences~$\Gamma_v$ of \formulae, where $v \in \TVs$.
+The $\Gamma_v$ are called the components of $\Gamma$.
+
+For a sequence of \formulae, $\Delta$, and $W \subseteq \TVs$,
+let $[W\colon \Delta]$ denote the sequent
+whose component $\Gamma_v$ is~$\Delta$ if $v \in W$ and empty otherwise.
+For $[\{w_1,\ldots, w_k\}\colon \Delta]$ we also write
+$[w_1,\ldots, w_k\colon \Delta]$.
+If $\Gamma$ and $\Gamma'$ are sequents, then $\Gamma, \Gamma'$ denotes the
+sequent $\Gamma_{\TV1},\Gamma'_{\TV1} | \ifnum\NoTVs>2 \ldots | \fi
+\Gamma_{\TV\NoTVs},\Gamma'_{\TV\NoTVs}$.
+\end{definition}
+
+\begin{definition}[Semantics of Sequents]
+Let \I\ be an interpretation. \I\ {\em satisfies\/} a sequent~$\Gamma$ iff
+there is a $v \in \TVs$ so that for some formula $A \in \Gamma_v$,
+$\val_\I(F) = v$.  \I\ is called a {\em model\/}
+of $\Gamma$, in symbols $\I \models \Gamma$.
+
+$\Gamma$ is called {\em satisfiable\/} iff there is an interpretation \I\
+so that $\I \models \Gamma$ and {\em valid\/} iff for every interpretation
+\I, $\I \models \Gamma$.
+\end{definition}
+
+\begin{definition}
+The {\em sequent calculus}~\SC\ for the \NameOfLogic\ is given by:
+\begin{enumerate}
+\item axiom schemas of the form $[\TVs \colon A]$,  % 1
+\item weakening rules for every truth value~$v$:       % 2
+      \[
+         \infer[$w:$v]{\Gamma, [v \colon A]}{\Gamma}
+      \]
+\item exchange rules for every truth value~$v$:        % 3
+      \[
+         \infer[$x:$v]{\Gamma, [v \colon B, A], \Delta}
+               {\Gamma, [v \colon A, B], \Delta}
+      \]
+\item contraction rules for every truth value~$v$:     % 4
+      \[
+         \infer[$c:$v]{\Gamma, [v \colon A]}{\Gamma, [v \colon A, A]}
+      \]
+\item cut rules for every two truth values $v \neq w$:        % 5
+      \[
+         \infer[$cut:$vw]{\Gamma, \Delta}
+               {\Gamma, [v \colon A] & \Delta, [w \colon A]}
+      \]
+\ifnum\NoOps>0
+   \item an introduction rule~$\operator \colon v$ for every
+         connective~\operator\ and every truth value $v$,
+         as specified \ifnum\NoQus>0 below, \else below. \fi  % 6
+\fi
+\ifnum\NoQus>0
+   \item an introduction rule~$\quantor \colon v$ for every
+         quantifier~\quantor\ and every truth value $v$,
+         as specified below,
+         where the free variables~$\alpha$ occurring in the
+         upper sequents satisfy the so-called {\em eigenvariable condition}:
+         No $\alpha$ occurs in the lower sequent.
+\fi
+\end{enumerate}                                  % 7
+(2)--(5) are called {\em structural rules}.
+\ifnum\NoOps>0
+   \ifnum\NoQus>0
+      (6) and (7) are
+   \else
+      (6) are
+   \fi
+   called {\em logical rules}.
+\else
+   \ifnum\NoQus>0
+      (6) are called {\em logical rules}.
+   \fi
+\fi
+\end{definition}
+
+
+\FOR \op=1 \TO \NoOps \DO
+   {\noindent
+    The introduction rules for connective $\Opname\op$ are given by
+    \begin{center}
+       \FOR \tv=1 \TO \NoTVs \DO
+          \hspace{2em}%
+          \mbox{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}%
+       \ENDFOR
+       \hspace{2em}
+    \end{center}
+   }
+\ENDFOR
+\FOR \qu=1 \TO \NoQus \DO
+   {\noindent
+    The introduction rules for quantifier $\Quname\qu$ are given by
+    \begin{center}
+       \FOR \tv=1 \TO \NoTVs \DO
+          \hspace{2em}%
+          \mbox{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
+       \ENDFOR
+       \hspace{2em}%
+    \end{center}
+   }
+\ENDFOR
+
+
+%%% Proofs, Theorems
+
+\begin{definition}[Proof]
+An upward tree~$P$ of sequents is called a {\em proof} in the sequent
+calculus~\SC\ iff every leaf is
+\ifnotprop an instance of \fi an axiom in~\SC, and
+all other sequents in it are obtained from the ones standing
+immediately above it by applying one of the rules of~\SC.
+The sequent at the root of~$P$ is called its {\em end-sequent}. A
+sequent~$\Gamma$ is called {\em provable} in \SC, in symbols:
+$\vdash^\SC \Gamma$ iff it is the end-sequent of some proof in~\SC.
+\end{definition}
+
+\begin{theorem}[Soundness and Completeness for \SC\ of the \NameOfLogic\ logic]
+A sequent is provable, if and only if it is valid.
+\end{theorem}
+
+For a proof of these theorems see Zach~\cite{Zach93DA}.
+
+
+
+
+\section{Natural Deduction}\label{sec:natural}
+
+
+%%% Natural Deduction Systems, Formulation
+
+Let $\Gamma$ be a (set) sequent, $\TVs^+ \subseteq \TVs$ the set of
+{\em designated truth values}.  The set of non-designated truth values is then
+$\TVs^- = \TVs\setminus \TVs^+$.  We divide the sequent $\Gamma$ into its
+designated part $\Gamma^+$ and its non-designated part $\Gamma^-$ in
+the obvious way:
+\begin{eqnarray*}
+   \Gamma^+ & := & \langle \Gamma_v \mid v \in \TVs^+ \rangle \\
+   \Gamma^- & := & \langle \Gamma_v \mid v \in \TVs^- \rangle
+\end{eqnarray*}
+
+\begin{definition}
+The {\em natural deduction system} for the \NameOfLogic\ logic is given by:
+\begin{enumerate}
+\item Assumptions of the form $[\TVs^- \colon A]$ where $A$ is any formula.
+\item A weakening rule for all $v \in \TVs^+$:
+      \[
+         \infer[$w$\colon v]{\Gamma^+, [v \colon A]}{\deduce{\Gamma^+}{\Gamma^-}}
+      \]
+Weakenings are considered as introduction rules.
+\ifnum\NoOps>0
+   \item For every connective $\Box$ and every truth value $v$ an
+         introduction rule $\Box$:I$_v$ (if $v \in \TVs^+$) or an elimination
+         rule $\Box$:E$_v$ (if $v \in \TVs^-$).
+\fi
+\ifnum\NoQus>0
+   \item For every quantifier \quantor\ and every truth value $v_i$ an
+         introduction rule \quantor:I$_i$ (if $v_i \in \TVs^+$) or an
+         elimination rule~\quantor:E$_i$ (if $v_i \in \TVs^-$).
+\fi
+\end{enumerate}
+\end{definition}
+
+
+
+
+\FOR \op=1 \TO \NoOps \DO
+   {\noindent
+    The introduction and elimination rules for connective $\Opname\op$ are given by
+    \begin{center}
+       \FOR \tv=1 \TO \NoTVs \DO
+          \hspace{2em}%
+          \mbox{\infer[\Opname\op{:}\NDEI\tv_{\TV\tv}]{\NDOpconcl{\op}{\tv}}{\NDOpprems{\op}{\tv}}}%
+       \ENDFOR
+       \hspace{2em}%
+    \end{center}
+   }
+\ENDFOR
+\FOR \qu=1 \TO \NoQus \DO
+   {\noindent
+    The introduction and elimination rules for quantifier $\Quname\qu$ are given by
+    \begin{center}
+       \FOR \tv=1 \TO \NoTVs \DO
+          \hspace{2em}%
+          \mbox{\infer[\Quname\qu{:}\NDEI\tv_{\TV\tv}]{\NDQuconcl{\qu}{\tv}}{\NDQuprems{\qu}{\tv}}}%
+       \ENDFOR
+       \hspace{2em}%
+    \end{center}
+   }
+\ENDFOR
+
+
+
+%%% Natural Deduction Systems, Misc.
+
+\begin{definition}
+A {\em natural deduction derivation} is defined inductively as follows:
+\begin{enumerate}
+\item Let $A$ be any formula. Then
+      \[
+         \infer{ [\TVs^+ \colon A] }{ [\TVs^- \colon A]}
+      \]
+      is a derivation of $A$ from the assumption $[\TVs^- \colon A]$
+      (an {\em initial derivation}).
+\item If $D_k$ are derivations of $\Gamma_k^+, \Delta_k^+$ from the
+      assumptions $\Gamma_k^-, \hat{\Delta}_k^-$, and
+      \[
+         \infer{\Pi^+}
+               {\left\langle
+               \begin{array}{c}
+                  \Gamma_k^-, \lceil \Delta_k^- \rceil \\
+                  \Gamma_k^+, \Delta_k^+
+               \end{array}
+               \right\rangle_{k \in K}}
+      \]
+      is an instance of a deduction rule with $\hat{\Delta}_k^-$ a
+      subsequent of $\Delta_k^-$,
+      and all eigenvariable conditions are satisfied, then
+      \[
+         \infer{\Pi^+}{\langle D_k \rangle_{k \in K}}
+      \]
+      is a derivation of $\Pi^+$ from the assumptions
+      $\bigcup_{k \in K}\Gamma_k^-$.
+      The \formulae\ in $\hat{\Delta}_k^-$ which do not occur in
+      $\bigcup_{k \in K} \Gamma_k^-$
+      are said to be {\em discharged} at this inference.
+\end{enumerate}
+\end{definition}
+
+
+\begin{definition}
+We call a formula occurrence $A$
+\begin{enumerate}
+\item the {\em conclusion formula} of an introduction, if it is the formula
+      being introduced, i.e., it is $F$ in the conclusion $[i \colon F]$;
+\item a {\em premise formula} of an introduction, if it is one of the \formulae\
+      in $\Delta'_{f\colon i}(j)^+$ in that introduction;
+\item a {\em major premise formula} of an elimination, if it is among the
+      formula being eliminated, i.e., in the major premise $[\TVs^+ \colon F]$;
+\item a {\em minor premise formula} of an elimination, if it is among
+      the \formulae\ in $\Delta'_{f\colon i}(j)^+$ in that elimination,
+\item a {\em discharged assumption formula} of an elimination, if
+      it stands immediately below an assumption which contains
+      the \formulae\ in $\Delta'_{f\colon i}(j)^-$ being discharged
+      at that elimination.
+\end{enumerate}
+A formula occurrence $A$ is said to {\em follow} $A'$, if both
+are of the same form and $A'$ stands immediately above $A$
+at the same position.
+\end{definition}
+
+\begin{theorem}[Soundness]
+If a partial sequent $\Gamma^+$ can be derived from the
+assumptions $\Gamma^-$, then the following holds for every
+interpretation~$\I$:
+If no formula in $\Gamma^-_v$ ($v \in \TVs^-$) evaluates
+to the truth value $v$, then there is a $w \in \TVs^+$ and a formula
+in $\Gamma^+_w$ that evaluates to $w$.
+\end{theorem}
+
+\begin{theorem}[Completeness]
+Natural deduction systems are complete.
+\end{theorem}
+
+For a proof see Zach~\cite{Zach93DA}.
+
+
+
+\section{Clause Formation Rules}\label{sec:clauses}
+
+
+%%% Clause Formation Calculi, Clauses, Semantics of Clauses
+
+\begin{definition}
+A {\em (many-valued) clause~$C = \{ A_1^{w_1}, \ldots, A_n^{w_n}\}$} is a
+finite set of signed atoms (proper clause).
+The empty clause is denoted by $\Box$.
+% The {\em atom set~at$(C)$} of a clause $C$ is
+% the set of its atomic \formulae:
+% at$(C) = \{A_1, \ldots, A_n\}$.
+
+An {\em extended clause} is a finite set of signed \formulae.
+\end{definition}
+
+\begin{definition}[Semantics of Clauses and Sets of Clauses]
+We translate clauses (clause sets) into signed formula expression by
+defining:
+\begin{eqnarray*}
+   \mbox{sfe}(\Clause) \defeq \sall \vec{x} \Sor_{L \in \Clause} L \\
+   \mbox{sfe}({\ClauseSet}) \defeq \Sand_{\Clause \in \ClauseSet}
+   \mbox{sfe}(\Clause)
+\end{eqnarray*}
+Satisfiability and validity can then be expressed in terms of sfes:
+A clause $\Clause$ (clause set $\ClauseSet$) is satisfiable (valid),
+if and only if sfe$(\Clause)$ (sfe$(\ClauseSet)$) is satisfiable (valid).
+\end{definition}
+
+%%% I assume that the general definition for the translation rules
+%%% are not required as they weren't for int rules at SC and ND.
+% \begin{definition}
+% Let $\bigsand_{j \in I}\Delta_{\operator\colon i}(j)$ be an
+% $i$-th~partial normal form of $\operator(A_1, \ldots, A_n)$, where $\operator$
+% is of arity~$n$, $\Delta_{\operator\colon i}(j)$ is a disjunction of signed
+% atoms of the form $A_i^w$ ($1 \le i \le n$), and let
+% $\Delta'_{\operator\colon i}(j)$ be the clause corresponding
+% to~$\Delta_{\operator\colon i}(j)$
+%
+% A {\em translation rule for~$\operator$ at place~$i$}
+% is a schema of the form:
+% \[
+ %   \infer[\operator$:$i]
+%          {\C \cup \bigl\{
+%          C \cup \Delta'_{\operator\colon i}(j)
+%          \mid j \in I\}\bigr\}}
+%          {\C \cup \bigl\{C \cup \{\operator(A_1,\ldots, A_n)^{v_i}\}\bigr\}}
+% \]
+% \end{definition}
+%
+% \begin{definition}
+% Let $\bigsand_{j \in I}\Delta_{\quantor\colon i}(j)$ be an
+% $i$-th partial normal form of $(\quantor x)A(x)$, where
+% $\Delta_{\quantor\colon i}(j)$ is a disjunction of signed
+% atoms of the form $A(\tau_i)^w$ ($1 \le i \le p$) respectively
+% $A(\alpha_i)^w$ ($1 \le i \le q$), and let
+% $\Delta'_{\quantor\colon i}(j)$ be the clause corresponding
+% to~$\Delta_{\quantor\colon i}(j)$.
+%
+% A {\em translation rule for~$\quantor$ at place~$i$}
+% is a schema of the form:
+% \[
+%    \infer[\operator \colon i]
+%          {\D = \C \cup \bigl\{
+%          C \cup \Delta''_{\quantor\colon i}(j)
+%          \mid j \in I\}\bigr\}}
+%          {\E = \C \cup \bigl\{C \cup
+%          \{ \bigl((\quantor x)A(x)\bigr)^{v_i} \}\bigr\}}
+% \]
+% where $\Delta''_{\quantor\colon i}(j)$ is obtained
+% from $\Delta'_{\quantor\colon i}(j)$ by
+% \begin{enumerate}
+% \item replacing term variables $\tau_i$ by terms of the form
+%       $f_i(a_1, \ldots, a_k)$, where $f_i$ are distinct new $k$-ary
+%       function symbols and $a_1$, \dots, $a_k$ are all free variables in
+%       $C \cup \{ \bigl((\quantor x)A(x)\bigr)^{v_i}\}$, and by
+% \item replacing eigenvariables $\alpha_i$ by distinct new free
+%       variables $b_i$ (not occurring in \E).
+% \end{enumerate}
+% \end{definition}
+
+
+\FOR \op=1 \TO \NoOps \DO
+   {\noindent
+    The clause formation rules for connective $\Opname\op$ are given by
+    \begin{center}
+       \FOR \tv=1 \TO \NoTVs \DO
+          \hspace{2em}%
+          \mbox{\infer[\Opname\op{:}\TV\tv]%
+                      {\ClauseSet\ClOpconcl{\op}{\tv}}%
+                      {\ClauseSet\ClOpprem {\op}{\tv}}%
+               }%
+       \ENDFOR
+       \hspace{2em}
+    \end{center}
+   }
+\ENDFOR
+\FOR \qu=1 \TO \NoQus \DO
+   {\noindent
+    The clause formation rules for quantifier $\Quname\qu$ are given by
+    \begin{center}
+       \FOR \tv=1 \TO \NoTVs \DO
+          \hspace{2em}%
+          \mbox{\infer[\Quname\qu{:}\TV\tv]%
+                      {\ClauseSet\ClQuconcl{\qu}{\tv}}%
+                      {\ClauseSet\ClQuprem {\qu}{\tv}}%
+               }%
+       \ENDFOR
+       \hspace{2em}%
+    \end{center}
+   }
+\ENDFOR
+
+
+%%% Clause Formation Calculi, Soundness, Completeness
+
+% I am assuming here that the CFC-chapter is entirely skipped, if
+% neither connectives nor quantifiers are defined.
+\begin{theorem}
+Let {\cal D} be the result of exhaustively applying the translation rules
+to a clause set $\ClauseSet$. Then {\cal D} is a set of proper clauses, i.e.\
+{\cal D} contains only signed atoms%
+\ifnum\NoOps>0%
+   \ifnum\NoQus>0%
+      \ (all many-valued connectives and quantifiers are eliminated)%
+   \else
+      \ (all many-valued connectives are eliminated)%
+   \fi
+\else
+   \ifnum\NoQus>0%
+      \ (all many-valued quantifiers are eliminated)%
+   \fi
+\fi
+. Furthermore, {\cal D}~is equivalent to $\ClauseSet$ with respect to
+satisfiability.
+\end{theorem}
+
+\section{Future directions of research}
+
+In this paper we presented an optimal sequent calculus, an optimal natural
+deduction system, and optimal clause formation rules.
+Currently we are searching
+for optimized versions of other
+calculi for the \NameOfLogic\ logic, like tableau systems or 
+negative variants of sequent calculus.
+Another interesting topic are calculi based
+on sets as signs~\cite{Haehnle:93}.
+On the practical side, we intend to implement the calculi in a prototype using
+Prolog.
+
+\section*{Acknowledgements}
+
+I am deeply indebted to my creators. In particular I would like to thank
+M.~Baaz, C.~Ferm\"uller and R.~Zach for laying the foundations, and G.~Salzer
+for calling me into existence. Last but not least, I am grateful to
+A.~Leitgeb, W.~Nix and M.~Schranz for their cosmetical surgery,
+greatly enhancing my outward appearance.
+
+\bibliography{ml}
+
+\end{document}
+
