@@ -78,7 +78,7 @@ https://github.com/rzach/multlog
 ## 2.2 Running the installation script
 
 As of version 1.05, MUltlog comes with an installation script for
-Linux. Before running the script,
+Linux. Before running the script:
 
 - decide which Prolog to use. The script will look for SWI-Prolog,
   SICStus, and BinProlog in some standard locations, and suggest the
@@ -87,7 +87,7 @@ Linux. Before running the script,
 - decide where to put MUltlog. If run as root, the default locations
   are `/usr/local/bin` for executables, `/usr/local/lib` for library
   files, and `/usr/share/doc` for documentation. If not run as root,
-  the script will install into ~/.local/bin, `~/.local/lib`, and
+  the script will install into `~/.local/bin,` `~/.local/lib`, and
   `~/.local/doc`. Note that these directories must exist; the script
   will not try to create them.
 
@@ -256,12 +256,13 @@ the various options mean.
 The installation script may produce the following warnings
 and errors.
 
-- "Error: <directory> does not exist."
+- "Error: `<directory>` does not exist."
 
   The installation script did not find the directory for executables,
   library, or documentation (`/usr/local/bin`, `/usr/local/lib`, and
-  `/usr/share/doc` by default). Create the directories before running
-  the script.
+  `/usr/share/doc` or `~/.local/bin`, `~/.local/lib`, `~./local/doc`
+  by default). Create the directories before running the script or 
+  select different directories when prompted.
 
 - "Error: could not find Unix command `<command>`."
   where `<command>` is one of
@@ -277,8 +278,8 @@ and errors.
   `<command>` and put it on your command search path during
   installation.
 
-  If your Unix system does not have `<command>` at all, send a bug
-  report to MUltlog@logic.at.
+  If your Unix system does not have `<command>` at all, submit an 
+  issue on https://github.com/rzach/multlog/.
 
 - "Warning: could not find TeX command `<command>`."
   where `<command>` is one of
@@ -334,7 +335,7 @@ and errors.
   ```
   is checked for the string "gernot". If `<command>` is a Prolog
   system but fails this test, or if it is no Prolog system but passes
-  the test, send a bug report to MUltlog@logic.at.
+  the test, submit an issue on https://github.com/rzach/multlog/.
 
 ### 6.2 Runtime errors
 
@@ -347,13 +348,13 @@ and errors.
 
   Solutions (alternatives):
 
-  -  Switch to SWI Prolog which  is faster and more robust.  You will
-     have to re-install Multlog after SWI-Prolog is in its place.
-  -  Re-install MUltlog using BinProlog with the option `-h 1024` (or
-     some bigger value). When the installation script asks for the
-     Prolog to be used, type e.g. `/usr/local/bin/bp -h 1024`. Note
-     that adding options to the Prolog call only works with MUltlog
-     1.06 or higher.
+  - Switch to SWI Prolog which  is faster and more robust.  You will
+    have to re-install Multlog after SWI-Prolog is in its place.
+  - Re-install MUltlog using BinProlog with the option `-h 1024` (or
+    some bigger value). When the installation script asks for the
+    Prolog to be used, type e.g. `/usr/local/bin/bp -h 1024`. Note
+    that adding options to the Prolog call only works with MUltlog
+    1.06 or higher.
   - Add the option `-h 1024` by hand. To this aim, edit the files
     ```
     /usr/local/bin/lgc2tex
@@ -362,12 +363,12 @@ and errors.
     /usr/local/lib/multlog/ilc/lgc2ilc
     ``` 
     Near their top there is a line starting with `PROLOG=`. Replace
-     this line e.g. by 
-     ```
-     PROLOG='/usr/local/bin/bp -h 1024'
-     ```
-     Make sure that the files have still execute permission after
-     saving.
+    this line e.g. by 
+    ```
+    PROLOG='/usr/local/bin/bp -h 1024'
+    ```
+    Make sure that the files have still execute permission after
+    saving.
 
 ## 7. About MUltlog
 
