@@ -264,11 +264,10 @@ and errors.
   the script.
 
 - "Error: could not find Unix command `<command>`."
-
-  Where `<command>` is one of
-
-     basename chmod cp dirname false grep mkdir pwd rm sed true.
-
+  where `<command>` is one of
+  ```
+  basename chmod cp dirname false grep mkdir pwd rm sed true.
+  ```
   The installation script and the scripts for starting MUltlog
   (`lgc2tex`, `lgc2dvi`, `lgc2pdf`, and `lgc2ilc`) need these Unix
   commands. The error message means that <command> could not be
@@ -282,11 +281,10 @@ and errors.
   report to MUltlog@logic.at.
 
 - "Warning: could not find TeX command `<command>`."
-
   where `<command>` is one of
-
-    latex bibtex.
-
+  ```
+  latex bibtex.
+  ```
   The script `lgc2dvi` needs latex and bibtex to produce a DVI-file
   from the TeX document created by MUltlog. The warning means that
   `<command>` could not be located, neither on the current command
@@ -301,7 +299,7 @@ and errors.
 
 - "Warning: couldn't find any PDF converters."
 
-  The script "lgc2pdf" needs either `pdflatex` or `latex`, `dvips`
+  The script `lgc2pdf` needs either `pdflatex` or `latex`, `dvips`
   and `ps2pdf` to produce a PDF-file from the TeX document created by
   MUltlog. The warning means that either `pdflatex` or `dvips` and `ps2pdf`
   could not be located, neither on the current command search path nor
@@ -331,9 +329,9 @@ and errors.
   exists but fails the test performed by the installation
   script. This test is a heuristic check whether `<command>`
   is indeed a Prolog system; more precisely, the output of
-
-    echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
-
+  ```
+  echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
+  ```
   is checked for the string "gernot". If `<command>` is a Prolog
   system but fails this test, or if it is no Prolog system but passes
   the test, send a bug report to MUltlog@logic.at.
@@ -371,8 +369,7 @@ and errors.
      Make sure that the files have still execute permission after
      saving.
 
-7. About MUltlog
-================
+## 7. About MUltlog
 
 The following people contributed to MUltlog (in alphabetical order):
 
@@ -392,5 +389,5 @@ Vienna, July 11, 2001                 Gernot Salzer, salzer@logic.at
 ## Changelog
 
 | Version | Date | | Author|
-|---|---|---|---|---|
+|---|---|---|---|
 | 1.12 | 2020-10-20 | Update install scripts and README | rzach |
