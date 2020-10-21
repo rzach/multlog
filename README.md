@@ -385,9 +385,3 @@ The following people contributed to MUltlog (in alphabetical order):
 (eLK, JMUltlog, and the web interface are no longer available.)
 
 Vienna, July 11, 2001                 Gernot Salzer, salzer@logic.at
-
-## Changelog
-
-| Version | Date | | Author|
-|---|---|---|---|
-| 1.12 | 2020-10-20 | Update install scripts and README | rzach |
