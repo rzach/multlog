@@ -14,7 +14,7 @@ proc getfilename {text fnvar} { global fileDLGname fileDLGok
     set fileDLGname $filename; $w.e selection range 0 end
     frame $w.b
     button $w.b.ok -text "Ok" -command {set fileDLGok 1}
-    button $w.b.cancel -text "go back"  -command {set fileDLGok 0}
+    button $w.b.cancel -text "Cancel"  -command {set fileDLGok 0}
     pack $w.b.ok $w.b.cancel -side left -fill x
     pack $w.lab $w.e $w.b -side top -fill x
 

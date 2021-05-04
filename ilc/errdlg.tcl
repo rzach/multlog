@@ -11,7 +11,7 @@ proc errorDLG {} { global FV FF FBV errorDLGmessages errorDLGtargets
     wm protocol $w WM_DELETE_WINDOW {ifnograb errorDLGdismiss}
     wm transient $w [winfo toplevel [winfo parent $w]]
 
-    label $w.title -font $FBV -text "Errors in Specification:" -justify center
+    label $w.title -font $FBV -text "Errors in specification:" -justify center
     text $w.text -font $FF -wrap none -yscrollcommand [list $w.scroll set] \
               -setgrid true -width 60 -height 24 -$HT 0
     scrollbar $w.scroll -command [list $w.text yview] -$HT 0

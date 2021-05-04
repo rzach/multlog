@@ -2,7 +2,7 @@ proc desigTV {} { global tv ntv maxlen WinCnt
     if {[winfo exist .desigTV]} return
     incr WinCnt
     toplevel .desigTV
-    wm title .desigTV "Designate Truthvalues"
+    wm title .desigTV "Designated truth values"
     wm iconname .desigTV "des.TV"
     wm protocol .desigTV WM_DELETE_WINDOW {ifnograb desigTVcancel}
     

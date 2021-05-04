@@ -35,7 +35,7 @@ fi
 
 logfile=$file.mlg
 
-for ext in tex sty aux log bbl blg dvi mlg ilc
+for ext in tex sty aux log bbl out blg dvi mlg ilc
 do
    if [ -f $file.$ext ]
    then
@@ -56,20 +56,16 @@ EndPROLOG
 if [ -f "$file.sty" ]
 then
   $CP $MLPATH/ml.tex $file.tex
-  $CP $MLPATH/ml.sty .
   $CP $MLPATH/ml.bib .
   $CP $MLPATH/proof.sty .
-  $RM $logfile
   echo
   echo "Your paper '$file.tex' is now ready for TeXing."
   echo
   echo "Use the commands:"
-  echo "   latex $file"
+  echo "   pdflatex $file"
   echo "   bibtex $file"
-  echo "   latex $file"
-  echo "   latex $file"
-  echo "Viewing:"
-  echo "   xdvi $file &"
+  echo "   pdflatex $file"
+  echo "   pdflatex $file"
 else
   echo "$prg: Some error happened. See $logfile for more information."
   exit 1

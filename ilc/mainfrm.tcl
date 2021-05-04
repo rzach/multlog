@@ -44,8 +44,8 @@ pack .menu.file -side left
 # menu help
 menubutton .menu.help -text "Help" -menu .menu.help.m -underline 0 -takefocus 0
 menu .menu.help.m -tearoff 0 -postcommand [list OnOpenHelpMenu .menu.help.m]
-.menu.help.m add command -label "Show Errors" -underline 0 -command {edit_item error}
-.menu.help.m add command -label "Reset Errors" -underline 0 -command {errorDLGclear}
+.menu.help.m add command -label "Show errors" -underline 0 -command {edit_item error}
+.menu.help.m add command -label "Reset errors" -underline 0 -command {errorDLGclear}
 .menu.help.m add separator
 .menu.help.m add command -label "About ..." -underline 0 -command menu.about
 pack .menu.help -side right
@@ -53,7 +53,7 @@ pack .menu.help -side right
 # oben
 frame .top -bd 2 -relief raised 
 frame .top.1 -relief sunken -bd 1
-label .top.label -text "Name of Logic:"
+label .top.label -text "Name of logic:"
 entry .top.entry -width 20 -textvariable logicname
 pack .top.label .top.entry -in .top.1 -side left -expand yes
 pack .top.1 -fill x -expand yes
@@ -63,7 +63,7 @@ focus .top.entry
 frame .mid -bd 2 -relief raised; frame .mid.0 -bd 1 -relief sunken 
 # mitte - oben
 frame .mid.1
-label .mid.lab1 -text "Truthvalues:\n(``,'' is separator)"
+label .mid.lab1 -text "Truth values:\n(separate by comma)"
 entry .mid.list -textvariable tv_str
 pack .mid.lab1 .mid.list -in .mid.1 -side left -expand yes
 pack .mid.1 -in .mid.0 -fill x -side top
@@ -72,7 +72,7 @@ frame .mid.2 -bd 0; frame .mid.3 -bd 0
 button .mid.auto; upd_autogen 
 label .mid.lab2 -text "Number:"
 entry .mid.num -textvariable gntv -width 3 -state disabled -relief flat
-button .mid.desig -text "\"true\"" -command designate -state disabled
+button .mid.desig -text "Designated" -command designate -state disabled
 pack .mid.lab2 .mid.num -in .mid.3 -side left -expand no
 pack .mid.auto .mid.3 .mid.desig -in .mid.2 -side left -expand yes
 pack .mid.2 -in .mid.0 -fill x -side bottom
@@ -82,7 +82,7 @@ pack .mid.0 -fill x
 frame .bot -bd 2 -relief raised
 # unten - links
 frame .bot.1 -bd 1 -relief sunken
-label .bot.lab -text "already defined:"
+label .bot.lab -text "Already defined:"
 listbox .bot.lb -exportselection no -selectmode browse \
                 -width 15   -yscrollcommand ".bot.sb set" -takefocus 0
 scrollbar .bot.sb -takefocus 0 -command ".bot.lb yview"
@@ -92,11 +92,11 @@ pack .bot.lb     -in .bot.1 -side right -fill both -expand yes
 pack .bot.1 -side left -fill both -expand yes
 # unten - rechts
 frame .bot.2 -bd 1 -relief sunken
-button .bot.butt1 -text "New Operator" -command newOP 
-button .bot.butt2 -text "New Quantifier" -command newQU
-button .bot.butt5 -text "New Ordering" -command newORD
-button .bot.butt3 -text "Edit Selected" -state disabled -command {edit_item -}
-button .bot.butt4 -text "Kill Selected" -state disabled -command kill_item
+button .bot.butt1 -text "New operator" -command newOP 
+button .bot.butt2 -text "New quantifier" -command newQU
+button .bot.butt5 -text "New ordering" -command newORD
+button .bot.butt3 -text "Edit selected" -state disabled -command {edit_item -}
+button .bot.butt4 -text "Delete selected" -state disabled -command kill_item
 pack .bot.butt1 .bot.butt2 .bot.butt5 .bot.butt3 .bot.butt4 -in .bot.2 \
     -side top -fill both -expand yes
 pack .bot.2 -side right -fill y

@@ -104,7 +104,7 @@ proc makeTV {} {
     set natlist [natlist $ntv]
     foreach i $natlist { 
         if { [t2n [n2t $i]] != $i } {
-            set errstr "Error: Truthvalue not unique"
+            set errstr "Error: Truth value not unique"
             set errind [string last ",[n2t $i]," ",$tv_str,"]
             ResetValid; return 0
         } 

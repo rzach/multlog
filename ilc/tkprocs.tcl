@@ -307,7 +307,7 @@ proc finish {} { global changed
 proc menu.about {} { global ILCPATH
     tk_dialog .about About \
         "interactive Logic Creator\nVersion @ilc_version@\n by A. Leitgeb" \
-        @${ILCPATH}ilc.xbm 0 "  Worship  Author  "
+        @${ILCPATH}ilc.xbm 0 "  Author  "
 }
 
 proc checkTV {} {

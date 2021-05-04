@@ -68,6 +68,7 @@ tex_out(FN, CFN) :-
 	   print_phrase(texOpRule(Op, TV, Cnf, TVs)),
 	   print_phrase(texNDOpRule(Op, TV, Cnf, TVs, DTVs)),
 	   print_phrase(texClOpRule(Op, TV, Cnf)),
+	   print_phrase(texTabOpRule(Op, TV, Cnf)),
 	   fail
 	;  true
 	),
@@ -75,6 +76,7 @@ tex_out(FN, CFN) :-
 	   print_phrase(texQuRule(Qu, TV, Cnf, TVs)),
 	   print_phrase(texNDQuRule(Op, TV, Cnf, TVs, DTVs)),
 	   print_phrase(texClQuRule(Qu, TV, Cnf)),
+	   print_phrase(texTabQuRule(Qu, TV, Cnf)),
 	   fail
 	;  true
 	),
@@ -146,6 +148,7 @@ texOp(Op, S, TVs) -->
 	{Op=N/A},
 	def(texopname(Op),  texName(N)),
 	def(texoparity(Op), str(A)),
+	def(texopfmla(Op), texOpExprStrict(A, N)),
 	\\def, texoptab(Op), "{%", eol,
 	texOpSpec(A, Op, S, TVs), "%", eol,
 	"}", eol.
@@ -157,13 +160,14 @@ texOpSpec(2, Op, S, TVs)      -->
 	!,
 	{opmap2textab(S, TVs, Lines), ml_length(TVs,L)},
 	"   ", \\begin, "{array}{c|*{", str(L), "}{c}}", eol,
-	"   ", texopname(Op), " & ", texTVs(TVs, " & "), " ", bsbs, \\hline, eol,
+	"   ", \\widetilde, "{", texopname(Op), "} & ", 
+	texTVs(TVs, " & "), " ", bsbs, \\hline, eol,
 	texOpTabLines(Lines), eol,
 	"   ", \\end, "{array}".
 texOpSpec(_, Op, S, TVs)      -->
 	{opmap2tex(S, TVs, Lines)},
 	"   ", \\begin, "{array}{c|l}", eol,
-	"   ", texopname(Op), " & ", bsbs, \\hline, eol,
+	"   ",\\widetilde,"{", texopname(Op), "} & ", bsbs, \\hline, eol,
 	texOpMapLines(Lines), eol,
 	"   ", \\end, "{array}".
 
@@ -199,7 +203,7 @@ texQu(Qu, S, TVs) -->
 texQuSpec(Qu, S, TVs) -->
 	{qumap2tex(S, TVs, Lines)},
 	"   ", \\begin, "{array}{c|l}", eol,
-	"   ", texquname(Qu), " & ", bsbs, \\hline, eol,
+	\\widetilde,"{", texquname(Qu), "} & ", bsbs, \\hline, eol,
 	texQuMapLines(Lines), eol,
 	"   ", \\end, "{array}".
 
@@ -224,6 +228,8 @@ texOpRule(Op, TV, Cnf, TVs) -->
 texOpConcl(N/A, TV) -->
 	\\'Gamma', ", [", textv(TV), \\colon, " ", texOpExpr(A, N), "]".
 
+% texOpExpr(Arity,N) - write atomic formula with connective N: eg: A \land B
+
 texOpExpr(0, N) -->
 	!,
 	texName(N).
@@ -236,11 +242,24 @@ texOpExpr(2, N) -->
 texOpExpr(A, N) -->
 	texName(N), "(", texOpExprArgs(1, A), ")".
 
+% texOpExprStrict(Arity,N) - write atomic formula with connective N, 
+% but with parens if needed: eg: (A \land B)
+
+texOpExprStrict(2, N) -->
+	{texInfix(N)},
+	!,
+	"(", texOpExpr(2, N), ")".
+texOpExprStrict(A, N) -->
+	texOpExpr(A, N).
+
+% texOpExprArgs(N,Arity) - write list of N schematic arguments.
+
 texOpExprArgs(A, A) -->
 	texOpAtom(A).
 texOpExprArgs(I, A) -->
 	{I < A, I1 is I+1},
-	texOpAtom(I), ",", texOpExprArgs(I1, A).
+	texOpAtom(I), ",", 
+	texOpExprArgs(I1, A).
 
 texOpPrems([])     -->
 	"".
@@ -322,6 +341,7 @@ texQuAtomArg(t(_I), c(_,1)) -->
 	\\tau.
 texQuAtomArg(t(I), _)       -->
 	\\tau,   "_{", str(I), "}".
+
 
 texNDOpRule(Op, TV, Cnf, TVs, DTVs) -->
 	{split_cnf(Cnf, DTVs, NCnf, PCnf),
@@ -559,13 +579,100 @@ texClQuAtomArg(a(I), _)       -->
 	"b_{", str(I), "}".
 texClQuAtomArg(t(_I), c(_,1)) -->
 	!,
-	"f(", \\vec, "{y})".
+	"f(", \\vec, "{a})".
 texClQuAtomArg(t(I), _)       -->
-	"f_{", str(I), "}(", \\vec, "{y})".
+	"f_{", str(I), "}(", \\vec, "{a})".
 
 texClQuPrem(Qu, TV) -->
 	\\cup, \\'{', \\'Clause', \\cup, \\'{', "((", texName(Qu), \\(','), "x)A(x))^",
         textv(TV), \\'}', \\'}'.
+
+% Tableaux
+
+
+texTabOpRule(Op, TV, Cnf) -->
+	\\def, textabopconcl(Op, TV), eol,
+	"   {", texTabOpConcl(Cnf), "}", eol,
+	\\def, textabopprem(Op, TV), eol,
+	"   {", texTabOpPrem(Op, TV), eol,
+	"   }", eol.
+
+texTabOpConcl([]) -->
+	!,
+	\\otimes.
+texTabOpConcl([C]) -->
+	!,
+	texTabOpBranch(C).
+texTabOpConcl([C|Cs]) -->
+	texTabOpBranch(C), \\qquad,
+	texTabOpConcl(Cs).
+
+texTabOpBranch([]) -->
+	!.
+texTabOpBranch(C) -->
+	\\begin, "{array}[t]{@{}r@{}l@{}}", 
+	texTabOpLits(C), 
+	\\end, "{array}".
+
+texTabOpLits([L]) -->
+	!,
+	texTabOpLit(L).
+texTabOpLits([L|Ls]) -->
+	texTabOpLit(L), "\\\\ ",
+	texTabOpLits(Ls).
+
+texTabOpLit(N^TV) -->
+	textv(TV), "&", \\colon, " ", texOpAtom(N).
+
+texTabOpPrem(N/A, TV) -->
+	textv(TV), \\colon, " ", texTabOpExpr(A, N).
+
+texTabOpExpr(0, N) -->
+	!,
+	texName(N).
+texTabOpExpr(1, N) -->
+	{texPrefix(N)},!,
+	\\mathord, texName(N), texOpAtom(1).
+texTabOpExpr(2, N) -->
+	{texInfix(N)}, !,
+	texOpAtom(1), \\mathbin, texName(N), texOpAtom(2).
+texTabOpExpr(A, N) -->
+	texName(N), "(", texOpExprArgs(1, A), ")".
+
+texTabQuRule(Op, TV, Cnf0) -->
+	{name_qucnf(Cnf0, c(0,0), _Ts, Cnf1, Cnts)},
+	\\def, textabquconcl(Op, TV), eol,
+	"   {", texTabQuConcl(Cnf1, Cnts), "}", eol,
+	\\def, textabquprem(Op, TV), eol,
+	"   {", texTabQuPrem(Op, TV), eol,
+	"   }", eol.
+
+texTabQuConcl([C], Cnts) -->
+	!,
+	texTabQuBranch(C, Cnts).
+texTabQuConcl([C|Cs], Cnts) -->
+	texTabQuBranch(C, Cnts), \\qquad,
+	texTabQuConcl(Cs, Cnts).
+
+texTabQuBranch([], _Cnts) -->
+	!.
+texTabQuBranch(C, Cnts) -->
+	\\begin, "{array}[t]{@{}r@{}l@{}}", 
+	texTabQuLits(C, Cnts),
+	\\end, "{array}".
+
+texTabQuLits([L], Cnts) -->
+	!,
+	texTabQuLit(L, Cnts).
+texTabQuLits([L|Ls], Cnts) -->
+	texTabQuLit(L, Cnts), "\\\\",
+	texTabQuLits(Ls, Cnts).
+
+texTabQuLit(N^TV, Cnts) -->
+	textv(TV), "&", \\colon, " A(", texQuAtomArg(N, Cnts), ")".
+
+texTabQuPrem(Qu, TV) -->
+	textv(TV), \\colon,  "(", texName(Qu), "x)A(x)".
 
 texTVs([], _Sep)      -->
 	"".
@@ -579,6 +686,7 @@ texTVs([TV|TVs], Sep) -->
 textv(TV)        --> {texTVno(TV, I)}, \\('TV', I).
 texopname(Op)    --> {texOpno(Op, I)}, \\('Opname', I).
 texoparity(Op)   --> {texOpno(Op, I)}, \\('Oparity', I).
+texopfmla(Op)    --> {texOpno(Op, I)}, \\('Opfmla', I).
 texoptab(Op)     --> {texOpno(Op, I)}, \\('Optab', I).
 texquname(Qu)    --> {texQuno(Qu, I)}, \\('Quname', I).
 texqutab(Qu)     --> {texQuno(Qu, I)}, \\('Qutab', I).
@@ -588,12 +696,16 @@ texndopconcl(Op,TV)--> {texOpno(Op, I), texTVno(TV, J)}, \\('NDOpconcl', I, J).
 texndopprems(Op,TV)--> {texOpno(Op, I), texTVno(TV, J)}, \\('NDOpprems', I, J).
 texclopconcl(Op,TV)--> {texOpno(Op, I), texTVno(TV, J)}, \\('ClOpconcl', I, J).
 texclopprem(Op,TV)--> {texOpno(Op, I), texTVno(TV, J)}, \\('ClOpprem', I, J).
+textabopconcl(Op,TV)--> {texOpno(Op, I), texTVno(TV, J)}, \\('TabOpconcl', I, J).
+textabopprem(Op,TV)--> {texOpno(Op, I), texTVno(TV, J)}, \\('TabOpprem', I, J).
 texquconcl(Qu,TV)--> {texQuno(Qu, I), texTVno(TV, J)}, \\('Quconcl', I, J).
 texquprems(Qu,TV)--> {texQuno(Qu, I), texTVno(TV, J)}, \\('Quprems', I, J).
 texndquconcl(Qu,TV)--> {texQuno(Qu, I), texTVno(TV, J)}, \\('NDQuconcl', I, J).
 texndquprems(Qu,TV)--> {texQuno(Qu, I), texTVno(TV, J)}, \\('NDQuprems', I, J).
 texclquconcl(Op,TV)--> {texQuno(Op, I), texTVno(TV, J)}, \\('ClQuconcl', I, J).
 texclquprem(Op,TV)--> {texQuno(Op, I), texTVno(TV, J)}, \\('ClQuprem', I, J).
+textabquconcl(Op,TV)--> {texQuno(Op, I), texTVno(TV, J)}, \\('TabQuconcl', I, J).
+textabquprem(Op,TV)--> {texQuno(Op, I), texTVno(TV, J)}, \\('TabQuprem', I, J).
 
 
 texName(N) --> {texName(N,TN)}, !, "{", TN, "}".

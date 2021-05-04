@@ -22,7 +22,7 @@ proc OnSetValid {} {
     global gntv ntv; set gntv $ntv
     pack .bot -before .status -fill x
     .mid.list conf -state disabled  -relief flat
-    .mid.auto conf -text "truthvalues" -command {
+    .mid.auto conf -text "Truth values" -command {
     	if {$WinCnt == 0} ResetValid else {
     		bell; status "There are open Editors"
     	}

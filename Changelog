@@ -1,3 +1,10 @@
+1.13 & 1.2, 03.05.2021
+- Make ml_tex.pl also produce code for tableaux.
+- Update ml.tex: more current introduction, use modern packages, load
+  hyperref, updated bibliography with links, add section on tableaux,
+  add detail on completeness results and resolution.
+- Update dialog text of iLC.
+- Increase limit on name of logic to 40 chars.
 1.12, 20.10.2020:
 - Update the install script to install into ~/.local if not run as root, and 
   to put documentation into /usr/share/doc by default. Update README to reflect

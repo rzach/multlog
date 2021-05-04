@@ -25,7 +25,7 @@ proc fputs {{str {}}} {global FileIdw; puts $FileIdw $str }
 proc fputsn str {global FileIdw; puts -nonewline $FileIdw $str }
 proc fclosew {} {global FileIdw; 
     close $FileIdw 
-    status "finished"
+    status "Finished"
 }
 set FileIdw stdout
 
@@ -42,7 +42,7 @@ proc fgets {{strn {}}} {global FileIdr;
 }
 proc fcloser {} {global FileIdr; 
     close $FileIdr 
-    status "finished"
+    status "Finished"
 }
 set FileIdr stdin
 
@@ -70,7 +70,7 @@ proc fsave {lname} { global arr itemlist
             
         fclosew
     } msg ] { global errorInfo
-        status "couldn't save $lname"
+        status "Couldn't save $lname"
     	ilc_error "$errorInfo"
     	return 0
     }
@@ -155,7 +155,7 @@ proc fload {lname} {
         while {[readnext]} {}
         fcloser
     } msg] { global errorInfo
-    	status "couldn't load $lname"
+    	status "Couldn't load $lname"
     	ilc_error "$errorInfo"
     	return "syserror"
     }

@@ -82,7 +82,6 @@ EndPROLOG
 if [ -f "$file.sty" ]
 then
   $CP $MLPATH/ml.tex $file.tex
-  $CP $MLPATH/ml.sty .
   $CP $MLPATH/ml.bib .
   $CP $MLPATH/proof.sty .
   echo ""
@@ -114,7 +113,7 @@ then
   then
     echo "Cleaning up ..."
     delfiles="$logfile"
-    delfiles="$delfiles $file.aux $file.log $file.bbl $file.blg $file.dvi $file.ps"
+    delfiles="$delfiles $file.aux $file.log $file.out $file.bbl $file.blg $file.dvi $file.ps"
     delfiles="$delfiles $file.sty $file.tex ml.sty ml.bib proof.sty"
     for f in $delfiles
     do

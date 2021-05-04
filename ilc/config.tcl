@@ -10,7 +10,7 @@ set allow_arranging 1
 
 # Variable DefFileName: this will be the default-name initially offered
 #   by the File-open and File-save dialogs.
-set DefFileName "demo"
+set DefFileName "untitled"
 
 # Error-messages:
 # 0: most errors will be reported in the status-line of the Main-window.
@@ -60,7 +60,7 @@ set MinArity 0
 set MinInducedArity 2
 
 # Maximum lengths of identifiers
-set MaxLLogicname 20
+set MaxLLogicname 40
 set MaxLOpname 10
 set MaxLQuname 10
 set MaxLOrdname 10

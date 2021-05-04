@@ -8,7 +8,7 @@
 
 % Length limits
 
-max_length(logname,20).
+max_length(logname,40).
 max_length(ordname,10).
 max_length(opname,10).
 max_length(quname,10).
