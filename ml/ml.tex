@@ -16,6 +16,7 @@
 \documentclass{article}
 
 \usepackage{latexsym}
+\usepackage{amsfonts,amssymb}
 \usepackage{mathrsfs}
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsthm}
@@ -143,7 +144,6 @@ ClQuprem\romannumeral#1X\romannumeral#2\endcsname}
 
 \usepackage{\jobname} % TeX commands specific to the particular logic; written by "ml_tex.pl".
 
-
 \title{Analytic Proof Systems for \ecapitalisewords{\NameOfLogic}
 Logic}
 
@@ -151,6 +151,11 @@ Logic}
 \NameOfLogic\ logic by
 \href{https://github.com/rzach/multlog}{\textsc{multlog}}, v.~@ml_version@.}}
 \date{}
+
+\makeatletter
+\hypersetup{pdftitle={\@title},pdfauthor={\@author},pdfkeywords={{\NameOfLogic}
+logic, sequent calculus, tableaux, natural deduction, resolution}}
+\makeatother
 
 \begin{document}
 
@@ -258,7 +263,7 @@ developed by Salzer~\cite{Salzer1996a,Salzer2000}.
       \item Every propositional variable is a formula.
       \ifnum\NoOps>0
          \FOR \n=1 \TO \NoOps \DO
-            \ifcase\Oparity\n
+            \ifcase\numexpr\Oparity\n\relax
                \item The propositional constant $\Opname\n$ is a formula.
             \or
                \item If $A$ is a formula, so is $\Opfmla\n$.
@@ -330,7 +335,7 @@ developed by Salzer~\cite{Salzer1996a,Salzer2000}.
          a formula. It is called \emph{atomic} or an \emph{atom}.
       \ifnum\NoOps>0
          \FOR \n=1 \TO \NoOps \DO
-            \ifcase\Oparity\n
+            \ifcase\numexpr\Oparity\n\relax
                \item The propositional constant $\Opname\n$ is an (atomic) formula.
             \or
                \item If $A$ is a formula, so is $\Opfmla\n$.
