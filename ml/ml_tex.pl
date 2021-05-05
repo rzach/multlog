@@ -155,7 +155,7 @@ texOp(Op, S, TVs) -->
 
 texOpSpec(0, Op, [[]:F], _)   -->
 	!,
-	"   ", texopname(Op), \\equiv, textv(F).
+	"   ", \\widetilde, "{", texopname(Op), "} ", \\equiv, textv(F).
 texOpSpec(2, Op, S, TVs)      -->
 	!,
 	{opmap2textab(S, TVs, Lines), ml_length(TVs,L)},
