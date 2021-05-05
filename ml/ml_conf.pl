@@ -13,7 +13,7 @@ max_length(ordname,10).
 max_length(opname,10).
 max_length(quname,10).
 max_length(truthvalue,10).
-max_length(ordspec,200).
+max_length(ordspec,300).
 max_length(errcontext_before, 30). % Has to be greater than 3
 max_length(errcontext_after,  30). % Has to be greater than 3
 
