@@ -1,4 +1,4 @@
-MUltlog 1.13 & iLC 1.1
+MUltlog 1.14 & iLC 1.2
 ======================
 
 MUltlog is a system which takes as input the specification of
