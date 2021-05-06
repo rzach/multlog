@@ -1,5 +1,5 @@
 %%% Filename : ml_check.pl
-%%% Date     : 5.7.1999
+%%% Date     : 6.5.2021
 %%% Contents : Checks the syntax of all names in the specification.
 %%%            Checks completeness and consistency.
 %%% Author   : Gernot Salzer
