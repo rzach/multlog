@@ -41,8 +41,8 @@ check_TVs :-
 	check(ml_is_set(TVs), multTV),
 	% Are there at least two truth values?
 	check((ml_length(TVs,N), N>1), notEnoughTVs),
-        % Are there less than 20 truth values?
-        check((ml_length(TVs,N), N=<20), toomanyTVs),
+	% Are there less than 20 truth values?
+	check((ml_length(TVs,N), N=<20), toomanyTVs),
 	sort(TVs, TVs1), %%% DO NOT CHANGE ORDER OF TRUTH VALUES!
 	assert(chkTVs(TVs1)),
 	!.

@@ -718,24 +718,26 @@ The \emph{sequent calculus} for \NameOfLogic\ logic is given by:
    {\noindent
     The introduction rules for connective $\Opname\op$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-          \hspace{2em}%
-          \mbox{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}%
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}%
        \ENDFOR
-       \hspace{2em}
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The introduction rules for quantifier $\Quname\qu$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-          \hspace{2em}%
-          \mbox{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
        \ENDFOR
-       \hspace{2em}%
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 
