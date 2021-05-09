@@ -24,7 +24,7 @@ if [ `id -u` -ne 0 ]
   else 
   echo "Installing system-wide"
   prefix=/usr/local
-  docprefix=/usr/share/
+  docprefix=/usr/share
 fi
 
 set_cmd(){
@@ -260,4 +260,5 @@ $rm -f $distdir/bin/$deinstall
 
 echo "Installation done."
 echo ""
-echo "In case of problems, send e-mail to multlog@logic.at."
+echo "In case of problems, file an issue at https://github.com/rzach/multlog/issues."
+#echo "In case of problems, send e-mail to multlog@logic.at."

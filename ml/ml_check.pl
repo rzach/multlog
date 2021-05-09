@@ -1,5 +1,5 @@
 %%% Filename : ml_check.pl
-%%% Date     : 5.7.1999
+%%% Date     : 6.5.2021
 %%% Contents : Checks the syntax of all names in the specification.
 %%%            Checks completeness and consistency.
 %%% Author   : Gernot Salzer
@@ -41,8 +41,8 @@ check_TVs :-
 	check(ml_is_set(TVs), multTV),
 	% Are there at least two truth values?
 	check((ml_length(TVs,N), N>1), notEnoughTVs),
-        % Are there less than 20 truth values?
-        check((ml_length(TVs,N), N=<20), toomanyTVs),
+	% Are there less than 20 truth values?
+	check((ml_length(TVs,N), N=<20), toomanyTVs),
 	sort(TVs, TVs1), %%% DO NOT CHANGE ORDER OF TRUTH VALUES!
 	assert(chkTVs(TVs1)),
 	!.
@@ -147,8 +147,8 @@ inf(V, V, _R, V).
 inf(V1, V2, R, V) :-
 	min(R, V1, V2, V), !.
 inf(V1, V2, R, Inf) :-
-	bagof(V, (ml_member(V<V1,R), ml_member(V<V2,R)), [LB|LBs]),
-	maxs(LBs, LB, R, Inf).
+	bagof(V, (ml_member(V<V1,R), ml_member(V<V2,R)), LBs),
+	maxs(LBs, R, [Inf]).
 
 sup_op(C, Op) :-
 	chkTVs(TVs),
@@ -169,23 +169,35 @@ sup(V, V, _R, V).
 sup(V1, V2, R, V) :-
 	max(R, V1, V2, V), !.
 sup(V1, V2, R, Sup) :-
-	bagof(V, (ml_member(V1<V,R), ml_member(V2<V,R)), [UB|UBs]),
-	mins(UBs, UB, R, Sup).
+	bagof(V, (ml_member(V1<V,R), ml_member(V2<V,R)), UBs),
+	mins(UBs, R, [Sup]).
 
-mins([], M, _R, M).
-mins([V|Vs], M0, R, M) :-
-	min(R, V, M0, M1),
-	mins(Vs, M1, R, M).
+mins(Vs, R, Ms) :-
+    mins(Vs, Vs, R, Ms).
+
+mins([], _Vs, _R, []).
+mins([V0|Vs0], Vs, R, Ms) :-
+    ml_member(V, Vs),
+    ml_member(V < V0, R), !,
+	mins(Vs0, Vs, R, Ms).
+mins([M|Vs0], Vs, R, [M|Ms]) :-
+    mins(Vs0, Vs, R, Ms).
 
 min([V1<V2|_R], V1, V2, V1) :- !.
 min([V2<V1|_R], V1, V2, V2) :- !.
 min([_|R], V1, V2, V) :-
 	min(R, V1, V2, V).
 
-maxs([], M, _R, M).
-maxs([V|Vs], M0, R, M) :-
-	max(R, V, M0, M1),
-	maxs(Vs, M1, R, M).
+maxs(Vs, R, Ms) :-
+    maxs(Vs, Vs, R, Ms).
+
+maxs([], _Vs, _R, []).
+maxs([V0|Vs0], Vs, R, Ms) :-
+    ml_member(V, Vs),
+    ml_member(V0 < V, R), !,
+	maxs(Vs0, Vs, R, Ms).
+maxs([M|Vs0], Vs, R, [M|Ms]) :-
+    maxs(Vs0, Vs, R, Ms).
 
 max([V1<V2|_R], V1, V2, V2) :- !.
 max([V2<V1|_R], V1, V2, V1) :- !.

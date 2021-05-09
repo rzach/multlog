@@ -1,4 +1,4 @@
-MUltlog 1.13 & iLC 1.1
+MUltlog 1.14 & iLC 1.2
 ======================
 
 MUltlog is a system which takes as input the specification of
@@ -381,13 +381,9 @@ The following people contributed to MUltlog (in alphabetical order):
 - Stefan Katzenbeisser and  Stefan Kral rewrote the optimization
   procedure for operators using more efficient data structures
 - Andreas Leitgeb is the author of iLC, the interactive Logic Creator
-- Wolfram Nix wrote eLK, a DOS interface to MUltlog
-- Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog
+- Wolfram Nix wrote eLK, a DOS interface to MUltlog (not part of this repository).
+- Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog (not part of this repository).
 - Gernot Salzer wrote the MUltlog kernel and coordinated the project.
 - Markus Schranz  wrote a web interface to MUltlog based on plain HTML
-  and Perl.
-
-(eLK, JMUltlog, and the web interface are no longer available.)
-
-Vienna, July 11, 2001                 Gernot Salzer, salzer@logic.at
-Calgary, May 3, 2021                 Richard Zach, rzach@ucalgary.ca
+  and Perl (not part of this repository). 
+- Richard Zach refurbished and enhanced MUltlog 20 years after the project was first published.
