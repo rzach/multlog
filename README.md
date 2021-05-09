@@ -3,12 +3,12 @@ MUltlog 1.14 & iLC 1.2
 
 MUltlog is a system which takes as input the specification of
 a finitely-valued first-order logic and produces a sequent 
-calculus, a natural deduction system, and clause formation
-rules for this logic. All generated rules are optimized
-regarding their branching degree. The output is in the form
-of a scientific paper written in LaTeX.
+calculus, a natural deduction system, a tableaux calculus,
+and clause formation rules for this logic. All generated
+rules are optimized regarding their branching degree.
+The output is in the form of a scientific paper written in LaTeX.
 
-iLC is an editor for Tcl/Tk, which allows to specify many-valued
+iLC is an editor for Tcl/Tk, which allows the user to specify many-valued
 logics for MUltlog in a convenient form.
    
 Further information: multlog@logic.at, http://www.logic.at/multlog/
@@ -36,15 +36,13 @@ CONTENTS:
 
 You need the following packages to run MUltlog:
 
-- MUltlog, available from http://www.logic.at/multlog/ or
-  https://github.com/rzach/multlog
+- MUltlog, available from
 
-- Some standard Prolog system, e.g. SWI-Prolog from
+     https://github.com/rzach/multlog
+
+- A standard Prolog system like SWI-Prolog, available from
 
      https://www.swi-prolog.org/
-
-  Other Prologs should work as well; MUltlog has been tested with SWI and
-  SICStus Prolog.
 
 The packages below are not absolutely necessary, but recommended.
 
@@ -56,8 +54,8 @@ properly, you need the typesetting system
   convenient to install and is most likely available via your package
   manager.
 
-MUltlog includes a special editor, iLC, which allows to specify
-many-valued logics in a convenient, windows-oriented way, instead
+MUltlog includes a special editor, iLC, which allows the user to specify
+many-valued logics via a GUI (graphical user interface), instead
 of typing an ASCII text in a strict syntax. To use this editor
 you need the script language
 
@@ -77,8 +75,7 @@ https://github.com/rzach/multlog
 
 ## 2.2 Running the installation script
 
-As of version 1.05, MUltlog comes with an installation script for
-Linux. Before running the script:
+MUltlog comes with an installation script for Linux. Before running the script:
 
 - decide which Prolog to use. The script will look for SWI-Prolog,
   SICStus, and BinProlog in some standard locations, and suggest the
@@ -86,7 +83,7 @@ Linux. Before running the script:
 
 - decide where to put MUltlog. If run as root, the default locations
   are `/usr/local/bin` for executables, `/usr/local/lib` for library
-  files, and `/usr/share/doc` for documentation. If not run as root,
+  files, and `/usr/share/doc` for documentation. Otherwise,
   the script will install into `~/.local/bin,` `~/.local/lib`, and
   `~/.local/doc`. Note that these directories must exist; the script
   will not try to create them.

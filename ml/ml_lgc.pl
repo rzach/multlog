@@ -1,10 +1,9 @@
-%%% Filename : ml_lgc.pl
-%%% Date     : 9.1.1997
-%%% Contents : Scanner and parser for LGC-files
-%%% Author   : Gernot Salzer
+%%% ml_lgc.pl, scanner and parser for lgc files
 %%% Interface: lgc_in(FN).       Translates the declarations on LGC-file to
 %%%                              their internal representation.
 %%%                              Performs basic syntax checks.
+%%%  9. 1.1997, Gernot Salzer: initial version
+%%%  9. 5.2021, Gernot Salzer: generation of lgc file stripped of comments
 
 :- set_prolog_flag(double_quotes, codes).
 :- dynamic   lgcFN/1, lgcLN/1, lgcTVs/1, lgcDTVs/1, lgcOrd/2, lgcOrd1/2, lgcOp/2, lgcQu/2.
@@ -30,7 +29,27 @@ lgc_in(FN) :-
 	ml_member(eof, Errs_get),
 	!,
 	seen.
+
 lgc_in(FN) :-
+	phrase(lgc_errmess(cannot_read_file(FN)), Message),
+	error(openerror, [Message]).
+
+lgc_stripped(FN, Stripped) :-
+	see(FN),
+	tell(Stripped),
+	!,
+	repeat,
+	   get_chars(Cs0, Errs_get),
+	   (append(_, Cs1, Cs0),Cs1=[C|_],C > 32 ->
+	      atom_codes(CsA, Cs1),
+	      write(CsA), nl
+	   ;  true
+       ),
+	   ml_member(eof, Errs_get),
+	   !,
+	seen,
+	told.
+lgc_stripped(FN, _Stripped) :-
 	phrase(lgc_errmess(cannot_read_file(FN)), Message),
 	error(openerror, [Message]).
 
@@ -228,7 +247,7 @@ errposmark(N, [0' |S]) :-
 get_chars(Cs, Errs) :-
 	repeat,
 	get0(C),
-	(32 < C, C =\= 128; C = -1),
+%	(32 < C, C =\= 128; C = -1),
 	!,
 	get_chars(C, Cs, Errs).
 
@@ -247,11 +266,11 @@ get_chars(0'%, [0' /**/|Cs], Errs) :- !,   /* %-comment                    */
 	!,
 	'end%comment'(C, Cs, Errs).
 get_chars(C0, [C0|Cs], Errs) :-            /* significant character        */
-	(32 < C0, C0 =\= 128), !,
+%	(32 < C0, C0 =\= 128), !,
 	get0(C1),
 	get_chars(C1, Cs, Errs).
-get_chars(_C, [0' /**/|Cs], Errs) :-       /* white spaces                 */
-	get_chars(Cs, Errs).
+%get_chars(_C, [0' /**/|Cs], Errs) :-       /* white spaces                 */
+%	get_chars(Cs, Errs).
 
 '/*comment?'(0'*, [0' /**/|Cs], Errs) :- !,
 	get0(C),
@@ -319,7 +338,7 @@ tokens1([end]) -->
 	[].
 
 spaces -->
-	" ",
+    space(_),
 	spaces.
 spaces -->
 	[].
@@ -370,6 +389,7 @@ digit(C)  --> [C], {0'0 =< C, C =< 0'9}.
 symbol(C) --> [C], {ml_member(C, "-+*^<>=~?@#$&")}.
 lower(C)  --> [C], {0'a =< C, C =< 0'z}.
 upper(C)  --> [C], {0'A =< C, C =< 0'Z; C == 0'_}.
+space(C)  --> [C], {C =< 0' /**/}.
 
 string(Cs) -->
 	"""",

@@ -6,7 +6,7 @@
 %%%            lgc2tex(In,Out,Cnf). Translates LGC-file "In" to TeX-file "Out"
 %%%                                 using configuration in "Cnf"
 %%%
-%%% 9.5.2021: Caching added
+%%% 9.5.2021: Caching added, stripping of lgc file
 
 :- ['@mlpath@/ml_conf'].
 :- ['@mlpath@/ml_util'].
@@ -31,7 +31,9 @@ lgc2tex(In, Out, CFN) :-
 	  ,  println_terms([' using configuration in ', CFN])
 	),
 	lgc_in(In),
-	atom_concat(In, '.cac', Cache),
+	atom_concat(In, '.stripped', Stripped),
+	lgc_stripped(In, Stripped),
+	atom_concat(In, '.cache', Cache),
 	cache_in(Cache),
 	check,
 	kernel,

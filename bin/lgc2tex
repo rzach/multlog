@@ -9,6 +9,7 @@ CP='@cp@'
 LATEX='@latex@'
 RM='@rm@'
 SED='@sed@'
+AWK='@awk@'
 
 prg=`$BASENAME $0`
 
@@ -45,7 +46,7 @@ done
 
 if [ ! -f $file.cfg ]
 then
-   $CP $MLPATH/ml.cfg $file.cfg
+   $AWK '/^%/||/^ *$/{next}{print}' $MLPATH/ml.cfg > $file.cfg
 fi
 
 $PROLOG -s "$MLPATH/ml" -g "lgc2tex('$file.lgc','$file.sty','$file.cfg'), halt." 2>>$logfile

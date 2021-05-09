@@ -9,6 +9,7 @@ CP='@cp@'
 LATEX='@latex@'
 RM='@rm@'
 SED='@sed@'
+AWK='@awk@'
 
 LTX='@ltx@'
 
@@ -55,7 +56,7 @@ done
 
 if [ ! -f $file.cfg ]
 then
-   $CP $MLPATH/ml.cfg $file.cfg
+   $AWK '/^%/||/^ *$/{next}{print}' $MLPATH/ml.cfg > $file.cfg
 fi
 
 $PROLOG -s "$MLPATH/ml" -g "lgc2tex('$file.lgc','$file.sty','$file.cfg'), halt." 2>>$logfile
@@ -80,7 +81,7 @@ then
      echo "Cleaning up ..."
      delfiles="$logfile"
      delfiles="$delfiles $file.aux $file.log $file.bbl $file.blg"
-     delfiles="$delfiles $file.sty $file.tex ml.sty ml.bib proof.sty"
+     delfiles="$delfiles $file.sty $file.tex ml.sty ml.bib proof.sty $file.lgc.stripped"
      for f in $delfiles
      do
         if [ -f $f ]
