@@ -811,32 +811,35 @@ exactly dual to that of Carnielli (in the sense of
    {\noindent
     The branch expansion rules for connective $\Opname\op$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO%
        \ifthenelse{\equal{\TabOpconcl{\op}{\tv}}{}}{}{%
-            \hspace{2em}%
-            $\begin{array}[t]{@{}c@{}}
-               \TabOpprem{\op}{\tv} \\ \hline
-               \TabOpconcl{\op}{\tv} 
-            \end{array}$}%
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{%
+		    $\begin{array}[t]{@{}c@{}}
+              \TabOpprem{\op}{\tv} \\ \hline
+              \TabOpconcl{\op}{\tv} 
+            \end{array}$}}%
        \ENDFOR
-       \hspace{2em}
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The branch extension rules rules for quantifier $\Quname\qu$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-       \hspace{2em}%
-       $\begin{array}[t]{@{}c@{}}
-       \TabQuprem{\qu}{\tv} \\ \hline
-       \TabQuconcl{\qu}{\tv}
-       \end{array}$
-       \hspace{2em}
-  \ENDFOR
-       \hspace{2em}%
-    \end{center}
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{%
+            $\begin{array}[t]{@{}c@{}}
+              \TabQuprem{\qu}{\tv} \\ \hline
+              \TabQuconcl{\qu}{\tv}
+            \end{array}$}%
+       \ENDFOR
+    \end{center}%
    }
 \ENDFOR
 
@@ -904,26 +907,30 @@ The \emph{natural deduction rules} for \NameOfLogic\ logic are given by:
    {\noindent
     The introduction and elimination rules for connective $\Opname\op$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-          \hspace{2em}%
-          \mbox{\infer[{\Opname\op}{\NDEI\tv} \colon {\TV\tv}]
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{%
+            \infer[{\Opname\op}{\NDEI\tv} \colon {\TV\tv}]
             {\NDOpconcl{\op}{\tv}}
             {\NDOpprems{\op}{\tv}}}%
        \ENDFOR
-       \hspace{2em}%
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The introduction and elimination rules for quantifier $\Quname\qu$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-          \hspace{2em}%
-          \mbox{\infer[\Quname\qu\NDEI\tv\colon \TV\tv]{\NDQuconcl{\qu}{\tv}}{\NDQuprems{\qu}{\tv}}}%
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{%
+            \infer[\Quname\qu\NDEI\tv\colon \TV\tv]{\NDQuconcl{\qu}{\tv}}{\NDQuprems{\qu}{\tv}}}%
        \ENDFOR
-       \hspace{2em}%
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 
@@ -1025,30 +1032,32 @@ clause set~$\C$ iff it satisfies every clause in~$\C$.  $\C$~is called
    {\noindent
     The clause formation rules for connective $\Opname\op$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-          \hspace{2em}%
-          \mbox{\infer[\Opname\op{:}\TV\tv]%
-                      {\ClauseSet\ClOpconcl{\op}{\tv}}%
-                      {\ClauseSet\ClOpprem {\op}{\tv}}%
-               }%
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{%
+            \infer[\Opname\op{:}\TV\tv]%
+              {\ClauseSet\ClOpconcl{\op}{\tv}}%
+              {\ClauseSet\ClOpprem {\op}{\tv}}}%
        \ENDFOR
-       \hspace{2em}
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The clause formation rules for quantifier $\Quname\qu$ are given by
     \begin{center}
+       \let\rulesep\relax
        \FOR \tv=1 \TO \NoTVs \DO
-          \hspace{2em}%
-          \mbox{\infer[\Quname\qu{:}\TV\tv]%
-                      {\ClauseSet\ClQuconcl{\qu}{\tv}}%
-                      {\ClauseSet\ClQuprem {\qu}{\tv}}%
-               }%
+          \rulesep
+          \def\rulesep{\\[2ex]}%
+          \makebox[0pt]{%
+            \infer[\Quname\qu{:}\TV\tv]%
+              {\ClauseSet\ClQuconcl{\qu}{\tv}}%
+              {\ClauseSet\ClQuprem {\qu}{\tv}}}%
        \ENDFOR
-       \hspace{2em}%
-    \end{center}
+    \end{center}%
    }
 \ENDFOR
 
