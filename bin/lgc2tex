@@ -48,10 +48,7 @@ then
    $CP $MLPATH/ml.cfg $file.cfg
 fi
 
-$PROLOG 2>>$logfile <<EndPROLOG
-['$MLPATH/ml'].
-lgc2tex('$file.lgc','$file.sty','$file.cfg').
-EndPROLOG
+$PROLOG -s "$MLPATH/ml" -g "lgc2tex('$file.lgc','$file.sty','$file.cfg'), halt." 2>>$logfile
 
 if [ -f "$file.sty" ]
 then

@@ -1,5 +1,6 @@
-1.14 & 1.2, 06.05.2021
+1.14 & 1.2, 09.05.2021
 - Bug fix regarding mins and maxs in ml_check.pl
+- Caching added
 1.13 & 1.2, 03.05.2021
 - Make ml_tex.pl also produce code for tableaux.
 - Update ml.tex: more current introduction, use modern packages, load
