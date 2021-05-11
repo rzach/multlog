@@ -2,6 +2,10 @@
 - Bug fix regarding mins and maxs in ml_check.pl
 - Caching of minimization that may be computationally expensive
 - Appendix with specification of logic added to paper
+- \thanks includes citation info
+- Date set to date of conversion run by ml_tex.pl
+- Allow arbitrary TeX macros in .cfg; load \Preamble, \Intro, and
+  \Semantics if defined.
 1.13 & 1.2, 03.05.2021
 - Make ml_tex.pl also produce code for tableaux.
 - Update ml.tex: more current introduction, use modern packages, load

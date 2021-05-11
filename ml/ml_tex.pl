@@ -12,10 +12,10 @@
 
 :- set_prolog_flag(double_quotes, codes).
 :- dynamic   texFN/1, texCFN/1, texTVno/2, texOpno/2, texQuno/2, texCounter/1,
-             texName/2, texPrefix/1, texInfix/1.
+             texName/2, texPrefix/1, texInfix/1, texExtra/2.
 
 texDatabase([texFN/1, texCFN/1, texTVno/2, texOpno/2, texQuno/2, texCounter/1,
-             texName/2, texPrefix/1, texInfix/1]).
+             texName/2, texPrefix/1, texInfix/1, texExtra/2]).
 
 tex_out(FN, CFN) :-
 	\+ errOccurred(_,_),
@@ -23,6 +23,10 @@ tex_out(FN, CFN) :-
 	ml_if(nonvar(CFN), read_texCfg(CFN), true),
 	asserta(texFN(FN)),
 	tell(FN),
+	get_time(TimeStamp),
+	format_time(string(Date), "%B %d, %Y", TimeStamp),
+	format_time(string(Year), '%Y', TimeStamp),
+	print_phrase(texDate(Date, Year)),
 	lgcLN(LN),
 	print_phrase(texLN(LN)),
 	lgcTVs(TVs),
@@ -80,6 +84,11 @@ tex_out(FN, CFN) :-
 	   fail
 	;  true
 	),
+	(texExtra(Ex,Def),
+	   print_phrase(texExtraDef(Ex,Def)),
+	   fail
+	;  true
+	),
 	told,
 	!.
 
@@ -114,6 +123,8 @@ process_texCfg(texInfix(L)) :- !,
    assertz(texInfix(L)).
 process_texCfg(texPrefix(L)) :- !,
    assertz(texPrefix(L)).
+process_texCfg(texExtra(L, T)) :- !,
+   assertz(texExtra(L, T)).
 process_texCfg(_X) :-
 	phrase(tex_errmess(unknownTeXcfg), Message),
 	error(syntax, [Message]).
@@ -134,6 +145,10 @@ bs        --> [92].
 bsbs      --> [92,92].
 
 def(X,Y)  --> \\def, X, "{", Y, "}", eol.
+
+texDate(Date, Year) --> "\\date{", 
+	Date, "}", eol,
+	def(\\'Year', Year).
 
 texTVCnt(C) --> def(\\'NoTVs', str(C)).
 texOpCnt(C) --> def(\\'NoOps', str(C)).
@@ -710,6 +725,8 @@ textabquprem(Op,TV)--> {texQuno(Op, I), texTVno(TV, J)}, \\('TabQuprem', I, J).
 
 texName(N) --> {texName(N,TN)}, !, "{", TN, "}".
 texName(N) --> "{", \\it, " ", str(N), "}".
+
+texExtraDef(Ex,Def) --> "\\def\\", Ex, "{", Def, "}", eol.
 
 roman(0)  --> "".
 roman(I0) --> {roman(N,R), I0 >= N, !, I1 is I0-N}, R, roman(I1).

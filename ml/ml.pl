@@ -1,12 +1,9 @@
 %%% Filename : ml.pl
-%%% Date     : 13.1.1997
 %%% Contents : Root module of MUltlog
 %%% Author   : Gernot Salzer
 %%% Interface:
 %%%            lgc2tex(In,Out,Cnf). Translates LGC-file "In" to TeX-file "Out"
 %%%                                 using configuration in "Cnf"
-%%%
-%%% 9.5.2021: Caching added, stripping of lgc file
 
 :- ['@mlpath@/ml_conf'].
 :- ['@mlpath@/ml_util'].
