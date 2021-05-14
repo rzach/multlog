@@ -9,6 +9,9 @@
 %%%                              ord/op/qu-names to TeX expressions, and maybe other
 %%%                              configuration information. If SFN is a variable, it is
 %%%                              ignored.
+%%%            write_texCfg(CFN) Writes cfg file stripped of comments
+%%%
+%%% 2021/05/14, GS: output of stripped cfg file added
 
 :- set_prolog_flag(double_quotes, codes).
 :- dynamic   texFN/1, texCFN/1, texTVno/2, texOpno/2, texQuno/2, texCounter/1,
@@ -134,6 +137,15 @@ tex_errmess(cannot_read_file(FN)) -->
 tex_errmess(unknownTeXcfg) -->
 	"Unknown declaration in TeX configuration file.".
 
+write_texCfg(CFN) :-
+    tell(CFN), !,
+	(member(CFG, [texName(L,T), texInfix(L), texPrefix(L), texExtra(L,T)]),
+        CFG,
+        write_term(CFG,[]), write('.'), nl,
+        fail
+	;   true
+    ),
+	told.
 
 :- op(10,fx,\\).
 

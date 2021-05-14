@@ -5,202 +5,178 @@ IFS=":"
 path=`echo $PATH`
 IFS="$oldIFS"
 path="$path /usr/local/bin /usr/local/sbin /usr/bin /usr/sbin /bin /sbin"
-ucmds="false true awk basename chmod cp dirname grep mkdir pwd rm sed"
+ucmds="false true awk basename chmod cp dirname grep mkdir pwd rm awk sed cat"
 tcmds="latex bibtex"
 ppcmdsa="pdflatex"
 ppcmdsb="dvips ps2pdf"
 ttcmds="wish"
 pcmds="pl sicstus bp swipl"
-extravars="prolog mlpath ilcpath ml_version ml_date ml_ver ilc_version ilc_date \
-      ltx ltxpdf pspdf"
+extravars="prolog mlpath ilcpath ml_version ml_date ml_ver ilc_version ilc_date ltx ltxpdf pspdf"
 
 
-if [ `id -u` -ne 0 ]
-  then 
-  echo "Not running as root: you will only be able"
-  echo "to install multlog into your home directory"
-  prefix=$HOME/.local
-  docprefix=$prefix
-  else 
-  echo "Installing system-wide"
-  prefix=/usr/local
-  docprefix=/usr/share
+if [ `id -u` -ne 0 ]; then 
+   echo "Not running as root: you will only be able"
+   echo "to install multlog into your home directory"
+   prefix="$HOME/.local"
+   docprefix="$prefix"
+else 
+   echo "Installing system-wide"
+   prefix=/usr/local
+   docprefix=/usr/share
 fi
 
 set_cmd(){
-  for c in $*
-  do
-    notfound=$true
-    for p in $path
-    do
-      if [ -x $p/$c ]
-      then
-        eval $c=$p/$c
-        notfound=$false
-        break
+   for c in $*; do
+      notfound=$true
+      for p in $path; do
+         if [ -x $p/$c ]; then
+            eval $c=$p/$c
+            notfound=$false
+            break
+         fi
+      done
+      if $notfound; then
+         eval $c=$c
+         return 1
       fi
-    done
-    if $notfound
-    then
-      eval $c=$c
-      return 1
-    fi
-  done
-  return 0
+   done
+   return 0
 }
 
 is_prolog(){
-  echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' \
-  | ($* 2>&1) \
-  | $grep -q gernot
+   echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' \
+   | ($* 2>&1) \
+   | $grep -q gernot
 }
 
 read_dir(){
-  while $true
-  do
-    eval echo -n \"Directory for $1 [\$$2]: \"
-    read a
-    a=`echo $a | $sed 's|~|'$HOME'|;s|$HOME|'$HOME'|'`
-    if [ ! "$a" ]
-    then
-      eval a=\$$2
-    fi
-    if (echo $a | $grep -q '^/')
-    then
-      :
-    else
-      a=`$pwd`/$a
-    fi
-    if [ -d $a ]
-    then
-      eval $2=$a
-      break
-    else
-      echo "   Error: directory $a does not exist."
-      echo "   Please create it before running ml_install"
-    fi
-  done
+   while $true; do
+      eval echo -n \"Directory for $1 [\$$2]: \"
+      read a
+      a=`echo $a | $sed 's|~|'$HOME'|;s|$HOME|'$HOME'|'`
+      if [ ! "$a" ]; then
+         eval a=\$$2
+      fi
+      if (echo $a | $grep -q '^/'); then
+         :
+      else
+         a=`$pwd`/$a
+      fi
+      if [ -d $a ]; then
+         eval $2=$a
+         break
+      else
+         echo "   Error: directory $a does not exist."
+         echo "   Please create it before running ml_install"
+      fi
+   done
 }
 
 
 
 # Searching for some Unix commands
-if set_cmd $ucmds
-then
-  :
+if set_cmd $ucmds; then
+   :
 else
-  echo "Error: could not find Unix command $c."
-  exit 1
+   echo "Error: could not find Unix command $c."
+   exit 1
 fi
 
 # Searching for TeX
-if set_cmd $tcmds
-then
-  ltx=$true
+if set_cmd $tcmds; then
+   ltx=$true
 else
-  echo "Warning: could not find TeX command $c."
-  echo "You do not need TeX to run MUltlog,"
-  echo "but its output will be hard to read without TeX."
-  ltx=$false
+   echo "Warning: could not find TeX command $c."
+   echo "You do not need TeX to run MUltlog,"
+   echo "but its output will be hard to read without TeX."
+   ltx=$false
 fi
 
 # Searching for pdf converters
-if set_cmd $ppcmdsa
-then
-  ltxpdf=$true
-  pspdf=$false
-elif set_cmd $ppcmdsb
-then
-  ltxpdf=$false
-  pspdf=$true
+ltxpdf=$false
+pspdf=$false
+if set_cmd $ppcmdsa; then
+   ltxpdf=$true
+elif set_cmd $ppcmdsb; then
+   pspdf=$true
 else
-  echo "Warning: couldn't find any PDF converters,"
-  echo "neither pdflatex nor dvips&ps2pdf."
-  echo "You do not need PDF converters to run MUltlog,"
-  echo "but you will not be able to generate PDF directly."
-  ltxpdf=$false
-  pspdf=$false
+   echo "Warning: couldn't find any PDF converters,"
+   echo "neither pdflatex nor dvips&ps2pdf."
+   echo "You do not need PDF converters to run MUltlog,"
+   echo "but you will not be able to generate PDF directly."
 fi
 
 # Searching for Tcl/Tk
-if set_cmd $ttcmds
-then
-  tcltk=$true
+tcltk=$false
+if set_cmd $ttcmds; then
+   tcltk=$true
 else
-  echo "Warning: could not find Tcl/Tk command $c."
-  echo "You do not need Tcl/Tk to run MUltlog,"
-  echo "but you will not be able to use the editor 'ilc'"
-  echo "for writing the specification of your logic."
-  tcltk=$false
+   echo "Warning: could not find Tcl/Tk command $c."
+   echo "You do not need Tcl/Tk to run MUltlog,"
+   echo "but you will not be able to use the editor 'ilc'"
+   echo "for writing the specification of your logic."
 fi
 
 # Searching for Prolog
-for x in $pcmds
-do
-  if set_cmd $x && is_prolog $x
-  then
-    eval prolog=\$$x
-    break
-  fi
+for x in $pcmds; do
+   if set_cmd $x && is_prolog $x; then
+     eval prolog=\$$x
+     break
+   fi
 done
 
-while $true
-do
-  echo -n "Prolog to be used [$prolog]: "
-  read a
-  a=`echo $a | $sed 's|~|'$HOME'|;s|$HOME|'$HOME'|'`
-  if [ ! "$a" ]
-  then
-    break
-  fi
-  aa=`echo "$a" | $sed 's/ .*//'`
-  if [ -x "$aa" ]
-  then
-    if is_prolog $a
-    then
-      prolog=$a
+while $true; do
+   echo -n "Prolog to be used [$prolog]: "
+   read a
+   a=`echo $a | $sed 's|~|'$HOME'|;s|$HOME|'$HOME'|'`
+   if [ ! "$a" ]; then
       break
-    else
-      echo "   Error: $a does not behave like Prolog."
     fi
-  else
-    echo "   Error: $aa does not exist or has no execute permission."
-  fi
+    aa=`echo "$a" | $sed 's/ .*//'`
+    if [ -x "$aa" ]; then
+       if is_prolog $a; then
+          prolog=$a
+          break
+       else
+          echo "   Error: $a does not behave like Prolog."
+       fi
+    else
+       echo "   Error: $aa does not exist or has no execute permission."
+    fi
 done
 
-bindir=$prefix/bin
+bindir="$prefix/bin"
 read_dir executables bindir
 prefix=`dirname $bindir`
 
-libdir=$prefix/lib
+libdir="$prefix/lib"
 read_dir library libdir
 
-docdir=$docprefix/doc
+docdir="$docprefix/doc"
 read_dir documentation docdir
 
-mlbin=$bindir
-mldoc=$docdir/multlog
-mllib=$libdir/multlog
-mlpath=$mllib/ml
-ilcpath=$mllib/ilc
+mlbin="$bindir"
+mldoc="$docdir/multlog"
+mllib="$libdir/multlog"
+mlpath="$mllib/ml"
+ilcpath="$mllib/ilc"
 
 distdir=`$dirname $0`
-cd $distdir
+cd "$distdir"
 distdir=`$pwd`
 
 cd bin
-deinstall=ml_deinstall
-echo '#!/bin/sh' > $deinstall
-echo "echo 'Deleting ...'" >> $deinstall
-for d in $mldoc $mllib
-do
-  echo "echo '   directory $d'" >> $deinstall
-  echo "$rm -rf $d" >> $deinstall
+deinstall="ml_deinstall"
+echo '#!/bin/sh' > "$deinstall"
+echo "echo 'Deleting ...'" >> "$deinstall"
+for d in "$mldoc" "$mllib"; do
+   echo "echo '   directory $d'" >> "$deinstall"
+   echo "$rm -rf '$d'" >> "$deinstall"
 done
-for f in *
+for f in * lgc2pdf lgc2dvi
 do
-  echo "echo '   file $mlbin/$f'" >> $deinstall
-  echo "$rm $mlbin/$f" >> $deinstall
+   echo "echo '   file $mlbin/$f'" >> $deinstall
+   echo "$rm '$mlbin/$f'" >> $deinstall
 done
 echo "echo 'Deinstallation done.'" >> $deinstall
 cd ..
@@ -243,8 +219,7 @@ do
   cd $distdir/$d
   for f in *
   do
-    if [ $f = "lgc2ilc" ]
-    then
+    if [ $f = "lgc2ilc" ]; then
        m=755
     else
        m=$mode
@@ -252,6 +227,13 @@ do
     echo "   $f to $dest, mode $m"
     $sed -f $sedscript $f > $dest/$f
     chmod $m $dest/$f
+	if [ $f = "lgc2tex" ]; then
+	   for g in lgc2dvi lgc2pdf; do
+          echo "   $g to $dest, mode $m"
+          $sed -f $sedscript $f > $dest/$g
+          chmod $m $dest/$g
+	   done
+	fi
   done
 done
 
