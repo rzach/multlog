@@ -140,7 +140,7 @@ ClQuprem\romannumeral#1X\romannumeral#2\endcsname}
 \author{M.~Ultlog\thanks{Cite as: Multlog (\Year), ``Analytic proof systems for {\NameOfLogic}\texExtra{ShortName}{~\ShortName}{\relax}.'' [PDF file generated
 by MULTLOG, v.~@ml_version@, \url{https://logic.at/multlog}].
 \texExtra{Link}{Available from \url{\Link}.}{}\newline\newline See
-\IfFileExists{\jobname.cfg}{\cref{lgc,cfg}}{\cref{lgc}} for
+\IfFileExists{\jobname.cfg.stripped}{\cref{lgc,cfg}}{\cref{lgc}} for
 the specification of {\NameOfLogic}.}}
 
 
@@ -1147,9 +1147,9 @@ $T(\C)$ contains only signed atoms%
 \section{\jobname.lgc~-- specification of \NameOfLogic}\label{lgc}
 \lstinputlisting[basicstyle=\footnotesize\ttfamily,breaklines]{\jobname.lgc.stripped}
 
-\IfFileExists{\jobname.cfg}{%
+\IfFileExists{\jobname.cfg.stripped}{%
   \section{\jobname.cfg~-- \LaTeX\ translations}\label{cfg}
-  \lstinputlisting[basicstyle=\footnotesize\ttfamily,breaklines]{\jobname.cfg}
+  \lstinputlisting[basicstyle=\footnotesize\ttfamily,breaklines]{\jobname.cfg.stripped}
 }{}
 
 \end{document}

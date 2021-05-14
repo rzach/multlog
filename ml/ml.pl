@@ -4,6 +4,9 @@
 %%% Interface:
 %%%            lgc2tex(In,Out,Cnf). Translates LGC-file "In" to TeX-file "Out"
 %%%                                 using configuration in "Cnf"
+%%%
+%%% 2021/05/14, GS: output of stripped cfg file added
+
 
 :- ['@mlpath@/ml_conf'].
 :- ['@mlpath@/ml_util'].
@@ -28,14 +31,16 @@ lgc2tex(In, Out, CFN) :-
 	  ,  println_terms([' using configuration in ', CFN])
 	),
 	lgc_in(In),
-	atom_concat(In, '.stripped', Stripped),
-	lgc_stripped(In, Stripped),
+	atom_concat(In, '.stripped', InStripped),
+	lgc_stripped(In, InStripped),
 	atom_concat(In, '.cache', Cache),
 	cache_in(Cache),
 	check,
 	kernel,
 	cache_out(Cache),
-	tex_out(Out, CFN).
+	tex_out(Out, CFN),
+	atom_concat(CFN, '.stripped', CFNStripped),
+    write_texCfg(CFNStripped).
 
 cache_in(Cache) :-
 	(exists_file(Cache) ->
