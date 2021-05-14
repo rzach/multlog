@@ -728,7 +728,7 @@ declaration:
   value in the \texttt{.lgc} file, then
 
 \begin{verbatim}
-texName(t, "\mathbf{T}").
+texName(t, "\\mathbf{T}").
 \end{verbatim}
 
   will result in the truth value \texttt{t} be typset as \(\mathbf{T}\).
@@ -760,7 +760,7 @@ texPrefix(neg).
   (re-)define any macro used in the LaTeX file. For instance,
 
 \begin{verbatim}
-texExtra("ShortName", "\\ensuremath{\\textbf{\\L}_3}").
+texExtra("ShortName", "\\textbf{\\L}_3").
 \end{verbatim}
 
   will define \texttt{\textbackslash{}ShortName} as
@@ -777,6 +777,7 @@ texExtra("ShortName", "\\ensuremath{\\textbf{\\L}_3}").
   \item
     \texttt{\textbackslash{}ShortName} may contain code for an
     abbreviation or symbol for the logic.
+    \texttt{\textbackslash{}ShortName} will be called in math mode.
   \item
     \texttt{\textbackslash{}FullNameOfLogic} is the macro used to insert
     the name of the logic. By default it will be

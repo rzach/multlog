@@ -507,7 +507,7 @@ The `.cfg` file for a logic can contain three kinds of declaration:
   LaTeX code used to typeset it. For instance, if `t` is a truth value
   in the `.lgc` file, then
   ```
-  texName(t, "\mathbf{T}").
+  texName(t, "\\mathbf{T}").
   ```
   will result in the truth value `t` be typset as $$\mathbf{T}$$.
   (Note that `\` have to be doubled.)  If the LaTeX replacement is a
@@ -529,7 +529,7 @@ The `.cfg` file for a logic can contain three kinds of declaration:
   be loaded in the preamble. This can be used to (re-)define any macro
   used in the LaTeX file.  For instance,
   ```
-  texExtra("ShortName", "\\ensuremath{\\textbf{\\L}_3}").
+  texExtra("ShortName", "\\textbf{\\L}_3").
   ```
   will define `\ShortName` as `\ensuremath{\textbf{\L}_3}`, and this
   macro will be available in the LaTeX file. The LaTeX template file
@@ -538,10 +538,11 @@ The `.cfg` file for a logic can contain three kinds of declaration:
     `\begin{document}`. It can be used, e.g., to load packages needed
     for some of the operator symbols, or to change the document font.
   - `\ShortName` may contain code for an abbreviation or symbol for
-    the logic.
+    the logic. `\ShortName` will be called in math mode.
   - `\FullNameOfLogic` is the macro used to insert the name of the
-    logic. By default it will be "`<logname>` logic", plus `\ShortName`,
-    if defined. Sometimes this doesn't work, so, e.g., you could say:
+    logic. By default it will be "`<logname>` logic", plus
+    `\ShortName`, if defined. Sometimes this doesn't work, so, e.g.,
+    you could say:
     ```
     texExtra("FullNameOfLogic", "Halld\\'en's logic of nonsense").
     ```
