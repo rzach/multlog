@@ -324,7 +324,7 @@ saved your logic, will produce a DVI file of the paper.
 \section{Specification of a logic}\label{specification-of-a-logic}}
 
 The directory \texttt{/usr/share/doc/multlog} (or whatever you chose)
-contains a documented examples of the configuration file format (as does
+contains a documented example of the configuration file format (as does
 the \texttt{doc} subdirectory of the source distribution itself),
 \texttt{sample.lgc}.
 
@@ -352,6 +352,9 @@ the regular expression RE1
 
 of up to 40 characters. In other words, the string may consist of any
 printable ASCII character, where quotes (") have to be doubled.
+\texttt{\textless{}logname\textgreater{}} may contain LaTeX code (e.g.,
+for accented characters), where \texttt{\textbackslash{}} does
+\emph{not} need to be escaped.
 
 Example:
 
@@ -362,8 +365,9 @@ logic "G\""odel".
 \hypertarget{truth-values-mandatory}{%
 \subsection{Truth values (mandatory)}\label{truth-values-mandatory}}
 
-The particular order of the values is of no significance as indicated by
-the braces. Every truth value may appear only once.
+You have to list the truth values of the logic you are defining. The
+order in which they are listed will be the order used for the
+presentation of truth tables. Every truth value may appear only once.
 
 Syntax:
 
@@ -487,11 +491,11 @@ Optional; but what's a logic without operators?
 \subsubsection{Mappings}\label{mappings}}
 
 In its simplest and most general form, each operator is specified by its
-name and the mapping of input to output values. Again braces are used to
-indicate that the order in which the input tuples are assigned output
-values is of no significance. The definitions should be complete: every
-\(k\)-tuple has to be assigned exactly one value, where \(k>0\) is the
-arity of the operator. There may be several operators with the same
+name and the mapping of input to output values. The braces indicate that
+the order in which the input tuples are assigned output values is of no
+significance. The definitions should be complete: every \(k\)-tuple has
+to be assigned exactly one value, where \(k>0\) is the arity of the
+operator. There may be several operators with the same
 \texttt{\textless{}opname\textgreater{}} but with different
 \texttt{\textless{}arity\textgreater{}}.
 
@@ -733,8 +737,8 @@ texName(t, "\\mathbf{T}").
 
   will result in the truth value \texttt{t} be typset as \(\mathbf{T}\).
   (Note that \texttt{\textbackslash{}} have to be doubled.) If the LaTeX
-  replacement is a simple command, the quotation marks can be left off,
-  e.g.,
+  replacement is a simple command beginning with a lowercase letter, the
+  quotation marks can be left off, e.g.,
 
 \begin{verbatim}
 texName(and,    \\wedge  ).
@@ -764,9 +768,9 @@ texExtra("ShortName", "\\textbf{\\L}_3").
 \end{verbatim}
 
   will define \texttt{\textbackslash{}ShortName} as
-  \texttt{\textbackslash{}ensuremath\{\textbackslash{}textbf\{\textbackslash{}L\}\_3\}},
-  and this macro will be available in the LaTeX file. The LaTeX template
-  file makes use of a number of macros which can be defined in this way:
+  \texttt{\textbackslash{}textbf\{\textbackslash{}L\}\_3}, and this
+  macro will be available in the LaTeX file. The LaTeX template file
+  makes use of a number of macros which can be defined in this way:
 
   \begin{itemize}
   \item
@@ -781,8 +785,7 @@ texExtra("ShortName", "\\textbf{\\L}_3").
   \item
     \texttt{\textbackslash{}FullNameOfLogic} is the macro used to insert
     the name of the logic. By default it will be
-    ``\texttt{\textless{}logname\textgreater{}} logic'', plus
-    \texttt{\textbackslash{}ShortName}, if defined. Sometimes this
+    ``\texttt{\textless{}logname\textgreater{}} logic''. Sometimes this
     doesn't work, so, e.g., you could say:
 
 \begin{verbatim}

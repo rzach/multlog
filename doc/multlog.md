@@ -16,8 +16,6 @@ Further information is available on the [project
 webpage](http://www.logic.at/multlog/), where you can also find an
 up-to-date copy of this manual, and example outputs.
 
-
-
 # Requirements
 
 You need the following to run MUltlog:
@@ -207,8 +205,9 @@ produce a DVI file of the paper.
 # Specification of a logic
 
 The directory `/usr/share/doc/multlog` (or whatever you chose)
-contains a documented examples of the configuration file format (as
-does the `doc` subdirectory of the source distribution itself), `sample.lgc`.
+contains a documented example of the configuration file format (as
+does the `doc` subdirectory of the source distribution itself),
+`sample.lgc`.
 
 To specify a logic, your specification (`.lgc`) file has to contain
 the following:
@@ -227,6 +226,8 @@ where `<logname>` is a string described by the regular expression RE1
 
 of up to 40 characters. In other words, the string may consist
 of any printable ASCII character, where quotes (") have to be doubled.
+`<logname>` may contain LaTeX code (e.g., for accented characters),
+where `\` does *not* need to be escaped.
 
 Example:
 
@@ -234,8 +235,9 @@ Example:
 
 ## Truth values (mandatory)
 
-The particular order of the values is of 
-no significance as indicated by the braces. Every truth value may appear only once.
+You have to list the truth values of the logic you are defining. The
+order in which they are listed will be the order used for the
+presentation of truth tables. Every truth value may appear only once.
 
 Syntax:
 
@@ -323,12 +325,12 @@ Optional; but what's a logic without operators?
 ### Mappings
 
 In its simplest and most general form, each operator is specified by
-its name and the mapping of input to output values.  Again braces are
-used to indicate that the order in which the input tuples are assigned
-output values is of no significance.  The definitions should be
-complete: every $$k$$-tuple has to be assigned exactly one value, where
-$$k>0$$ is the arity of the operator. There may be several operators with
-the same `<opname>` but with different `<arity>`.
+its name and the mapping of input to output values.  The braces
+indicate that the order in which the input tuples are assigned output
+values is of no significance.  The definitions should be complete:
+every $$k$$-tuple has to be assigned exactly one value, where $$k>0$$
+is the arity of the operator. There may be several operators with the
+same `<opname>` but with different `<arity>`.
 
 Syntax:
 
@@ -361,7 +363,8 @@ Example:
 ### Tables
 
 Binary operators can be also specified as tables.  Since the order of
-truth values in the table is significant, brackets are used instead of braces.
+truth values in the table is significant, brackets are used instead of
+braces.
 
 Syntax:
 
@@ -411,7 +414,6 @@ Examples:
 
     operator(and  /2, inf(linear)).
     operator(or   /2, sup(linear)).
-
 
 ## Definitions of (distribution) quantifiers
 
@@ -511,7 +513,8 @@ The `.cfg` file for a logic can contain three kinds of declaration:
   ```
   will result in the truth value `t` be typset as $$\mathbf{T}$$.
   (Note that `\` have to be doubled.)  If the LaTeX replacement is a
-  simple command, the quotation marks can be left off, e.g.,
+  simple command beginning with a lowercase letter, the quotation
+  marks can be left off, e.g.,
   ```
   texName(and,    \\wedge  ).
   ```
@@ -531,7 +534,7 @@ The `.cfg` file for a logic can contain three kinds of declaration:
   ```
   texExtra("ShortName", "\\textbf{\\L}_3").
   ```
-  will define `\ShortName` as `\ensuremath{\textbf{\L}_3}`, and this
+  will define `\ShortName` as `\textbf{\L}_3`, and this
   macro will be available in the LaTeX file. The LaTeX template file
   makes use of a number of macros which can be defined in this way:
   - `\Preamble` will be executed in the preamble just before
@@ -540,9 +543,8 @@ The `.cfg` file for a logic can contain three kinds of declaration:
   - `\ShortName` may contain code for an abbreviation or symbol for
     the logic. `\ShortName` will be called in math mode.
   - `\FullNameOfLogic` is the macro used to insert the name of the
-    logic. By default it will be "`<logname>` logic", plus
-    `\ShortName`, if defined. Sometimes this doesn't work, so, e.g.,
-    you could say:
+    logic. By default it will be "`<logname>` logic". Sometimes this
+    doesn't work, so, e.g., you could say:
     ```
     texExtra("FullNameOfLogic", "Halld\\'en's logic of nonsense").
     ```
