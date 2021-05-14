@@ -255,6 +255,11 @@ do
   done
 done
 
+echo "pdfLaTeXing the manual."
+pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
+pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
+$rm -f $mldoc/multlog.aux $mldoc/multlog.log $mldoc/multlog.toc $mldoc/multlog.out
+
 $rm -f $sedscript
 $rm -f $distdir/bin/$deinstall
 

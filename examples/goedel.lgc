@@ -1,0 +1,30 @@
+% Specification of 3-valued Goedel logic for MUltlog
+
+logic "G\""odel".
+
+truth_values {f,*,t}.
+
+designated_truth_values {t}.
+
+ordering(linear, "f < * < t").
+
+operator(true /0, mapping { t }).
+operator(false/0, mapping { f }).
+
+operator(neg  /1, mapping { (t): f,
+                            (*): f,
+                            (f): t
+                          }
+        ).
+
+operator(imp/2, table   [     f, *, t,
+                          f,  t, t, t,
+                          *,  f, t, t,
+                          t,  f, *, t
+                        ]
+        ).
+operator(and  /2, inf(linear)).
+operator(or   /2, sup(linear)).
+
+quantifier(forall, induced_by inf(linear)).
+quantifier(exists, induced_by sup(linear)).

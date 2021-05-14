@@ -1,0 +1,997 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={MUltlog 1.14 \& iLC 1.2},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{MUltlog 1.14 \& iLC 1.2}
+\date{}
+
+\begin{document}
+\maketitle
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+MUltlog is a system which takes as input the specification of a
+finitely-valued first-order logic and produces a sequent calculus, a
+natural deduction system, and clause formation rules for this logic. All
+generated rules are optimized regarding their branching degree. The
+output is in the form of a scientific paper written in LaTeX.
+
+iLC is an editor for Tcl/Tk, which allows to specify many-valued logics
+for MUltlog in a convenient form.
+
+Further information is available on the
+\href{http://www.logic.at/multlog/}{project webpage}, where you can also
+find an up-to-date copy of this manual, and example outputs.
+
+\hypertarget{requirements}{%
+\section{Requirements}\label{requirements}}
+
+You need the following to run MUltlog:
+
+\begin{itemize}
+\item
+  MUltlog itself. The source code is available in the
+  \href{https://github.com/rzach/multlog}{Multlog GitHub repository}.
+\item
+  Some standard Prolog system,
+  e.g.~\href{https://www.swi-prolog.org/}{SWI-Prolog}. Other Prologs
+  should work as well; MUltlog has been tested with SWI and SICStus
+  Prolog.
+\end{itemize}
+
+The output of MUltlog is in the form of a LaTeX paper. To view it
+properly, you need the typesetting system
+
+\begin{itemize}
+\tightlist
+\item
+  TeX, available from \href{https://ctan.org/}{CTAN}. For Linux, the
+  \href{https://www.tug.org/texlive/}{TeXLive} distribution is
+  particularly convenient to install and is most likely available via
+  your package manager.
+\end{itemize}
+
+MUltlog includes a special editor, iLC, which allows to specify
+many-valued logics in a convenient, windows-oriented way, instead of
+typing an ASCII text in a strict syntax. To use this editor you need the
+script language
+
+\begin{itemize}
+\tightlist
+\item
+  \href{https://www.tcl.tk/}{Tcl/Tk} (version 7.4/4.0 or later). Many
+  Linux systems include Tcl/Tk by default (check for a program named
+  \texttt{wish}).
+\end{itemize}
+
+\hypertarget{installation}{%
+\section{Installation}\label{installation}}
+
+\hypertarget{obtaining-multlog}{%
+\subsection{Obtaining MUltlog}\label{obtaining-multlog}}
+
+Get the newest release of MUltlog by cloning or downloading the Git
+repository from
+\href{https://github.com/rzach/multlog}{github.com/rzach/multlog}.
+
+\hypertarget{running-the-installation-script}{%
+\subsection{Running the installation
+script}\label{running-the-installation-script}}
+
+As of version 1.05, MUltlog comes with an installation script for Linux.
+Before running the script:
+
+\begin{itemize}
+\item
+  decide which Prolog to use. The script will look for SWI-Prolog,
+  SICStus, and BinProlog in some standard locations, and suggest the
+  result as a default to the user.
+\item
+  decide where to put MUltlog. If run as root, the default locations are
+  \texttt{/usr/local/bin} for executables, \texttt{/usr/local/lib} for
+  library files, and \texttt{/usr/share/doc} for documentation. If not
+  run as root, the script will install into
+  \texttt{\textasciitilde{}/.local/bin,}
+  \texttt{\textasciitilde{}/.local/lib}, and
+  \texttt{\textasciitilde{}/.local/doc}. Note that these directories
+  must exist; the script will not try to create them.
+\end{itemize}
+
+To run the installation script, change to the installation directory
+\texttt{multlog} and type
+
+\begin{verbatim}
+./ml_install
+\end{verbatim}
+
+The script will - determine the location of some Unix commands - ask the
+user for the Prolog to use - ask the user for the place where to put
+MUltlog - generate the deinstallation script \texttt{ml\_deinstall} -
+insert the correct paths in some of MUltlog's files - copy the MUltlog
+files in the right places.
+
+In case of problems see the section on
+\protect\hyperlink{troubleshooting}{troubleshooting} below.
+
+Note that the installation procedure puts path information directly into
+some of MUltlog's files. This means that to install MUltlog somewhere
+else, you need the original distribution as well as the installation
+script.
+
+\hypertarget{deinstallation}{%
+\subsection{Deinstallation}\label{deinstallation}}
+
+Run the script
+
+\begin{verbatim}
+ml_deinstall
+\end{verbatim}
+
+to remove files installed by \texttt{ml\_install}. The deinstallation
+script is located in the same directory as the other MUltlog commands
+like \texttt{lgc2tex}, \texttt{lgc2pdf}, \ldots{}
+(\texttt{/usr/local/bin} or \texttt{\textasciitilde{}/.local/bin} by
+default).
+
+\hypertarget{using-multlog}{%
+\section{Using MUltlog}\label{using-multlog}}
+
+The examples below assume that MUltlog was installed into the standard
+place \texttt{/usr/local/*}, and assumes that the locations of the
+MUltlog scripts \texttt{lgc2tex} and \texttt{lgc2pdf} are your command
+path. If you use different settings, change the examples accordingly.
+
+\hypertarget{guide-for-the-impatient}{%
+\subsection{Guide for the impatient}\label{guide-for-the-impatient}}
+
+\begin{itemize}
+\item
+  Move to a temporary directory, e.g.,
+
+\begin{verbatim}
+mkdir tmp; cd tmp
+\end{verbatim}
+\item
+  Get the sample logic from the \texttt{doc} directory, e.g.,
+
+\begin{verbatim}
+cp /usr/share/doc/multlog/sample.lgc .
+\end{verbatim}
+\item
+  Generate the paper in PDF format
+
+\begin{verbatim}
+lgc2pdf sample
+\end{verbatim}
+
+  You should now be able to open \texttt{goedel.pdf} using the PDF
+  reader of your choice.
+\item
+  To edit the specification of the logic before generating the paper,
+  type
+
+\begin{verbatim}
+ilc &
+\end{verbatim}
+
+  Select ``Open'' from the menu ``File'' and type \texttt{goedel} as the
+  name of the file to be loaded.
+\end{itemize}
+
+The \texttt{examples/} directory of the distribution contains other
+example specification and configuration files.
+
+\hypertarget{creating-the-specification-of-a-logic}{%
+\subsection{Creating the specification of a
+logic}\label{creating-the-specification-of-a-logic}}
+
+You can either use your favourite text editor, or the ``interactive
+Logic Creator'' \texttt{ilc}.
+
+In the first case specify your many-valued logic in the syntax described
+in the sample specification \texttt{/usr/share/doc/multlog/sample.lgc}
+and save the result as \texttt{\textless{}name\textgreater{}.lgc}.
+
+To start \texttt{ilc}, type
+
+\begin{verbatim}
+ilc &
+\end{verbatim}
+
+A window pops up, and you are able to edit a new logic or re-edit an
+already exisiting one, and to save the result in a textual format
+suitable for MUltlog. Note that you have to store the logic as
+\texttt{\textless{}name\textgreater{}}, the extension \texttt{.lgc}
+being added automatically.
+
+\hypertarget{creating-the-paper-pdf}{%
+\subsection{Creating the paper (PDF)}\label{creating-the-paper-pdf}}
+
+To obtain the paper corresponding to your logic, type
+
+\begin{verbatim}
+lgc2pdf <name>
+\end{verbatim}
+
+where \texttt{\textless{}name\textgreater{}} is the name under which you
+saved your logic. This invokes MUltlog as well as PDFLaTeX and BibTeX
+(or alternatively, if \texttt{pdflatex} was not found upon installation,
+LaTeX, BibTeX, \texttt{dvips} and \texttt{ps2pdf}).
+
+If \texttt{\textless{}name\textgreater{}.bib} exists, it should contain
+a bibliography entry with key \texttt{ml}, which will be cited as the
+source for the definition of the logic.
+
+Additionally, all files are deleted except the specification of the
+logic and the PDF file.
+
+View the resulting paper with any PDF reader, e.g.
+
+\begin{verbatim}
+acroread goedel.pdf &
+evince goedel.pdf &
+...
+\end{verbatim}
+
+\hypertarget{creating-the-paper-latex}{%
+\subsection{Creating the paper (LaTeX)}\label{creating-the-paper-latex}}
+
+If you are interested in the LaTeX source of the paper, use
+\texttt{lgc2tex} instead of \texttt{lgc2pdf}:
+
+\begin{verbatim}
+lgc2tex <name>
+\end{verbatim}
+
+This will invoke MUltlog, but does neither LaTeXing nor cleaning up. It
+will produce two files: \texttt{\textless{}name\textgreater{}.tex} and
+\texttt{\textless{}name\textgreater{}.sty}.
+\texttt{\textless{}name\textgreater{}.tex} is a template LaTeX file
+which loads \texttt{\textless{}name\textgreater{}.sty}. The latter
+contains the difinitions specific to your logic.
+
+The source will be \texttt{\textless{}name\textgreater{}.tex} and will
+require \texttt{\textless{}name\textgreater{}.sty} and to be compiled.
+\texttt{\textless{}name\textgreater{}.sty} contains the definitions
+produced by MUltlog.
+
+\hypertarget{creating-the-paper-dvi}{%
+\subsection{Creating the paper (DVI)}\label{creating-the-paper-dvi}}
+
+The command
+
+\begin{verbatim}
+lgc2dvi <name>
+\end{verbatim}
+
+where \texttt{\textless{}name\textgreater{}} is the name under which you
+saved your logic, will produce a DVI file of the paper.
+
+\hypertarget{specification-of-a-logic}{%
+\section{Specification of a logic}\label{specification-of-a-logic}}
+
+The directory \texttt{/usr/share/doc/multlog} (or whatever you chose)
+contains a documented examples of the configuration file format (as does
+the \texttt{doc} subdirectory of the source distribution itself),
+\texttt{sample.lgc}.
+
+To specify a logic, your specification (\texttt{.lgc}) file has to
+contain the following:
+
+\hypertarget{the-name-of-the-logic-mandatory}{%
+\subsection{The name of the logic
+(mandatory)}\label{the-name-of-the-logic-mandatory}}
+
+Here you specify the name of the logic to be used in the PDF.
+
+Syntax:
+
+\begin{verbatim}
+logic "<logname>".
+\end{verbatim}
+
+where \texttt{\textless{}logname\textgreater{}} is a string described by
+the regular expression RE1
+
+({[}
+\texttt{!\#\$\%\&\textquotesingle{}()*+,./0-9:;\textless{}=\textgreater{}?@A-Z{[}\textbackslash{}{]}\^{}\_\textasciigrave{}a-z\{\textbar{}\}\textasciitilde{}-}{]}
+\textbar{} \texttt{""} )*
+
+of up to 40 characters. In other words, the string may consist of any
+printable ASCII character, where quotes (") have to be doubled.
+
+Example:
+
+\begin{verbatim}
+logic "G\""odel".
+\end{verbatim}
+
+\hypertarget{truth-values-mandatory}{%
+\subsection{Truth values (mandatory)}\label{truth-values-mandatory}}
+
+The particular order of the values is of no significance as indicated by
+the braces. Every truth value may appear only once.
+
+Syntax:
+
+\begin{verbatim}
+truth_values { <v 1>, ..., <v n> }.
+\end{verbatim}
+
+Example:
+
+\begin{verbatim}
+truth_values {f,*,t}.
+\end{verbatim}
+
+where each of the truth values \texttt{\textless{}v\ 1\textgreater{}},
+\ldots{}, \texttt{\textless{}v\ n\textgreater{}} (\(n \ge 2\)) is
+described by the regular expression RE2
+
+( {[}\texttt{a}-\texttt{z}{]}{[}\texttt{A-Za-z0-9\_}{]}* \textbar{}
+{[}\texttt{-+*\^{}\textless{}\textgreater{}=\textasciitilde{}?@\#\$\&}{]}+
+\textbar{} \texttt{0} \textbar{} {[}\texttt{1-9}{]}{[}\texttt{0-9}{]}* )
+
+The truth values may consist of up to 10 characters. Unless you specify
+how they should be typeset in the corresponding \texttt{.cfg} file, the
+paper will use the names \texttt{\textless{}vn\textgreater{}} in italics
+in the generated PDF.
+
+\hypertarget{designated-truth-values-mandatory}{%
+\subsection{Designated truth values
+(mandatory)}\label{designated-truth-values-mandatory}}
+
+The designated truth values are usually those representing ``true''. The
+particular order of the values is of no significance as indicated by the
+braces. Every truth value may appear at most once.
+
+Syntax:
+
+\begin{verbatim}
+designated_truth_values { <v 1>, ..., <v n> }.
+\end{verbatim}
+
+Example:
+
+\begin{verbatim}
+designated_truth_values {t}.
+\end{verbatim}
+
+where each of the truth values \textless{}v 1\textgreater{}, \ldots{},
+(n\textgreater{}0) is described by the regular expression RE2 above and
+may consist of up to 10 characters.
+
+The choice of designated truth values has no effect on the generated
+rules. However, they make a difference to what sequent, initial tableau,
+or initial clause set has to be used to give a proof of an entailment.
+
+\hypertarget{orderings-of-truth-values-optional}{%
+\subsection{Orderings of truth values
+(optional)}\label{orderings-of-truth-values-optional}}
+
+By specifying an ordering on truth values, you can declare an operator
+or quantifier as being the ``inf'' (greatest lower bound) or ``sup''
+(least upper bound) operator with respect to the ordering.
+
+Syntax:
+
+\begin{verbatim}
+ordering(<ordname>, "<ordspec>").
+\end{verbatim}
+
+where \texttt{\textless{}ordname\textgreater{}} is defined according to
+RE2 above and may consist of up to 10 characters.
+\texttt{\textless{}ordspec\textgreater{}} is a string of up to 200
+characters satisfying RE1 above. This string is either a single chain,
+or a set of chains in \texttt{\{}\ldots{}\texttt{\}}. A chain, in turn,
+is a seqence of either elements separated by \texttt{\textless{}}, where
+each element is either a truth value (as defined by
+\texttt{truth\_values}) or itself a set of chains.
+
+In order to avoid ambiguities, spaces may be used to separate the
+\texttt{\textless{}} sign from truth values (which may also contain the
+character \texttt{\textless{}}).
+
+The semantics of order specifications is as follows:
+
+\begin{itemize}
+\tightlist
+\item
+  Chains like
+  ``\texttt{a\ \textless{}\ b\ \textless{}\ c\ \textless{}\ d\ \textless{}\ e}''
+  are interpreted as an abbreviation for
+  ``\texttt{a\ \textless{}\ b,\ b\ \textless{}\ c,\ c\ \textless{}\ d,\ d\ \textless{}\ e}''.
+\item
+  Independent chains are collected in sets:
+  ``\texttt{\{a\ \textless{}\ b,\ c\ \textless{}\ d\ \textless{}e,\ ...\}}'';
+\item
+  Sets and chains can be nested. E.g.,
+  ``\texttt{a\ \textless{}\ \{b,\ c\ \textless{}\ d\}\ \textless{}\ e}''
+  is the same as
+  ``\texttt{\{a\ \textless{}\ b,\ a\ \textless{}\ c,\ c\ \textless{}\ d,\ b\ \textless{}\ e,\ d\ \textless{}\ e\}}''.
+\end{itemize}
+
+Let \(R\) be the relation defined by this specification. The ordering
+induced by \(R\) is the smallest reflexive, anti-symmetric and
+transitive relation containing \(R\). Note that truth values with
+different names are treated as being different from each other. Hence a
+specification containing \texttt{a\textless{}b} and
+\texttt{b\textless{}a} induces no ordering, since anti-symmetry would
+imply \texttt{a}=\texttt{b}.
+
+Example:
+
+\begin{verbatim}
+ordering(linear, "f < * < t").
+\end{verbatim}
+
+\hypertarget{definitions-of-operators}{%
+\subsection{Definitions of operators}\label{definitions-of-operators}}
+
+Optional; but what's a logic without operators?
+
+\hypertarget{mappings}{%
+\subsubsection{Mappings}\label{mappings}}
+
+In its simplest and most general form, each operator is specified by its
+name and the mapping of input to output values. Again braces are used to
+indicate that the order in which the input tuples are assigned output
+values is of no significance. The definitions should be complete: every
+\(k\)-tuple has to be assigned exactly one value, where \(k>0\) is the
+arity of the operator. There may be several operators with the same
+\texttt{\textless{}opname\textgreater{}} but with different
+\texttt{\textless{}arity\textgreater{}}.
+
+Syntax:
+
+\begin{verbatim}
+operator(<opname>/<arity>, mapping { <ass 1>, ..., <ass m> }).
+\end{verbatim}
+
+\texttt{\textless{}opname\textgreater{}} is defined according to RE2
+above and may consist of up to 10 characters.
+\texttt{\textless{}arity\textgreater{}} is a non-negative integer.
+\texttt{\textless{}ass\ 1\textgreater{}}, \ldots{},
+\texttt{\textless{}ass\ m\textgreater{}} are assignments of the form
+
+\begin{verbatim}
+( <v 1>, ..., <v k> ) : <v>
+\end{verbatim}
+
+where
+\texttt{\textless{}v\ 1\textgreater{}},\ldots{},\texttt{\textless{}v\ k\textgreater{}},
+and \texttt{\textless{}v\textgreater{}} are truth values. Assignments
+must be separated by commas. For \(k = 0\), the mapping consists of a
+single truth value.
+
+Example:
+
+\begin{verbatim}
+operator(true /0, mapping { t }).
+operator(and  /2, mapping { (t,t): t,
+                            (t,*): *,
+                            (t,f): f,
+                            (*,t): *,
+                            (*,*): *,
+                            (*,f): f,
+                            (f,t): f,
+                            (f,*): f,
+                            (f,f): f
+                          }
+\end{verbatim}
+
+\hypertarget{tables}{%
+\subsubsection{Tables}\label{tables}}
+
+Binary operators can be also specified as tables. Since the order of
+truth values in the table is significant, brackets are used instead of
+braces.
+
+Syntax:
+
+\begin{verbatim}
+operator(<opname>/2, table [ <v 1>, ..., <v m> ]).
+\end{verbatim}
+
+\texttt{\textless{}opname\textgreater{}} is defined according to RE2
+above and may consist of up to 10 characters.
+\texttt{\textless{}v\ 1\textgreater{}},\ldots{},\texttt{\textless{}v\ m\textgreater{}}
+are truth values. The number of elements in the table, \(m\), has to be
+equal to \((n+1)^2-1\), where \(n\) is the number of different truth
+values.
+
+Example:
+
+\begin{verbatim}
+operator(and/2, table   [     t, *, f,
+                          t,  t, *, f,
+                          *,  *, *, f,
+                          f,  f, f, f
+                        ]
+        ).
+\end{verbatim}
+
+\hypertarget{inf-and-sup}{%
+\subsubsection{Inf and sup}\label{inf-and-sup}}
+
+Operators may also be declared to be the infimum (greatest lower bound)
+or supremum (least upper bound) with respect to some user-defined
+ordering.
+
+Syntax:
+
+\begin{verbatim}
+operator(<opname>/<arity>, sup(<ordname>)).
+operator(<opname>/<arity>, inf(<ordname>)).
+\end{verbatim}
+
+Here, \texttt{\textless{}opname\textgreater{}} is defined according to
+RE2 above and may consist of up to 10 characters.
+\texttt{\textless{}arity\textgreater{}} is a non-negative integer
+greater than one. \texttt{\textless{}ordname\textgreater{}} is the name
+of an appropriate ordering defined by an \texttt{ordering} statement.
+
+``sup'' stands for the least-upper-bound (= supremum) operation w.r.t.
+the given ordering. The value of the operator is determined as the least
+upper bound of the input truth values in the ordering. ``inf'' stands
+for the greatest-lower-bound (= infimum) operation w.r.t. the given
+ordering. The value of the operator is determined as the greatest lower
+bound of the input truth values in the ordering.
+
+The ordering has to define a unique supremum/infimum for any two truth
+values.
+
+Examples:
+
+\begin{verbatim}
+operator(and  /2, inf(linear)).
+operator(or   /2, sup(linear)).
+\end{verbatim}
+
+\hypertarget{definitions-of-distribution-quantifiers}{%
+\subsection{Definitions of (distribution)
+quantifiers}\label{definitions-of-distribution-quantifiers}}
+
+Optional.
+
+\hypertarget{mappings-1}{%
+\subsubsection{Mappings}\label{mappings-1}}
+
+In its simplest and most general form, each quantifier is specified by
+its name and a mapping assigning a truth value to each non-empty subset
+of the truth values. The definitions should be complete: \emph{every}
+non-empty subset should be assigned exactly one value.
+
+Syntax:
+
+\begin{verbatim}
+quantifier(<quname>, mapping { <ass 1>, ..., <ass m> }).
+\end{verbatim}
+
+\texttt{\textless{}quname\textgreater{}} is defined according to RE2
+above and may consist of up to 10 characters.
+\texttt{\textless{}ass\ 1\textgreater{}},\ldots{},\texttt{\textless{}ass\ m\textgreater{}}
+are assignments of the form
+\texttt{\{\ \textless{}v\ 1\textgreater{},\ ...,\ \textless{}v\ k\textgreater{}\ \}\ :\ \textless{}v\textgreater{}},
+where
+\texttt{\textless{}v\ 1\textgreater{}},\ldots{},\texttt{\textless{}v\ k\textgreater{}},
+and \texttt{\textless{}v\textgreater{}} are truth values. \(k\) has to
+be greater than one.
+
+Example:
+
+\begin{verbatim}
+quantifier(forall, mapping { {t}    : t,
+                             {t,*}  : *,
+                             {t,f}  : f,
+                             {t,*,f}: f,
+                             {*}    : *,
+                             {*,f}  : f,
+                             {f}    : f
+                           }
+          ).
+\end{verbatim}
+
+\hypertarget{induced-quantifiers}{%
+\subsubsection{Induced quantifiers}\label{induced-quantifiers}}
+
+The definition of induced quantifiers in a more comfortable and less
+error-prone form. Quantifiers can only be induced by operators which are
+associative, commutative and idempotent.
+
+Syntax:
+
+\begin{verbatim}
+quantifier(<quname>, induced_by <opname>/<arity>).
+\end{verbatim}
+
+\texttt{\textless{}quname\textgreater{}} is defined according to RE2
+above and may consist of up to 10 characters.
+\texttt{\textless{}opname\textgreater{}} is defined according to RE2
+above and may consist of up to 10 characters, and should be an operator
+defined as above. \texttt{\textless{}arity\textgreater{}} is an integer
+greater than one.
+
+Example:
+
+\begin{verbatim}
+quantifier(forall, induced_by and/2).
+\end{verbatim}
+
+\hypertarget{inf-and-sup-1}{%
+\subsubsection{Inf and sup}\label{inf-and-sup-1}}
+
+Quantifiers can also be induced by a lub/glb operator.
+
+Syntax:
+
+\begin{verbatim}
+quantifier(<quname>, induced_by <bop>(<ordname>)).
+\end{verbatim}
+
+\texttt{\textless{}quname\textgreater{}} is defined according to RE2
+above and may consist of up to 10 characters.
+\texttt{\textless{}bop\textgreater{}} is either sup or inf.
+\texttt{\textless{}ordname\textgreater{}} is the name of an appropriate
+ordering defined by an ``\texttt{ordering}''-statement.
+
+Example:
+
+\begin{verbatim}
+quantifier(forall, induced_by inf(linear)).
+\end{verbatim}
+
+\hypertarget{interactive-logic-creator}{%
+\subsection{interactive Logic Creator}\label{interactive-logic-creator}}
+
+\texttt{ilc} is a graphical front-end to make creating \texttt{.lgc}
+files a little easier. It requires Tcl/Tk (version 7.4/4.0 or later). To
+be exact, you only need the executable \texttt{wish} (the windowing
+shell) but not the libraries and none of the extensions.
+
+The program should be rather self-explanatory once you know what goes
+into the \texttt{.lgc} file. You can load and save \texttt{.lgc} files
+from the ``File'' menu. Before you can specify orderings, operators, and
+quantifiers, you have to enter the name of the logic and the list of
+truth values.
+
+\hypertarget{tex-configuration-files}{%
+\section{TeX configuration files}\label{tex-configuration-files}}
+
+MUltlog will generate a \texttt{.tex} and \texttt{.sty} file from a
+given \texttt{.lgc} file. If present, it will also use the content of a
+corresponding \texttt{.cfg} file, which can be used to fine-tune the
+formatted output.
+
+The \texttt{.cfg} file for a logic can contain three kinds of
+declaration:
+
+\begin{itemize}
+\item
+  \texttt{texName(\textless{}name\textgreater{},\ \textless{}definition\textgreater{})}
+  associates the name \texttt{\textless{}name\textgreater{}} of a truth
+  value, operator, or quantifier used in the \texttt{.lgc} file with
+  LaTeX code used to typeset it. For instance, if \texttt{t} is a truth
+  value in the \texttt{.lgc} file, then
+
+\begin{verbatim}
+texName(t, "\mathbf{T}").
+\end{verbatim}
+
+  will result in the truth value \texttt{t} be typset as \(\mathbf{T}\).
+  (Note that \texttt{\textbackslash{}} have to be doubled.) If the LaTeX
+  replacement is a simple command, the quotation marks can be left off,
+  e.g.,
+
+\begin{verbatim}
+texName(and,    \\wedge  ).
+\end{verbatim}
+\item
+  \texttt{texInfix(\textless{}op\textgreater{})} and
+  \texttt{texPrefix(\textless{}op\textgreater{})} will cause formulas
+  involving an operator to be set either as infix or prefix, as opposed
+  to the default operator notation. Of course, \texttt{texInfix} can
+  only be applied to binary operators, and \texttt{texPrefix} only to
+  unary operators. For instance:
+
+\begin{verbatim}
+texInfix(or).
+texPrefix(neg).
+\end{verbatim}
+\item
+  \texttt{texExtra(\textless{}macro\textgreater{},\ \textless{}definition\textgreater{})}
+  will insert a definition for
+  \texttt{\textbackslash{}\textless{}macro\textgreater{}} with body
+  \texttt{\textless{}definition\textgreater{}} in the \texttt{.sty}
+  file, which will be loaded in the preamble. This can be used to
+  (re-)define any macro used in the LaTeX file. For instance,
+
+\begin{verbatim}
+texExtra("ShortName", "\\ensuremath{\\textbf{\\L}_3}").
+\end{verbatim}
+
+  will define \texttt{\textbackslash{}ShortName} as
+  \texttt{\textbackslash{}ensuremath\{\textbackslash{}textbf\{\textbackslash{}L\}\_3\}},
+  and this macro will be available in the LaTeX file. The LaTeX template
+  file makes use of a number of macros which can be defined in this way:
+
+  \begin{itemize}
+  \item
+    \texttt{\textbackslash{}Preamble} will be executed in the preamble
+    just before \texttt{\textbackslash{}begin\{document\}}. It can be
+    used, e.g., to load packages needed for some of the operator
+    symbols, or to change the document font.
+  \item
+    \texttt{\textbackslash{}ShortName} may contain code for an
+    abbreviation or symbol for the logic.
+  \item
+    \texttt{\textbackslash{}FullNameOfLogic} is the macro used to insert
+    the name of the logic. By default it will be
+    ``\texttt{\textless{}logname\textgreater{}} logic'', plus
+    \texttt{\textbackslash{}ShortName}, if defined. Sometimes this
+    doesn't work, so, e.g., you could say:
+
+\begin{verbatim}
+texExtra("FullNameOfLogic", "Halld\\'en's logic of nonsense").
+\end{verbatim}
+  \item
+    \texttt{\textbackslash{}Intro} will be called (if defined) after the
+    first paragraph of the introduction, and can be used to print a
+    paragraph on the history or motivation of the logic. This paragraph
+    can use \texttt{\textbackslash{}cite} to generate references to any
+    entries in \texttt{\textless{}logname\textgreater{}.bib}.
+  \item
+    \texttt{\textbackslash{}Semantics} will be called just before the
+    definition of the matrix of the logic. It can be used to print a
+    paragraph, say, about the intuitive interpretation of the truth
+    values, or how the truth functions of the operators are defined
+    (say, on the basis of an ordering).
+  \item
+    \texttt{\textbackslash{}Link} will be added as a download link to
+    the citation information at the bottom of the first page.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{trouble-shooting}{%
+\section{Trouble shooting}\label{trouble-shooting}}
+
+\hypertarget{installation-errors}{%
+\subsection{Installation errors}\label{installation-errors}}
+
+The installation script may produce the following warnings and errors.
+
+\begin{itemize}
+\item
+  ``Error: \texttt{\textless{}directory\textgreater{}} does not exist.''
+
+  The installation script did not find the directory for executables,
+  library, or documentation (\texttt{/usr/local/bin},
+  \texttt{/usr/local/lib}, and \texttt{/usr/share/doc} or
+  \texttt{\textasciitilde{}/.local/bin},
+  \texttt{\textasciitilde{}/.local/lib},
+  \texttt{\textasciitilde{}./local/doc} by default). Create the
+  directories before running the script or select different directories
+  when prompted.
+
+  \begin{itemize}
+  \tightlist
+  \item
+    ``Error: could not find Unix command
+    \texttt{\textless{}command\textgreater{}}.'' where
+    \texttt{\textless{}command\textgreater{}} is one of
+  \end{itemize}
+
+\begin{verbatim}
+basename chmod cp dirname false grep mkdir pwd rm sed true.
+\end{verbatim}
+
+  The installation script and the scripts for starting MUltlog
+  (\texttt{lgc2tex}, \texttt{lgc2dvi}, \texttt{lgc2pdf}, and
+  \texttt{lgc2ilc}) need these Unix commands. The error message means
+  that could not be located, neither on the current command search path
+  nor in the directories \texttt{/usr/local/bin},
+  \texttt{/usr/local/sbin}, \texttt{/usr/bin}, \texttt{/usr/sbin},
+  \texttt{/bin}, or \texttt{/sbin}. Locate the directory containing
+  \texttt{\textless{}command\textgreater{}} and put it on your command
+  search path during installation.
+
+  If your Unix system does not have
+  \texttt{\textless{}command\textgreater{}} at all, submit an issue on
+  https://github.com/rzach/multlog/.
+\item
+  ``Warning: could not find TeX command
+  \texttt{\textless{}command\textgreater{}}.'' where
+  \texttt{\textless{}command\textgreater{}} is one of
+
+\begin{verbatim}
+latex bibtex.
+\end{verbatim}
+
+  The script \texttt{lgc2dvi} needs latex and bibtex to produce a
+  DVI-file from the TeX document created by MUltlog. The warning means
+  that \texttt{\textless{}command\textgreater{}} could not be located,
+  neither on the current command search path nor in the directories
+
+  \texttt{/usr/local/bin} \texttt{/usr/local/}sbin
+  /usr/bin\texttt{}/usr/sbin\texttt{}/bin\texttt{}/sbin`
+
+  Check whether TeX is properly installed and put the directory
+  containing \texttt{\textless{}command\textgreater{}} on your command
+  search path during installation.
+\item
+  ``Warning: couldn't find any PDF converters.''
+
+  The script \texttt{lgc2pdf} needs either \texttt{pdflatex} or
+  \texttt{latex}, \texttt{dvips} and \texttt{ps2pdf} to produce a
+  PDF-file from the TeX document created by MUltlog. The warning means
+  that either \texttt{pdflatex} or \texttt{dvips} and \texttt{ps2pdf}
+  could not be located, neither on the current command search path nor
+  in the directories \texttt{/usr/local/bin}, \texttt{/usr/local/sbin},
+  \texttt{/usr/bin}, \texttt{/usr/sbin}, \texttt{/bin}, or
+  \texttt{/sbin}. Check whether TeX and Ghostscript are properly
+  installed and put the directory containing the PDF converter on your
+  command search path during installation.
+\item
+  ``Warning: could not find Tcl/Tk command wish.''
+
+  The editor \texttt{ilc} needs the Tcl/Tk package, in particular the
+  program \texttt{wish}. The warning means that \texttt{wish} could not
+  be located, neither on the current command search path nor in the in
+  the directories \texttt{/usr/local/bin}, \texttt{/usr/local/sbin},
+  \texttt{/usr/bin}, \texttt{/usr/sbin}, \texttt{/bin}, or
+  \texttt{/sbin}. Check whether Tcl/Tk is properly installed and put the
+  directory containing \texttt{wish} on your command search path during
+  installation.
+\item
+  ``Error: \texttt{\textless{}command\textgreater{}} does not exist or
+  has no execute permission.''
+
+  \texttt{\textless{}command\textgreater{}} (suggested by the user as
+  Prolog interpreter) does not exist or cannot be executed.
+\item
+  ``Error: \texttt{\textless{}command\textgreater{}} does not behave
+  like Prolog.''
+
+  \texttt{\textless{}command\textgreater{}} (suggested by the user as
+  Prolog interpreter) exists but fails the test performed by the
+  installation script. This test is a heuristic check whether
+  \texttt{\textless{}command\textgreater{}} is indeed a Prolog system;
+  more precisely, the output of
+
+\begin{verbatim}
+echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
+\end{verbatim}
+
+  is checked for the string ``gernot''. If
+  \texttt{\textless{}command\textgreater{}} is a Prolog system but fails
+  this test, or if it is no Prolog system but passes the test, submit an
+  issue on https://github.com/rzach/multlog/.
+\end{itemize}
+
+\hypertarget{runtime-errors}{%
+\subsection{Runtime errors}\label{runtime-errors}}
+
+\begin{itemize}
+\item
+  "warning: *** copy\_term overflow in findall\_store\_heap ***"
+\item
+  "warning: *** overflow in findall\_store\_heap ***"
+
+  These error messages are produced by BinProlog and indicate that the
+  heap size is too small, which by default is 512 kB. (Reported by
+  Matthew Spinks
+  \href{mailto:mspinks@mugc.cc.monash.edu.au}{\nolinkurl{mspinks@mugc.cc.monash.edu.au}}.)
+
+  Solutions (alternatives):
+
+  \begin{itemize}
+  \item
+    Switch to SWI Prolog which is faster and more robust. You will have
+    to re-install Multlog after SWI-Prolog is in its place.
+  \item
+    Re-install MUltlog using BinProlog with the option \texttt{-h\ 1024}
+    (or some bigger value). When the installation script asks for the
+    Prolog to be used, type e.g.~\texttt{/usr/local/bin/bp\ -h\ 1024}.
+    Note that adding options to the Prolog call only works with MUltlog
+    1.06 or higher.
+  \item
+    Add the option \texttt{-h\ 1024} by hand. To this aim, edit the
+    files
+
+\begin{verbatim}
+/usr/local/bin/lgc2tex
+/usr/local/bin/lgc2dvi
+/usr/local/bin/lgc2pdf
+/usr/local/lib/multlog/ilc/lgc2ilc
+\end{verbatim}
+
+    Near their top there is a line starting with \texttt{PROLOG=}.
+    Replace this line e.g.~by
+
+\begin{verbatim}
+PROLOG='/usr/local/bin/bp -h 1024'
+\end{verbatim}
+
+    Make sure that the files have still execute permission after saving.
+  \end{itemize}
+\end{itemize}
+
+\hypertarget{about-multlog}{%
+\section{About MUltlog}\label{about-multlog}}
+
+The following people contributed to MUltlog (in alphabetical order):
+
+\begin{itemize}
+\tightlist
+\item
+  Stefan Katzenbeisser and Stefan Kral rewrote the optimization
+  procedure for operators using more efficient data structures
+\item
+  Andreas Leitgeb is the author of iLC, the interactive Logic Creator
+\item
+  Wolfram Nix wrote eLK, a DOS interface to MUltlog
+\item
+  Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog
+\item
+  Gernot Salzer wrote the MUltlog kernel and coordinated the project.
+\item
+  Markus Schranz wrote a web interface to MUltlog based on plain HTML
+  and Perl.
+\end{itemize}
+
+(eLK, JMUltlog, and the web interface are no longer available.)
+
+\end{document}
