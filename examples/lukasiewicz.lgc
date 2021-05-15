@@ -1,0 +1,34 @@
+% MUltlog specification of three-valued Lukasiewicz logic
+
+logic "\L ukasiewicz".
+
+truth_values {f,*,t}.
+
+designated_truth_values {t}.
+
+ordering(linear, "f < * < t").
+
+operator(neg  /1, mapping { (t): f,
+                            (*): *,
+                            (f): t
+                          }
+        ).
+
+operator(imp  /2, mapping { (t,t): t,
+                            (t,*): *,
+                            (t,f): f,
+                            (*,t): t,
+                            (*,*): t,
+                            (*,f): *,
+                            (f,t): t,
+                            (f,*): t,
+                            (f,f): t
+                          }
+        ).
+
+operator(and  /2, inf(linear)).
+operator(or   /2, sup(linear)).
+
+quantifier(forall, induced_by inf(linear)).
+quantifier(exists, induced_by sup(linear)).
+

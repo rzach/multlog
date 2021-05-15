@@ -1,0 +1,37 @@
+
+logic "Deutsch-Oller".
+
+truth_values { b , t , f , n }.
+
+designated_truth_values { b , t }.
+
+operator(neg/1, mapping {
+	 (b) : b,
+	 (t) : f,
+	 (f) : t,
+	 (n) : n
+	}
+).
+
+operator(and/2, table [
+	      b, t, f, n,
+	  b,  b, t, b, n,
+	  t,  t, t, t, n,
+	  f,  b, t, f, n,
+	  n,  n, n, n, n
+	]
+).
+
+operator(or/2, table [
+	      b, t, f, n,
+	  b,  b, b, f, n,
+	  t,  b, t, f, n,
+	  f,  f, f, f, n,
+	  n,  n, n, n, n
+	]
+).
+
+quantifier(forall, induced_by and/2).
+
+quantifier(exists, induced_by or/2).
+

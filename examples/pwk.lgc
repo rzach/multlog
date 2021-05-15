@@ -1,0 +1,34 @@
+
+logic "paraconsistent weak Kleene".
+
+truth_values { f , u , t }.
+
+designated_truth_values { u , t }.
+
+operator(neg/1, mapping {
+	 (f) : t,
+	 (u) : u,
+	 (t) : f
+	}
+).
+
+operator(and/2, table [
+	      f, u, t,
+	  f,  f, u, f,
+	  u,  u, u, u,
+	  t,  f, u, t
+	]
+).
+
+operator(or/2, table [
+	      f, u, t,
+	  f,  f, u, t,
+	  u,  u, u, u,
+	  t,  t, u, t
+	]
+).
+
+quantifier(forall, induced_by and/2).
+
+quantifier(exists, induced_by or/2).
+

@@ -1,0 +1,102 @@
+
+logic "First Degree Entailment".
+
+truth_values { t , b , n , f }.
+
+designated_truth_values { b , t }.
+
+ordering(truth,"f < {n, b} < t").
+
+operator(neg/1, mapping {
+	 (t) : f,
+	 (b) : b,
+	 (n) : n,
+	 (f) : t
+	}
+).
+
+operator(bneg/1, mapping {
+	 (t) : f,
+	 (b) : n,
+	 (n) : b,
+	 (f) : t
+	}
+).
+
+operator(and/2, inf(truth)).
+
+operator(or/2, sup(truth)).
+
+operator(impe/2, table [
+	      t, b, n, f,
+	  t,  t, b, n, f,
+	  b,  t, b, n, f,
+	  n,  t, t, t, t,
+	  f,  t, t, t, t
+	]
+).
+
+operator(impb/2, table [
+	      t, b, n, f,
+	  t,  t, b, n, f,
+	  b,  t, t, n, n,
+	  n,  t, b, t, b,
+	  f,  t, t, t, t
+	]
+).
+
+operator(impl/2, table [
+	      t, b, n, f,
+	  t,  t, f, n, f,
+	  b,  t, b, n, f,
+	  n,  t, n, t, n,
+	  f,  t, t, t, t
+	]
+).
+
+ordering(inform,"n < {t, f} < b").
+
+operator(confl/1, mapping {
+	 (t) : t,
+	 (b) : n,
+	 (n) : b,
+	 (f) : f
+	}
+).
+
+operator(times/2, inf(inform)).
+
+operator(plus/2, sup(inform)).
+
+
+operator(delta/1, mapping {
+	 (t) : t,
+	 (b) : t,
+	 (n) : f,
+	 (f) : f
+	}
+).
+
+operator(box/1, mapping {
+	 (t) : t,
+	 (b) : f,
+	 (n) : f,
+	 (f) : f
+	}
+).
+
+operator(class/1, mapping {
+	 (t) : t,
+	 (b) : f,
+	 (n) : f,
+	 (f) : t
+	}
+).
+
+quantifier(forall, induced_by inf(truth)).
+
+quantifier(exists, induced_by sup(truth)).
+
+quantifier(bigtimes, induced_by inf(inform)).
+
+quantifier(bigplus, induced_by sup(inform)).
