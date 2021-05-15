@@ -10,6 +10,7 @@ Changes to MUltlog:
   \Semantics if defined.
 - Add webpage/ to make the webpage at logic.at/multlog.
 - Add an actual manual (doc/multlog.md & .tex).
+- Streamline & improve output of ml.tex.
 1.13, 03.05.2021
 - Make ml_tex.pl also produce code for tableaux.
 - Update ml.tex: more current introduction, use modern packages, load
