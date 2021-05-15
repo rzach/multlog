@@ -1,6 +1,6 @@
 Changes to MUltlog:
 
-1.14, 09.05.2021
+1.14, 15.05.2021
 - Bug fix regarding mins and maxs in ml_check.pl.
 - Caching of minimization that may be computationally expensive.
 - Appendix with specification of logic added to paper.
@@ -11,6 +11,7 @@ Changes to MUltlog:
 - Add webpage/ to make the webpage at logic.at/multlog.
 - Add an actual manual (doc/multlog.md & .tex).
 - Streamline & improve output of ml.tex.
+- Forward additional options to lgc2* to prolog
 1.13, 03.05.2021
 - Make ml_tex.pl also produce code for tableaux.
 - Update ml.tex: more current introduction, use modern packages, load

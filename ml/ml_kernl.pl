@@ -4,6 +4,8 @@
 %%% Author   : Gernot Salzer
 %%% Interface:
 %%%            kernel.       Perform various computations.
+%%%
+%%% 2021/05/15 (GS): caching added
 
 :- dynamic   krnTautology/1, krnOpIntro/3, krnQuIntro/3.
 
@@ -125,10 +127,13 @@ simple_resolvent(C, [N^_|D], D) :-
    remove_member(N^_, C, D).
 
 simple_saturation(Cs0, Cs) :-
+   cached(simple_saturation(Cs0, Cs)), !.
+simple_saturation(Cs0, Cs) :-
    setof(R, C^Ds^D^(tail(Cs0,[C|Ds]), ml_member(D,Ds), simple_resolvent(C,D,R)), Rs0), !,
    simple_saturation(Rs0, Rs1),
    ground_subsumption(Cs0, Rs1, Cs1),
-   ml_append(Cs1, Rs1, Cs).
+   ml_append(Cs1, Rs1, Cs),
+   assertz(cached(simple_saturation(Cs0, Cs))).
 simple_saturation(Cs, Cs).
 
 ground_subsumption([], _, []).
@@ -160,9 +165,12 @@ factor1(C) :-
   factor(C).
 
 saturation(Cs0, Cs) :-
+   cached(saturation(Cs0, Cs)), !.
+saturation(Cs0, Cs) :-
    saturation([Cs0|Css], Css, Cs1, Cs1),
    remove_factors(Cs1),
-   findall(C, (ml_member(C-Flag, Cs1), var(Flag)), Cs).
+   findall(C, (ml_member(C-Flag, Cs1), var(Flag)), Cs),
+   assertz(cached(saturation(Cs0, Cs))).
 
 saturation(Css, CssEnd, _, []) :-
    Css == CssEnd, !.

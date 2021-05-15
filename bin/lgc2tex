@@ -50,10 +50,11 @@ fi
 file="${1%.lgc}"
 shift
 
-if [ "$*" ]; then
-   echo "$prg: too many arguments ($*)"
-   exit
-fi
+PrologOptions="$*"
+#if [ "$*" ]; then
+#   echo "$prg: too many arguments ($*)"
+#   exit
+#fi
 
 if [ ! -f "$file.lgc" ]; then
    echo "$prg: Specification $file.lgc does not exist."
@@ -71,7 +72,7 @@ if [ ! -f "$file.cfg" ]; then
    "$CP" "$MLPATH/ml.cfg" "$file.cfg"
 fi
 
-$PROLOG -s "$MLPATH/ml" -g "lgc2tex('$file.lgc','$file.sty','$file.cfg'), halt." 2>>"$logfile"
+$PROLOG $PrologOptions -s "$MLPATH/ml" -g "lgc2tex('$file.lgc','$file.sty','$file.cfg'), halt." 2>>"$logfile"
 
 if [ -f "$file.sty" ]; then
    "$CP" "$MLPATH/ml.tex" "$file.tex"
