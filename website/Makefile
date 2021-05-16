@@ -12,10 +12,13 @@ all: index.html examples manual
 
 examples: $(EXPDF)
 
-manual: ../doc/multlog.pdf
+manual: ../doc/multlog.pdf ../doc/multlog.html
 
 ../doc/multlog.tex: ../doc/multlog.md ../Version
-	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --toc -N --output=$@
+	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --toc -N --toc-depth=2 --output=$@
+
+../doc/multlog.html: ../doc/multlog.md ../Version
+	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --toc -N --toc-depth=1 -c https://www.logic.at/user/themes/logic/assets/css/main.css -B before.html -A after.html -H header.html --output=$@
 
 ../doc/multlog.pdf: ../doc/multlog.tex
 	pdflatex -output-directory $(@D) $< 
@@ -27,5 +30,5 @@ $(EXDIR)/%.pdf: .FORCE
 
 index.html: index.md website.md ../Version ../ml/ml.bib
 	pandoc --template=index.md  -V ml_version="$(MLVER)" \
-	-V ilc_version="$(ILCVER)" --toc website.md | \
-	pandoc -s --bibliography=../ml/ml.bib --metadata link-citations --toc --output=index.html
+	-V ilc_version="$(ILCVER)" --metadata pagetitle="website" website.md | \
+	pandoc -s --bibliography=../ml/ml.bib --metadata link-citations -c https://www.logic.at/user/themes/logic/assets/css/main.css -B before.html -A after.html  -H header.html --output=index.html

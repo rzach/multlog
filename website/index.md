@@ -3,8 +3,6 @@
 title: MUltlog $ml_version$ & iLC $ilc_version$
 ---
 
-## Description
-
 MUltlog is a system which takes as input the specification of a
 finitely-valued propositional or first-order logic and produces a
 sequent calculus, tableau and natural deduction systems, and clause
@@ -29,8 +27,10 @@ with MUltlog.
 ## Installation
 
 MUltlog can be obtained from
-[github.com/rzach/multlog](https://github.com/rzach/multlog). For
-installation instructions, see the [MUltlog manual](multlog.pdf).
+[github.com/rzach/multlog](https://github.com/rzach/multlog).
+
+For installation instructions, see the [MUltlog user
+manual](multlog.html) (also available [in PDF](multlog.pdf)).
 
 If you encounter problems, please [file an
 issue](https://github.com/rzach/multlog/issues) on GitHub.

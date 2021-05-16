@@ -1,6 +1,9 @@
 ---
-title: MUltlog $ml_version$ & iLC $ilc_version$
+title: MUltlog $ml_version$ & iLC $ilc_version$ User Manual
 ---
+
+This manual is [available in
+PDF](https://logic.at/multlog/multlog.pdf) from the MUltlog website. 
 
 MUltlog is a system which takes as input the specification of a
 finitely-valued first-order logic and produces a sequent calculus, a
@@ -559,7 +562,7 @@ The `.cfg` file for a logic can contain three kinds of declaration:
     information at the bottom of the first page.
 
 
-# Trouble shooting
+# Troubleshooting
 
 ## Installation errors
 
