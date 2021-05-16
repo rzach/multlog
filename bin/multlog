@@ -1,0 +1,12 @@
+#!/bin/bash
+
+PROLOG='@prolog@'
+MLPATH='@mlpath@'
+
+PrologOptions="$*"
+#if [ "$*" ]; then
+#   echo "$prg: too many arguments ($*)"
+#   exit
+#fi
+
+$PROLOG $PrologOptions -s "$MLPATH/ml_interactive"
