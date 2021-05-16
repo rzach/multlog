@@ -44,6 +44,11 @@ you need the script language
   systems include Tcl/Tk by default (check for a program named
   `wish`).
 
+On Debian/Ubuntu Linux, for instance, you can install the requirements
+using the command
+
+    sudo apt install swi-prolog tk texlive-latex-extra
+
 # Installation
 
 ## Obtaining MUltlog
