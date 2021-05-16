@@ -161,5 +161,3 @@ fmlasPolish(Lg,[F|Fs],List) :-
     fmlaPolish(Lg,F,L1),
     fmlasPolish(Lg,Fs,L2),
     append(L1,L2,List).
-
-run :- loadLogic('../examples/goedel.lgc',gl).
