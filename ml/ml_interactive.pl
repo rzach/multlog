@@ -114,8 +114,10 @@ listOfTVs([L|Ls], TVs) :-
     member(L, TVs),
     listOfTVs(Ls,TVs).
 
-% 
+% Attempts at making a generator for formulas
 
+isFormula(Lg, V) :-
+    var(V).
 isFormula(Lg, F) :-
     logOp(Lg,Op/N,_),
     functor(F, Op, N),
