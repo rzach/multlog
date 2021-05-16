@@ -120,29 +120,49 @@ qupdisj2disj([V^(-)|PD], N, TVs, D0) :-
 %    (= the resolved literal).
 %    simple_resolvent succeeds at most once.
 simple_resolvent([L|C], [L|D], [L|R]) :- !,
-   simple_resolvent(C, D, R).
-simple_resolvent([N^_|C], D, C) :-
-   remove_member(N^_, D, C).
-simple_resolvent(C, [N^_|D], D) :-
-   remove_member(N^_, C, D).
+    simple_resolvent(C, D, R).
+simple_resolvent([N^_|C], [N^_|C], C).
 
-simple_saturation(Cs0, Cs) :-
-   cached(simple_saturation(Cs0, Cs)), !.
-simple_saturation(Cs0, Cs) :-
-   setof(R, C^Ds^D^(tail(Cs0,[C|Ds]), ml_member(D,Ds), simple_resolvent(C,D,R)), Rs0), !,
-   simple_saturation(Rs0, Rs1),
-   ground_subsumption(Cs0, Rs1, Cs1),
-   ml_append(Cs1, Rs1, Cs),
-   assertz(cached(simple_saturation(Cs0, Cs))).
-simple_saturation(Cs, Cs).
+simple_resolvent_l([], _, Rs, Rs).
+simple_resolvent_l([D-x|DXs], CX, [R|Rs], Rs0) :-
+    CX = C-x,
+    simple_resolvent(C, D, R), !,
+    simple_resolvent_l(DXs, CX, Rs, Rs0).
+simple_resolvent_l([_|DXs], CX, Rs, Rs0) :-
+    simple_resolvent_l(DXs, CX, Rs, Rs0).
 
-ground_subsumption([], _, []).
-ground_subsumption([C|Cs0], Ds, Cs) :-
-   ml_member(D, Ds),
-   sublist(D, C), !,                  % Subsumption test. C and D have to be ground and sorted.
-   ground_subsumption(Cs0, Ds, Cs).
-ground_subsumption([C|Cs0], Ds, [C|Cs]) :-
-   ground_subsumption(Cs0, Ds, Cs).
+simple_resolvent_ll([], []).
+simple_resolvent_ll([CX|DXs], RXs) :-
+    simple_resolvent_l(DXs, CX, RXs, RXs0),
+    simple_resolvent_ll(DXs, RXs0).
+
+% simple_saturation is essentially the first phase of the Quine-McCluskey algorithm.
+simple_saturation(Cs, Ds) :-
+    cached(simple_saturation(Cs, Ds)), !.
+simple_saturation(Cs, Ds) :-
+    simple_saturation(Cs, Ds, []),
+    assertz(cached(simple_saturation(Cs, Ds))).
+
+simple_saturation(Cs0, Ds, Ds0) :-
+    (Cs0 = [] ->
+	     Ds = Ds0
+    ;    add_flags(Cs0, Cs1),
+         simple_resolvent_ll(Cs1, Rs0),
+         strip_flag(Cs1, Ds, Ds1),
+         sort(Rs0, Rs1),
+         simple_saturation(Rs1, Ds1, Ds0)
+    ).
+
+add_flags([], []).
+add_flags([C|Cs], [C-_|CXs]) :-
+    add_flags(Cs, CXs).
+
+strip_flag([], Cs, Cs).
+strip_flag([C-X|CXs], [C|Cs], Cs0) :-
+    var(X), !,
+    strip_flag(CXs, Cs, Cs0).
+strip_flag([_|CXs], Cs, Cs0) :-
+    strip_flag(CXs, Cs, Cs0).
 
 resolvent(C0, D0, R) :-
    remove_member(N^V, C0, C1),

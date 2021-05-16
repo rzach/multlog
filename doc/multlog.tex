@@ -59,22 +59,26 @@
 \begin{document}
 \maketitle
 
-{
-\setcounter{tocdepth}{3}
-\tableofcontents
-}
-MUltlog is a system which takes as input the specification of a
-finitely-valued first-order logic and produces a sequent calculus, a
-natural deduction system, and clause formation rules for this logic. All
-generated rules are optimized regarding their branching degree. The
-output is in the form of a scientific paper written in LaTeX.
+\begin{abstract}
 
-iLC is an editor for Tcl/Tk, which allows to specify many-valued logics
-for MUltlog in a convenient form.
+MUltlog is a system which takes as input the specification of a finitely-valued first-order logic and produces a sequent
+calculus,  a tableaux calculus, a natural deduction system, and clause formation rules for this logic. All generated
+rules are optimized regarding their branching degree. The output is in the form of a scientific paper written in LaTeX.
+
+iLC is an editor for Tcl/Tk, which allows the user to specify many-valued logics for MUltlog in a convenient form.
 
 Further information is available on the
 \href{http://www.logic.at/multlog/}{project webpage}, where you can also
 find an up-to-date copy of this manual, and example outputs.
+\end{abstract}
+
+\newpage
+
+{
+\setcounter{tocdepth}{3}
+\tableofcontents
+}
+\newpage
 
 \hypertarget{requirements}{%
 \section{Requirements}\label{requirements}}
@@ -88,8 +92,7 @@ You need the following to run MUltlog:
 \item
   Some standard Prolog system,
   e.g.~\href{https://www.swi-prolog.org/}{SWI-Prolog}. Other Prologs
-  should work as well; MUltlog has been tested with SWI and SICStus
-  Prolog.
+  might work as well, but have not been tested with recent versions of MUltlog.
 \end{itemize}
 
 The output of MUltlog is in the form of a LaTeX paper. To view it
@@ -217,7 +220,7 @@ cp /usr/share/doc/multlog/sample.lgc .
 lgc2pdf sample
 \end{verbatim}
 
-  You should now be able to open \texttt{goedel.pdf} using the PDF
+  You should now be able to open \texttt{sample.pdf} using the PDF
   reader of your choice.
 \item
   To edit the specification of the logic before generating the paper,
@@ -227,7 +230,7 @@ lgc2pdf sample
 ilc &
 \end{verbatim}
 
-  Select ``Open'' from the menu ``File'' and type \texttt{goedel} as the
+  Select ``Open'' from the menu ``File'' and type \texttt{sample} as the
   name of the file to be loaded.
 \end{itemize}
 
@@ -277,14 +280,6 @@ source for the definition of the logic.
 
 Additionally, all files are deleted except the specification of the
 logic and the PDF file.
-
-View the resulting paper with any PDF reader, e.g.
-
-\begin{verbatim}
-acroread goedel.pdf &
-evince goedel.pdf &
-...
-\end{verbatim}
 
 \hypertarget{creating-the-paper-latex}{%
 \subsection{Creating the paper (LaTeX)}\label{creating-the-paper-latex}}
@@ -929,32 +924,25 @@ echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
 \subsection{Runtime errors}\label{runtime-errors}}
 
 \begin{itemize}
-\item
-  "warning: *** copy\_term overflow in findall\_store\_heap ***"
-\item
-  "warning: *** overflow in findall\_store\_heap ***"
+\item Warnings/errors about stack or heap overflows, like \verb"Out of global stack".
 
-  These error messages are produced by BinProlog and indicate that the
-  heap size is too small, which by default is 512 kB. (Reported by
-  Matthew Spinks
-  \href{mailto:mspinks@mugc.cc.monash.edu.au}{\nolinkurl{mspinks@mugc.cc.monash.edu.au}}.)
-
-  Solutions (alternatives):
+  Such messages indicate that the Prolog system needs more space for the computation than it is currently granted.
+  Check out by which option the space can be increased with your Prolog system.
+  For SWI-Prolog, the command-line option \verb"--stack-limit=2g" will increase the total stack limit from 1GB on 64-bit-architectures (512MB on 32-bit-architectures) to 2GB.
+  There are three ways to tell MUltlog to use this option.
 
   \begin{itemize}
-  \item
-    Switch to SWI Prolog which is faster and more robust. You will have
-    to re-install Multlog after SWI-Prolog is in its place.
-  \item
-    Re-install MUltlog using BinProlog with the option \texttt{-h\ 1024}
-    (or some bigger value). When the installation script asks for the
-    Prolog to be used, type e.g.~\texttt{/usr/local/bin/bp\ -h\ 1024}.
-    Note that adding options to the Prolog call only works with MUltlog
-    1.06 or higher.
-  \item
-    Add the option \texttt{-h\ 1024} by hand. To this aim, edit the
-    files
+  \item \emph{For a single run:} Add the Prolog option as a further argument on the commandline.
 
+   \verb"lgc2pdf sample --stack-limit=2g"
+
+  \item \emph{Permanently during installation:}
+    Re-install MUltlog.
+    When the installation script asks for the
+    Prolog to be used, type e.g.~\verb"/usr/bin/swipl --stack-limit=2g".
+  \item \emph{Permanently after installation:}
+    Add the option \verb"--stack-limit=2g" manually, by editing the
+    files
 \begin{verbatim}
 /usr/local/bin/lgc2tex
 /usr/local/bin/lgc2dvi
@@ -966,7 +954,7 @@ echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
     Replace this line e.g.~by
 
 \begin{verbatim}
-PROLOG='/usr/local/bin/bp -h 1024'
+PROLOG='/usr/bin/swipl --stack-limit=2g'
 \end{verbatim}
 
     Make sure that the files have still execute permission after saving.
@@ -982,20 +970,23 @@ The following people contributed to MUltlog (in alphabetical order):
 \tightlist
 \item
   Stefan Katzenbeisser and Stefan Kral rewrote the optimization
-  procedure for operators using more efficient data structures
+  procedure for operators using more efficient data structures.
 \item
-  Andreas Leitgeb is the author of iLC, the interactive Logic Creator
-\item
-  Wolfram Nix wrote eLK, a DOS interface to MUltlog
-\item
-  Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog
+  Andreas Leitgeb is the author of iLC, the interactive Logic Creator.
+%\item
+%  Wolfram Nix wrote eLK, a DOS interface to MUltlog  
+%\item
+%  Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog
 \item
   Gernot Salzer wrote the MUltlog kernel and coordinated the project.
+%\item
+%  Markus Schranz wrote a web interface to MUltlog based on plain HTML
+%  and Perl.
 \item
-  Markus Schranz wrote a web interface to MUltlog based on plain HTML
-  and Perl.
+  Richard Zach worked on the contents of the MUltlog paper and added
+  the tableaux calculus.
 \end{itemize}
 
-(eLK, JMUltlog, and the web interface are no longer available.)
+%(eLK, JMUltlog, and the web interface are no longer available.)
 
 \end{document}
