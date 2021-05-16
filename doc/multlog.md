@@ -2,12 +2,12 @@
 title: MUltlog $ml_version$ & iLC $ilc_version$
 ---
 
-MUltlog is a system which takes as input the specification of
-a finitely-valued first-order logic and produces a sequent 
-calculus, a natural deduction system, and clause formation
-rules for this logic. All generated rules are optimized
-regarding their branching degree. The output is in the form
-of a scientific paper written in LaTeX.
+MUltlog is a system which takes as input the specification of a
+finitely-valued first-order logic and produces a sequent calculus, a
+tableau system, a natural deduction system, and clause formation rules
+for this logic. All generated rules are optimized regarding their
+branching degree. The output is in the form of a scientific paper
+written in LaTeX.
 
 iLC is an editor for Tcl/Tk, which allows to specify many-valued
 logics for MUltlog in a convenient form.
@@ -24,8 +24,8 @@ You need the following to run MUltlog:
   repository](https://github.com/rzach/multlog).
 
 - Some standard Prolog system, e.g. [SWI-Prolog](https://www.swi-prolog.org/).
-  Other Prologs should work as well; MUltlog has been tested with SWI and
-  SICStus Prolog.
+  Other Prologs might work as well but have not been tested with
+  recent versions of MUltlog.
 
 The output of MUltlog is in the form of a LaTeX paper. To view it
 properly, you need the typesetting system
@@ -125,7 +125,7 @@ different settings, change the examples accordingly.
   ```
   lgc2pdf sample
   ```
-  You should now be able to open `goedel.pdf` using the PDF reader of
+  You should now be able to open `sample.pdf` using the PDF reader of
   your choice.
   
 - To edit the specification of the logic before generating
@@ -133,7 +133,7 @@ different settings, change the examples accordingly.
   ```
   ilc &
   ```
-  Select "Open" from the menu "File" and type `goedel`
+  Select "Open" from the menu "File" and type `sample`
   as the name of the file to be loaded.
 
 The `examples/` directory of the distribution contains other example
@@ -174,13 +174,6 @@ logic.
 
 Additionally, all files are deleted except the specification
 of the logic and the PDF file.
-
-View the resulting paper with any PDF reader, e.g.
-
-    acroread goedel.pdf &
-    evince goedel.pdf &
-    ...
-
 
 ## Creating the paper (LaTeX)
 
@@ -656,23 +649,28 @@ and errors.
 
 ## Runtime errors
 
-- "warning: *** copy_term overflow in findall_store_heap ***"
-- "warning: *** overflow in findall_store_heap ***"
+- Warnings/errors about stack or heap overflows, like `Out of global
+  stack`.
 
-  These error messages are produced by BinProlog and indicate that
-  the heap size is too small, which by default is 512 kB.
-  (Reported by Matthew Spinks <mspinks@mugc.cc.monash.edu.au>.)
+  Such messages indicate that the Prolog system needs more space for
+  the computation than it is currently granted. Check out by which
+  option the space can be increased with your Prolog system. For
+  SWI-Prolog, the command-line option `--stack-limit=2g` will
+  increase the total stack limit from 1GB on 64-bit-architectures
+  (512MB on 32-bit-architectures) to 2GB. There are three ways to tell
+  MUltlog to use this option.
 
-  Solutions (alternatives):
-
-  - Switch to SWI Prolog which  is faster and more robust.  You will
-    have to re-install Multlog after SWI-Prolog is in its place.
-  - Re-install MUltlog using BinProlog with the option `-h 1024` (or
-    some bigger value). When the installation script asks for the
-    Prolog to be used, type e.g. `/usr/local/bin/bp -h 1024`. Note
-    that adding options to the Prolog call only works with MUltlog
-    1.06 or higher.
-  - Add the option `-h 1024` by hand. To this aim, edit the files
+  - *For a single run:* Add the Prolog option as a further argument on
+    the command line.
+    ```
+    lgc2pdf sample --stack-limit=2g
+    ```
+  - *Permanently during installation:* Re-install MUltlog. When the
+    installation script asks for the Prolog to be used, type e.g.,
+    `/usr/bin/swipl --stack-limit=2g`.
+  - *Permanently after installation:*
+    Add the option `--stack-limit=2g` manually, by editing the
+    files
     ```
     /usr/local/bin/lgc2tex
     /usr/local/bin/lgc2dvi
@@ -680,9 +678,9 @@ and errors.
     /usr/local/lib/multlog/ilc/lgc2ilc
     ``` 
     Near their top there is a line starting with `PROLOG=`. Replace
-    this line e.g. by 
+    this line, e.g., by 
     ```
-    PROLOG='/usr/local/bin/bp -h 1024'
+    PROLOG='/usr/bin/swipl --stack-limit=2g'
     ```
     Make sure that the files have still execute permission after
     saving.
@@ -692,12 +690,8 @@ and errors.
 The following people contributed to MUltlog (in alphabetical order):
 
 - Stefan Katzenbeisser and  Stefan Kral rewrote the optimization
-  procedure for operators using more efficient data structures
-- Andreas Leitgeb is the author of iLC, the interactive Logic Creator
-- Wolfram Nix wrote eLK, a DOS interface to MUltlog
-- Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog
+  procedure for operators using more efficient data structures.
+- Andreas Leitgeb is the author of iLC, the interactive Logic Creator.
 - Gernot Salzer wrote the MUltlog kernel and coordinated the project.
-- Markus Schranz  wrote a web interface to MUltlog based on plain HTML
-  and Perl.
-
-(eLK, JMUltlog, and the web interface are no longer available.)
+- Richard Zach worked on the contents of the MUltlog paper and added
+  the tableaux calculus.

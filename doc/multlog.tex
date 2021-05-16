@@ -59,26 +59,23 @@
 \begin{document}
 \maketitle
 
-\begin{abstract}
-
-MUltlog is a system which takes as input the specification of a finitely-valued first-order logic and produces a sequent
-calculus,  a tableaux calculus, a natural deduction system, and clause formation rules for this logic. All generated
-rules are optimized regarding their branching degree. The output is in the form of a scientific paper written in LaTeX.
-
-iLC is an editor for Tcl/Tk, which allows the user to specify many-valued logics for MUltlog in a convenient form.
-
-Further information is available on the
-\href{http://www.logic.at/multlog/}{project webpage}, where you can also
-find an up-to-date copy of this manual, and example outputs.
-\end{abstract}
-
-\newpage
-
 {
 \setcounter{tocdepth}{3}
 \tableofcontents
 }
-\newpage
+MUltlog is a system which takes as input the specification of a
+finitely-valued first-order logic and produces a sequent calculus, a
+tableau system, a natural deduction system, and clause formation rules
+for this logic. All generated rules are optimized regarding their
+branching degree. The output is in the form of a scientific paper
+written in LaTeX.
+
+iLC is an editor for Tcl/Tk, which allows to specify many-valued logics
+for MUltlog in a convenient form.
+
+Further information is available on the
+\href{http://www.logic.at/multlog/}{project webpage}, where you can also
+find an up-to-date copy of this manual, and example outputs.
 
 \hypertarget{requirements}{%
 \section{Requirements}\label{requirements}}
@@ -92,7 +89,8 @@ You need the following to run MUltlog:
 \item
   Some standard Prolog system,
   e.g.~\href{https://www.swi-prolog.org/}{SWI-Prolog}. Other Prologs
-  might work as well, but have not been tested with recent versions of MUltlog.
+  might work as well but have not been tested with recent versions of
+  MUltlog.
 \end{itemize}
 
 The output of MUltlog is in the form of a LaTeX paper. To view it
@@ -119,6 +117,13 @@ script language
   Linux systems include Tcl/Tk by default (check for a program named
   \texttt{wish}).
 \end{itemize}
+
+On Debian/Ubuntu Linux, for instance, you can install the requirements
+using the command
+
+\begin{verbatim}
+sudo apt install swi-prolog tk texlive-latex-extra
+\end{verbatim}
 
 \hypertarget{installation}{%
 \section{Installation}\label{installation}}
@@ -924,25 +929,34 @@ echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
 \subsection{Runtime errors}\label{runtime-errors}}
 
 \begin{itemize}
-\item Warnings/errors about stack or heap overflows, like \verb"Out of global stack".
+\item
+  Warnings/errors about stack or heap overflows, like
+  \texttt{Out\ of\ global\ stack}.
 
-  Such messages indicate that the Prolog system needs more space for the computation than it is currently granted.
-  Check out by which option the space can be increased with your Prolog system.
-  For SWI-Prolog, the command-line option \verb"--stack-limit=2g" will increase the total stack limit from 1GB on 64-bit-architectures (512MB on 32-bit-architectures) to 2GB.
-  There are three ways to tell MUltlog to use this option.
+  Such messages indicate that the Prolog system needs more space for the
+  computation than it is currently granted. Check out by which option
+  the space can be increased with your Prolog system. For SWI-Prolog,
+  the command-line option \texttt{-\/-stack-limit=2g} will increase the
+  total stack limit from 1GB on 64-bit-architectures (512MB on
+  32-bit-architectures) to 2GB. There are three ways to tell MUltlog to
+  use this option.
 
   \begin{itemize}
-  \item \emph{For a single run:} Add the Prolog option as a further argument on the commandline.
+  \item
+    \emph{For a single run:} Add the Prolog option as a further argument
+    on the command line.
 
-   \verb"lgc2pdf sample --stack-limit=2g"
+\begin{verbatim}
+lgc2pdf sample --stack-limit=2g
+\end{verbatim}
+  \item
+    \emph{Permanently during installation:} Re-install MUltlog. When the
+    installation script asks for the Prolog to be used, type e.g.,
+    \texttt{/usr/bin/swipl\ -\/-stack-limit=2g}.
+  \item
+    \emph{Permanently after installation:} Add the option
+    \texttt{-\/-stack-limit=2g} manually, by editing the files
 
-  \item \emph{Permanently during installation:}
-    Re-install MUltlog.
-    When the installation script asks for the
-    Prolog to be used, type e.g.~\verb"/usr/bin/swipl --stack-limit=2g".
-  \item \emph{Permanently after installation:}
-    Add the option \verb"--stack-limit=2g" manually, by editing the
-    files
 \begin{verbatim}
 /usr/local/bin/lgc2tex
 /usr/local/bin/lgc2dvi
@@ -951,7 +965,7 @@ echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
 \end{verbatim}
 
     Near their top there is a line starting with \texttt{PROLOG=}.
-    Replace this line e.g.~by
+    Replace this line, e.g., by
 
 \begin{verbatim}
 PROLOG='/usr/bin/swipl --stack-limit=2g'
@@ -973,20 +987,11 @@ The following people contributed to MUltlog (in alphabetical order):
   procedure for operators using more efficient data structures.
 \item
   Andreas Leitgeb is the author of iLC, the interactive Logic Creator.
-%\item
-%  Wolfram Nix wrote eLK, a DOS interface to MUltlog  
-%\item
-%  Alexandra Pascal wrote JMUltlog, a JAVA interface to MUltlog
 \item
   Gernot Salzer wrote the MUltlog kernel and coordinated the project.
-%\item
-%  Markus Schranz wrote a web interface to MUltlog based on plain HTML
-%  and Perl.
 \item
-  Richard Zach worked on the contents of the MUltlog paper and added
-  the tableaux calculus.
+  Richard Zach worked on the contents of the MUltlog paper and added the
+  tableaux calculus.
 \end{itemize}
-
-%(eLK, JMUltlog, and the web interface are no longer available.)
 
 \end{document}
