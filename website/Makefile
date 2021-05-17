@@ -32,3 +32,6 @@ index.html: index.md website.md ../Version ../ml/ml.bib
 	pandoc --template=index.md  -V ml_version="$(MLVER)" \
 	-V ilc_version="$(ILCVER)" --metadata pagetitle="website" website.md | \
 	pandoc -s --bibliography=../ml/ml.bib --metadata link-citations -c https://www.logic.at/user/themes/logic/assets/css/main.css -B before.html -A after.html  -H header.html --output=index.html
+
+update:
+	scp -o PubkeyAuthentication=false index.html ../examples/*.pdf ../doc/multlog.html ../doc/multlog.pdf rick.logic.at:web/www/multlog/

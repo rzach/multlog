@@ -16,6 +16,6 @@ example:
   link: pwk.pdf
 - name: "Three-valued Łukasiewic logic $\\textbf{\\L}_3$"
   link: lukasiewicz.pdf
-- name: "Shramko and Wansing's $\\mathcal{SIXTEEN}$"
+- name: "Shramko and Wansing's $\\textbf{SIXTEEN}_{2,\mathit{des}}$"
   link: shramko-wansing.pdf
 ---

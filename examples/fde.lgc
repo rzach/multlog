@@ -68,6 +68,13 @@ operator(times/2, inf(inform)).
 
 operator(plus/2, sup(inform)).
 
+operator(ruet/1, mapping {
+	 (t) : b,
+	 (b) : f,
+	 (n) : t,
+	 (f) : n
+	}
+).
 
 operator(delta/1, mapping {
 	 (t) : t,

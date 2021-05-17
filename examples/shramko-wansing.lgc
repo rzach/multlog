@@ -1,11 +1,14 @@
 
+%% Shramko and Wansing's SIXTEEN
+%% Note: computing the rules for SIXTEEN will take a few hours!
+
 logic "Shramko-Wansing".
 
 truth_values { e , n , f , t , b , nf , nt , ft , nb , fb , tb , nft , nfb , ntb , ftb , a }.
 
 designated_truth_values { t, nt, tb, ntb }.
 
-operator(neg/1, mapping {
+operator(negt/1, mapping {
 	 (e  ) : e  ,
 	 (n  ) : t  ,
 	 (f  ) : b  ,
@@ -25,6 +28,26 @@ operator(neg/1, mapping {
 	}
 ).
 
+operator(negf/1, mapping {
+	 (e  ) : e  ,
+	 (n  ) : f  ,
+	 (f  ) : n  ,
+	 (t  ) : b  ,
+	 (b  ) : t  ,
+	 (nf ) : nf ,
+	 (nt ) : fb ,
+	 (nb ) : ft ,
+	 (ft ) : nb ,
+	 (fb ) : nt ,
+	 (tb ) : tb ,
+	 (nft) : nft,
+	 (nfb) : nft,
+	 (ntb) : ftb,
+	 (ftb) : ntb,
+	 (a  ) : a  
+	}
+).
+
 /*
 %% Truth ordering: explicit ordering; all pairs
 ordering(truth,"{nf < f, nf < n, nf < nfb, nf < nft, f < fb, f < ft, f < e, n < e, n < nb, n < nt, e < b, e < t, nfb < fb, nfb < a, nfb < nb, nft < ft, nft < a, nft < nt, fb < ftb, fb < b, ft < ftb, ft < t, nb < b, nb < ntb, nt < t, nt < ntb, b < tb, t < tb, a < ftb, a < ntb, ftb < tb, ntb < tb }"). 
@@ -34,8 +57,10 @@ ordering(truth,"{nf < f, nf < n, nf < nfb, nf < nft, f < fb, f < ft, f < e, n < 
 
 ordering(truth, "nf < { f < { fb < {ftb < tb, b < tb}, ft < {ftb, t < tb}, e  < {b,t}}, nfb < { fb, a  < {ftb, ntb}, nb < {b, ntb}}, nft < { ft, a, nt < {t, ntb < tb}}, n < {e, nb, nt}}").
 
-operator(and  /2, inf(truth)).
-operator(or   /2, sup(truth)).
+%% Falsity ordering
+ordering(falsity, "nt < { n < { nf < {f < fb, nfb < fb}, e < {f, b < fb}, nb  < {nfb, b}}, nft < { nf, ft  < {f, ftb}, a < {nfb, ftb}}, t < { e, ft, tb < {b, ftb < fb}}, ntb < {nb, a, tb}}").
 
-%% quantifier(forall, induced_by inf(truth)).
-%% quantifier(exists, induced_by sup(truth)).
+operator(andt  /2, inf(truth)).
+operator(ort   /2, sup(truth)).
+operator(andf  /2, inf(falsity)).
+operator(orf   /2, sup(falsity)).

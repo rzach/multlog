@@ -185,8 +185,10 @@ calculi for finite-valued logics goes back to
 \citet{Schroter1955,Rousseau1967,Takahashi1968}. We follow the method
 given by \citet{BaazFermullerZach1994} and \citet{Zach1993} for
 constructing inference rules. This guarantees that our system
-automatically has cut-elimination\ifnotprop, mid-sequent theorem,\fi\
-and Maehara lemma.
+automatically has soundness and completness theorems, cut-elimination
+theorem\ifnotprop, mid-sequent theorem,\fi\ and Maehara lemma
+(interpolation); for proofs of these results see
+\citet{BaazFermullerZach1994} and \citet{Zach1993}.
 
 Signed tableau systems for finite-valued logics were proposed by
 \citet{Surma1977} and \citet{Carnielli1987}, and generalized by
@@ -746,7 +748,7 @@ root of~$P$ is called its \emph{end-sequent}. A sequent~$\Gamma$ is
 called \emph{provable} iff it is the end-sequent of some proof.
 \end{definition}
 
-\begin{theorem}
+\begin{theorem}[Soundness and Completeness]
 A sequent is provable if and only if it is valid.
 \end{theorem}
 
@@ -761,7 +763,7 @@ A sequent is provable if and only if it is valid.
    [\DTVss\colon A]$ has a proof.
 \end{corollary}
 
-\begin{theorem}
+\begin{theorem}[Cut-elimination]
    The cut rule is eliminable in the sequent calculus for
    \NameOfLogic.
 \end{theorem}
@@ -769,6 +771,27 @@ A sequent is provable if and only if it is valid.
 \begin{proof}
 See Theorem 4.1 of \citet{BaazFermullerZach1994} or Theorem 3.5.3 of
 \citet{Zach1993}.
+\end{proof}
+
+\ifnotprop
+\begin{theorem}[Midsequent theorem]
+   The midsequent theorem holds in the sequent calculus for
+   \NameOfLogic.
+\end{theorem}
+
+\begin{proof}
+See Theorem 6.1 of \citet{BaazFermullerZach1994} or Theorem 3.7.2 of
+\citet{Zach1993}.
+\end{proof}
+\fi
+
+\begin{theorem}[Maehara lemma]
+   The Maehara lemma holds for the sequent calculus for
+   \NameOfLogic.
+\end{theorem}
+
+\begin{proof}
+See Theorem 3.8.1 of \citet{Zach1993}.
 \end{proof}
 
 \section{Tableaux for \NameOfLogic}\label{sec:tableaux}
