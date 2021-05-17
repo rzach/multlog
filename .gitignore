@@ -1,0 +1,14 @@
+*.tex
+*.pdf
+*.aux
+*.log
+*.out
+*.toc
+*.html
+ml.bib
+*.bbl
+*.blg
+*.mlg
+*.sty
+*.cache
+*.stripped
