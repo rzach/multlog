@@ -80,6 +80,33 @@ ClQuprem\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\IfIsDTV[1]{\csname ifTV\romannumeral #1IsDTV\endcsname}
 \newcommand\NDEI[1]{\IfIsDTV{#1}\textsc{i}\else \textsc{e}\fi}
 
+\newdimen\rulewidth
+\newdimen\rulesep
+\rulesep=2em
+\newbox\rulebox
+\def\maxrulewidth{1.5\textwidth}
+\newenvironment{rules}{\begin{center}\rulewidth=0pt}{\end{center}}
+\def\setrule#1{%
+   \setbox\rulebox\hbox{\adjustbox{max width=\maxrulewidth}{#1}}%
+   \ifdim\wd\rulebox>\textwidth
+      \ifdim\rulewidth>0pt\\[2ex]\fi
+      \makebox[0pt]{\usebox\rulebox}%
+      \rulewidth=\textwidth
+   \else
+      \ifdim\rulewidth>0pt
+         \advance\rulewidth\rulesep
+         \advance\rulewidth\wd\rulebox
+         \ifdim\rulewidth>\textwidth
+            \\[2ex]
+            \rulewidth=\wd\rulebox
+         \else
+            \hskip\rulesep
+         \fi
+      \else
+          \advance\rulewidth\wd\rulebox
+      \fi
+      \usebox\rulebox
+   \fi}
 
 \def\C{\mathscr{C}}
 \def\Clause{C}
@@ -187,8 +214,8 @@ given by \citet{BaazFermullerZach1994} and \citet{Zach1993} for
 constructing inference rules. This guarantees that our system
 automatically has soundness and completness theorems, cut-elimination
 theorem\ifnotprop, mid-sequent theorem,\fi\ and Maehara lemma
-(interpolation); for proofs of these results see
-\citet{BaazFermullerZach1994} and \citet{Zach1993}.
+(interpolation). For proofs of these results see
+\cite{BaazFermullerZach1994,Zach1993}.
 
 Signed tableau systems for finite-valued logics were proposed by
 \citet{Surma1977} and \citet{Carnielli1987}, and generalized by
@@ -467,13 +494,11 @@ The set of \emph{undesignated values} is $\TVs^- = \TVs\setminus
       $\Opname\n$%
    \ENDFOR\
    \ARE{\NoOps} defined by
-   \begin{center}
-      \adjustbox{max width=\textwidth}{$\Optab1$}
-      \FOR \n=2 \TO \NoOps \DO
-         \qquad
-         \adjustbox{max width=\textwidth}{$\Optab\n$}
+   \begin{rules}
+      \FOR \n=1 \TO \NoOps \DO
+         \setrule{$\Optab\n$}%
       \ENDFOR
-   \end{center}
+   \end{rules}
 \fi
 % ----------- The Quantifiers ------------
 \ifnum\NoQus=0
@@ -494,13 +519,11 @@ The set of \emph{undesignated values} is $\TVs^- = \TVs\setminus
       $\Quname\n$%
    \ENDFOR\
    \ARE{\NoQus} defined by
-   \begin{center}
-      \adjustbox{max width=\textwidth}{$\Qutab1$}
-      \FOR \n=2 \TO \NoQus \DO
-         \qquad
-         \adjustbox{max width=\textwidth}{$\Qutab\n$}
+   \begin{rules}
+      \FOR \n=1 \TO \NoQus \DO
+         \setrule{$\Qutab\n$}%
       \ENDFOR
-   \end{center}
+   \end{rules}
 \fi
 
 
@@ -712,27 +735,21 @@ The \emph{sequent calculus} for \NameOfLogic{} is given by:
 \FOR \op=1 \TO \NoOps \DO
    {\noindent
     The introduction rules for connective $\Opname\op$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}}%
+          \setrule{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The introduction rules for quantifier $\Quname\qu$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \adjustbox{max width=1.5\textwidth}{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
+          \setrule{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 
@@ -815,7 +832,7 @@ of Carnielli (in the sense of \cite{BaazFermullerZach1993}).
    A \emph{tableau} for a set of signed formulas $\Delta$ is a
    downward rooted tree of signed formulas where each one is either an
    element of $\Delta$ or results from a signed formula in the branch
-   above it by a branch extension rule. A tableau is \emph{closed} if
+   above it by a branch expansion rule. A tableau is \emph{closed} if
    every branch contains, for some formula $A$, the signed formulas $v
    \colon A$ for all $v \in \TVs$, or a signed formula $v \colon A$
    with a branch expansion rule that explicitly closes the branch
@@ -825,36 +842,31 @@ of Carnielli (in the sense of \cite{BaazFermullerZach1993}).
 \FOR \op=1 \TO \NoOps \DO
    {\noindent
     The branch expansion rules for connective $\Opname\op$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO%
        \ifthenelse{\equal{\TabOpconcl{\op}{\tv}}{}}{}{%
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{%
-		    $\begin{array}[t]{@{}c@{}}
-              \TabOpprem{\op}{\tv} \\ \hline
+          \setrule{%
+            $\begin{array}[t]{@{}c@{}}
+              \TabOpprem{\op}{\tv} 
+              \\ \hline
               \TabOpconcl{\op}{\tv} 
-            \end{array}$}}}%
+               \end{array}$}%
+      }%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
-    The branch extension rules rules for quantifier $\Quname\qu$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    The branch expansion rules rules for quantifier $\Quname\qu$ are given by
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{%
-            $\begin{array}[t]{@{}c@{}}
+          \setrule{$\begin{array}[t]{@{}c@{}}
               \TabQuprem{\qu}{\tv} \\ \hline
               \TabQuconcl{\qu}{\tv}
-            \end{array}$}}%
+            \end{array}$}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 
@@ -921,31 +933,24 @@ The \emph{natural deduction rules} for \NameOfLogic{} are given by:
 \FOR \op=1 \TO \NoOps \DO
    {\noindent
     The introduction and elimination rules for connective $\Opname\op$ are given by
-    \begin{center}
-       \let\rulesep\relax
+       \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{%
-            \infer[{\Opname\op}{\NDEI\tv} \colon {\TV\tv}]
+            \setrule{\infer[{\Opname\op}{\NDEI\tv} \colon {\TV\tv}]
             {\NDOpconcl{\op}{\tv}}
-            {\NDOpprems{\op}{\tv}}}}%
+            {\NDOpprems{\op}{\tv}}}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The introduction and elimination rules for quantifier $\Quname\qu$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{%
-            \infer[\Quname\qu\NDEI\tv\colon \TV\tv]{\NDQuconcl{\qu}{\tv}}{\NDQuprems{\qu}{\tv}}}}%
+          \setrule{%
+            \infer[\Quname\qu\NDEI\tv\colon \TV\tv]{\NDQuconcl{\qu}{\tv}}{\NDQuprems{\qu}{\tv}}}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 
@@ -1045,33 +1050,27 @@ satisfies it, and \emph{unsatisfiable} otherwise.\fi
 \FOR \op=1 \TO \NoOps \DO
    {\noindent
     The clause formation rules for connective $\Opname\op$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{%
+          \setrule{%
             \infer[\Opname\op{:}\TV\tv]%
               {\C\ClOpconcl{\op}{\tv}}%
-              {\C\ClOpprem {\op}{\tv}}}}%
+              {\C\ClOpprem {\op}{\tv}}}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 \FOR \qu=1 \TO \NoQus \DO
    {\noindent
     The clause formation rules for quantifier $\Quname\qu$ are given by
-    \begin{center}
-       \let\rulesep\relax
+    \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \rulesep
-          \def\rulesep{\\[2ex]}%
-          \makebox[0pt]{\adjustbox{max width=1.5\textwidth}{%
+          \setrule{%
             \infer[\Quname\qu{:}\TV\tv]%
               {\C\ClQuconcl{\qu}{\tv}}%
-              {\C\ClQuprem {\qu}{\tv}}}}%
+              {\C\ClQuprem {\qu}{\tv}}}%
        \ENDFOR
-    \end{center}%
+    \end{rules}%
    }
 \ENDFOR
 
