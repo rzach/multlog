@@ -82,7 +82,7 @@ tex_out(FN, CFN) :-
 	),
 	(krnQuIntro(Qu, TV, Cnf),
 	   print_phrase(texQuRule(Qu, TV, Cnf, TVs)),
-	   print_phrase(texNDQuRule(Op, TV, Cnf, TVs, DTVs)),
+	   print_phrase(texNDQuRule(Qu, TV, Cnf, TVs, DTVs)),
 	   print_phrase(texClQuRule(Qu, TV, Cnf)),
 	   print_phrase(texTabQuRule(Qu, TV, Cnf)),
 	   print_phrase(texESeqQuRule(Qu, TV, TVs, Cnf)),
