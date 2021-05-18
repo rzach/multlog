@@ -12,7 +12,7 @@ all: index.html examples manual
 
 examples: $(EXPDF)
 
-manual: ../doc/multlog.pdf ../doc/multlog.html
+manual: ../doc/multlog.pdf ../doc/multlog.html ../Version
 
 ../doc/multlog.tex: ../doc/multlog.md ../Version
 	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --toc -N --toc-depth=2 --output=$@

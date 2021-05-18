@@ -735,8 +735,8 @@ texESeqOpConcl(N/A, [], TV) --> !.
 texESeqOpConcl(N/A, [TV|TVs], TV) -->
 	"{\\Gamma_{", textv(TV), "}, ", texOpExpr(A, N), "}",
 	texESeqOpConcl(N/A, TVs, TV).
-texESeqOpConcl(N/A, [_|TVs], TV) -->
-	"{\\Gamma_{", textv(TV), "}}",
+texESeqOpConcl(N/A, [T|TVs], TV) -->
+	"{\\Gamma_{", textv(T), "}}",
 	texESeqOpConcl(N/A, TVs, TV).
 
 texESeqQuRule(Qu, TV, TVs, Cnf0) -->
@@ -775,8 +775,8 @@ texESeqQuConcl(Qu, [], TV) --> !.
 texESeqQuConcl(Qu, [TV|TVs], TV) -->
 	"{\\Gamma_{", textv(TV), "}, (", texName(Qu), \\(','), "x)A(x) }", !,
 	texESeqQuConcl(Qu, TVs, TV).
-texESeqQuConcl(Qu, [_|TVs], TV) -->
-	"{\\Gamma_{", textv(TV), "}}", !,
+texESeqQuConcl(Qu, [T|TVs], TV) -->
+	"{\\Gamma_{", textv(T), "}}", !,
 	texESeqQuConcl(Qu, TVs, TV).
 
 texESeqDef(TVs, DTVs) --> 
