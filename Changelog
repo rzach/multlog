@@ -1,6 +1,6 @@
 Changes to MUltlog:
 
-1.14, 15.05.2021
+1.14, 17.05.2021
 - Bug fix regarding mins and maxs in ml_check.pl.
 - Caching of minimization that may be computationally expensive.
 - Appendix with specification of logic added to paper.
