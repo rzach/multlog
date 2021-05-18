@@ -29,7 +29,7 @@
 }
 \usepackage{hyperref}
 \hypersetup{
-            pdftitle={MUltlog 1.14 \& iLC 1.2 User Manual},
+            pdftitle={MUltlog 1.15-pre1 \& iLC 1.2 User Manual},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -53,7 +53,7 @@
 \makeatother
 
 
-\title{MUltlog 1.14 \& iLC 1.2 User Manual}
+\title{MUltlog 1.15-pre1 \& iLC 1.2 User Manual}
 \date{}
 
 \begin{document}
@@ -811,6 +811,30 @@ texExtra("FullNameOfLogic", "Halld\\'en's logic of nonsense").
     the citation information at the bottom of the first page.
   \end{itemize}
 \end{itemize}
+
+Using
+
+\begin{verbatim}
+texExtra("Preamble","\\ESequentstrue").
+\end{verbatim}
+
+you can tell MUltlog to not use the compact representations of sequents,
+but to explicitly list all components. This will only make sense if the
+number of truth values is small. In this case, sequents are typeset
+using the macro \texttt{\textbackslash{}esequent}. By default it is
+defined as
+
+\begin{verbatim}
+\newcommand{\esequent}[n]{#1 \mid ... \mid #n}
+\end{verbatim}
+
+where is the number of truth values. It can be redefined using
+
+\begin{verbatim}
+texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow ##2 \\mid ##3 \\Rightarrow ##4}").
+\end{verbatim}
+
+(Note the double \texttt{\#}.)
 
 \hypertarget{troubleshooting}{%
 \section{Troubleshooting}\label{troubleshooting}}

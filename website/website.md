@@ -1,5 +1,7 @@
 ---
 example:
+- name: "Classical logic (with some uncommon connectives and quantifiers)"
+  link: classical.pdf
 - name: "Ciuni, Ferguson, and Szmuc's $\\mathbf{HYP}_1$"
   link: ciuni-ferguson-szmuc.pdf
 - name: "Deutsch-Oller logic $\\mathbf{AL}$"
@@ -16,6 +18,8 @@ example:
   link: pwk.pdf
 - name: "Three-valued Łukasiewic logic $\\textbf{\\L}_3$"
   link: lukasiewicz.pdf
+- name: "Priest's logic of paradox $\\textbf{LP}$"
+  link: paradox.pdf
 - name: "Shramko and Wansing's $\\textbf{SIXTEEN}_{2,\\mathit{des}}$"
   link: shramko-wansing.pdf
 ---

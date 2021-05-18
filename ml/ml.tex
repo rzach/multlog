@@ -58,6 +58,8 @@
 ClOpprem\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\TabOpconcl[2]{\csname TabOpconcl\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\TabOpprem [2]{\csname TabOpprem\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ESeqOpprems[2]{\csname ESeqOpprems\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ESeqOpconcl [2]{\csname ESeqOpconcl\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\PnfOpL[2]{\csname PnfOpL\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\PnfOpR[2]{\csname PnfOpR\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\Quname [1]{\csname Quname\romannumeral#1\endcsname}
@@ -70,9 +72,15 @@ ClOpprem\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\ClQuprem [2]{\csname
 ClQuprem\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\TabQuconcl[2]{\csname TabQuconcl\romannumeral#1X\romannumeral#2\endcsname}
-\newcommand\TabQuprem [2]{\csname TabQuprem\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\TabQuprem [2]{\csname
+TabQuprem\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ESeqQuprems[2]{\csname ESeqQuprems\romannumeral#1X\romannumeral#2\endcsname}
+\newcommand\ESeqQuconcl [2]{\csname ESeqQuconcl\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\PnfQuL[2]{\csname PnfQuL\romannumeral#1X\romannumeral#2\endcsname}
 \newcommand\PnfQuR[2]{\csname PnfQuR\romannumeral#1X\romannumeral#2\endcsname}
+
+\newif\ifESequents
+\ESequentsfalse
 
 \newcommand\PS[1]{\ifnum#1>1s\fi}            % Plural "s"
 \newcommand\ARE[1]{\ifnum#1>1are\else is\fi}
@@ -650,18 +658,18 @@ A \emph{sequent $\Gamma$\/} is
 \fi
 %%% Idea: If we are dealing with excessively many TVs, we could insert
 %%% some dots instead of listing them all.
-$\Gamma_{\TV1} \FOR\n=2 \TO \NoTVs \DO \mid \Gamma_{\TV\n} \ENDFOR$,
+$\samplesequent$
 of finite sequences~$\Gamma_v$ of formulas, where $v \in \TVs$.
 The $\Gamma_v$ are called the \emph{components} of $\Gamma$.
 
 For a sequence of formulas~$\Delta$, and $W \subseteq \TVs$,
 let $[W\colon \Delta]$ denote the sequent
-whose component $\Gamma_v$ is~$\Delta$ if $v \in W$ and empty otherwise.
+whose component~$\Gamma_v$ is~$\Delta$ if $v \in W$ and empty otherwise.
 For $[\{w_1,\ldots, w_k\}\colon \Delta]$ we also write
 $[w_1,\ldots, w_k\colon \Delta]$.
-If $\Gamma$ and $\Gamma'$ are sequents, then $\Gamma, \Gamma'$ denotes the
-sequent $\Gamma_{\TV1},\Gamma'_{\TV1} \mid \ifnum\NoTVs>2 \ldots \mid \fi
-\Gamma_{\TV\NoTVs},\Gamma'_{\TV\NoTVs}$.
+If $\Gamma$ and $\Gamma'$ are sequents, then $\Gamma, \Gamma'$ denotes
+the component-wise union, i.e., the $v$-component of $\Gamma, \Gamma'$
+is $\Gamma_v, \Gamma'_v$.
 \end{definition}
 
 \begin{definition}
@@ -676,14 +684,23 @@ for every interpretation~$\I$, $\I \models \Gamma$.
 \end{definition}
 
 \begin{proposition}
-   $\Delta \models A$ iff the sequent $[\NDTVss\colon \Delta],
-   [\DTVss\colon A]$ is valid.
+   $\Delta \models A$ iff the sequent 
+   \ifESequents
+      $\consequent{\Delta}{A}$
+   \else
+      $[\NDTVss\colon \Delta], [\DTVss\colon A]$
+   \fi is valid.
 \end{proposition}
 
 \begin{definition}
 The \emph{sequent calculus} for \NameOfLogic{} is given by:
 \begin{enumerate}
-\item axiom schemas of the form $[\TVs \colon A]$,  % 1
+\item axiom schemas of the form 
+   \ifESequents
+      $\consequent{A}{A}$%
+   \else
+      $[\TVs \colon A]$%
+   \fi,  % 1
 \item weakening rules for every truth value~$v$:       % 2
       \[
          \infer[$\textsc{w}:$v]{\Gamma, [v \colon A]}{\Gamma}
@@ -737,7 +754,11 @@ The \emph{sequent calculus} for \NameOfLogic{} is given by:
     The introduction rules for connective $\Opname\op$ are given by
     \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \setrule{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}%
+         \ifESequents
+            \setrule{\infer[\Opname\op{:}\TV\tv]{\ESeqOpconcl{\op}{\tv}}{\ESeqOpprems{\op}{\tv}}}%
+         \else
+            \setrule{\infer[\Opname\op{:}\TV\tv]{\Opconcl{\op}{\tv}}{\Opprems{\op}{\tv}}}%
+         \fi
        \ENDFOR
     \end{rules}%
    }
@@ -747,7 +768,11 @@ The \emph{sequent calculus} for \NameOfLogic{} is given by:
     The introduction rules for quantifier $\Quname\qu$ are given by
     \begin{rules}
        \FOR \tv=1 \TO \NoTVs \DO
-          \setrule{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
+          \ifESequents
+            \setrule{\infer[\Quname\qu{:}\TV\tv]{\ESeqQuconcl{\qu}{\tv}}{\ESeqQuprems{\qu}{\tv}}}%
+         \else
+            \setrule{\infer[\Quname\qu{:}\TV\tv]{\Quconcl{\qu}{\tv}}{\Quprems{\qu}{\tv}}}%
+         \fi
        \ENDFOR
     \end{rules}%
    }
@@ -775,9 +800,18 @@ A sequent is provable if and only if it is valid.
 \end{proof}
 
 \begin{corollary}
-   In \NameOfLogic, $\models A$ iff $[\DTVss\colon A]$ has a
-   sequent proof, and $\Delta \models A$ iff $[\NDTVss\colon \Delta],
-   [\DTVss\colon A]$ has a proof.
+   In \NameOfLogic, $\models A$ iff 
+   \ifESequents
+      $\consequent{}{A}$
+   \else
+      $[\DTVss\colon A]$
+   \fi has a
+   sequent proof, and $\Delta \models A$ iff 
+   \ifESequents
+      $\consequent{\Delta}{A}$
+   \else
+      $[\NDTVss\colon \Delta], [\DTVss\colon A]$
+   \fi has a proof.
 \end{corollary}
 
 \begin{theorem}[Cut-elimination]

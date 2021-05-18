@@ -561,6 +561,23 @@ The `.cfg` file for a logic can contain three kinds of declaration:
   - `\Link` will be added as a download link to the citation
     information at the bottom of the first page.
 
+Using
+```
+texExtra("Preamble","\\ESequentstrue").
+```
+you can tell MUltlog to not use the compact representations of
+sequents, but to explicitly list all components. This will only make
+sense if the number of truth values is small.  In this case, sequents
+are typeset using the macro `\esequent`. By default it is defined as
+```
+\newcommand{\esequent}[n]{#1 \mid ... \mid #n}
+```
+where $n$ is the number of truth values. It can be redefined using
+```
+texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow ##2 \\mid ##3 \\Rightarrow ##4}").
+```
+(Note the double `#`.)
+
 
 # Troubleshooting
 

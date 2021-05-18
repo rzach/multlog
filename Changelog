@@ -1,5 +1,9 @@
 Changes to MUltlog:
-
+1.15-pre1, 18.05.2021
+- Add option to make "explicit" sequents, ie, rules don't use the
+  compact representation but list all components.
+- Add examples: classical logic with unusual connectives and
+  quantifiers; Priest's logic of paradox.
 1.14, 17.05.2021
 - Bug fix regarding mins and maxs in ml_check.pl.
 - Caching of minimization that may be computationally expensive.

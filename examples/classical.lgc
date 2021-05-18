@@ -1,0 +1,84 @@
+
+logic "classical".
+
+truth_values { f , t }.
+
+designated_truth_values { t }.
+
+ordering(truth," f < t ").
+
+operator(neg/1, mapping {
+	 (f) : t,
+	 (t) : f
+	}
+).
+
+operator(and/2, inf(truth)).
+
+operator(or/2, sup(truth)).
+
+operator(imp/2, table [
+	      f, t,
+	  f,  t, t,
+	  t,  f, t
+	]
+).
+
+operator(equiv/2, table [
+	      f, t,
+	  f,  t, f,
+	  t,  f, t
+	]
+).
+
+operator(nand/2, table [
+	      f, t,
+	  f,  t, t,
+	  t,  t, f
+	]
+).
+
+operator(nor/2, table [
+	      f, t,
+	  f,  t, f,
+	  t,  f, f
+	]
+).
+
+operator(xor/2, table [
+	      f, t,
+	  f,  f, t,
+	  t,  t, f
+	]
+).
+
+operator(excl/2, table [
+	      f, t,
+	  f,  f, f,
+	  t,  t, f
+	]
+).
+
+operator(ite/3, mapping {
+	 (f,f,f) : f,
+	 (f,f,t) : t,
+	 (f,t,f) : f,
+	 (f,t,t) : t,
+	 (t,f,f) : f,
+	 (t,f,t) : f,
+	 (t,t,f) : t,
+	 (t,t,t) : t
+	}
+).
+
+quantifier(forall, induced_by inf(truth)).
+
+quantifier(exists, induced_by sup(truth)).
+
+quantifier(cont, mapping {
+	 {f,t} : t,
+	 {f}   : f,
+	 {t}   : f
+	}
+).
+

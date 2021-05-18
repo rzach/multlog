@@ -1,0 +1,64 @@
+% Priest's Logic of Paradox
+
+logic "LP".
+
+truth_values {f,p,t}.
+
+designated_truth_values {p, t}.
+
+operator(neg  /1, mapping { (t): f,
+                            (p): p,
+                            (f): t
+                          }
+        ).
+
+operator(and  /2, mapping { (t,t): t,
+                            (t,p): p,
+                            (t,f): f,
+                            (p,t): p,
+                            (p,p): p,
+                            (p,f): f,
+                            (f,t): f,
+                            (f,p): f,
+                            (f,f): f
+                          }
+        ).
+operator(or   /2, mapping { (t,t): t,
+                            (t,p): t,
+                            (t,f): t,
+                            (p,t): t,
+                            (p,p): p,
+                            (p,f): p,
+                            (f,t): t,
+                            (f,p): p,
+                            (f,f): f
+                          }
+        ).
+
+operator(imp  /2, mapping { (t,t): t,
+                            (t,p): p,
+                            (t,f): f,
+                            (p,t): t,
+                            (p,p): p,
+                            (p,f): p,
+                            (f,t): t,
+                            (f,p): t,
+                            (f,f): t
+                          }
+        ).
+
+operator(equiv  /2, mapping { (t,t): t,
+                            (t,p): p,
+                            (t,f): f,
+                            (p,t): p,
+                            (p,p): p,
+                            (p,f): p,
+                            (f,t): f,
+                            (f,p): p,
+                            (f,f): t
+                          }
+        ).
+
+
+quantifier(forall, induced_by and/2).
+quantifier(exists, induced_by or/2).
