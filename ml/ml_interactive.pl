@@ -30,134 +30,123 @@ loadLogic(FN,Lg) :-
 % valueOp(Lg, Op, Arg, Val) -- in logic Lg, the value of Op applied to
 % Arg is V.
 
-valueOp(Lg, Op/Ar, Arg, V) :-
+valueOp(Lg, Op/Ar, Args, V) :-
     logOp(Lg, Op/Ar, Map),
-    member(Arg:V,Map).
-valueOp(Lg, Op, Arg, V) :-
+    member(Args:V,Map).
+valueOp(Lg, Op, Args, V) :-
     logOp(Lg, Op/_, Map), !,
-    member(Arg:V, Map).
+    member(Args:V, Map).
 
-% valueFmlaT(Lg, F, Val) -- in logic Lg, formula F has value V.
+% isFmla(+Lg, +Var, ?F, ?N) - F is a legal formula in logic Lg of
+% length N. Var is the list of variables in F.
 
-valueFmla(Lg, F, V) :-
-    logTVs(Lg, TVs), !,
-    member(V, TVs),
-    fmlaList(F, L),
-    valueList(Lg, L, V, TVs).
-
-% valueList(Lg, List, Val, TVs) -- in logic Lg, the expression corresponding
-% to List has value Val (TVs is the list of truth values of logic Lg).
-
-valueList(_, TV, TV, TVs) :-
-    member(TV, TVs).
-valueList(Lg, [Op|Args], Val, TVs) :-
-    valueLists(Lg, Args, Vals, TVs),
-    valueOp(Lg, Op, Vals, Val).
-
-valueLists(_, [], [], _).
-valueLists(Lg, [Arg|Args], [Val|Vals], TVs) :-
-    valueList(Lg, Arg, Val, TVs),
-    valueLists(Lg, Args, Vals, TVs).
-
-% fmlaList(F, L) -- recursively convert a formula F to a nested list L.
-
-fmlaList(F, Atom) :-
-    F =.. [Atom], !.
-fmlaList(F, [Op|Lists]) :-
+isFmla(_, Vars, v-N, 1) :-
+    member(v-N, Vars).
+isFmla(Lg, _, Op, 1) :-
+    logOp(Lg, Op/0, _).
+isFmla(Lg, Vars, F, Len) :-
+    logOp(Lg, Op/Ar, _),
+    Ar > 0,
+    functor(F, Op, Ar),
+    length(Args, Ar),
+    length(Lens, Ar),
     F =.. [Op|Args],
-    fmlaLists(Args,Lists).
+    succ(Sum,Len),
+    int_partition(Lens,Sum),
+    maplist(isFmla(Lg, Vars), Args, Lens).
 
-fmlaLists([],[]) :- !.
-fmlaLists([A|Args], [L|Lists]) :-
-    fmlaList(A,L),
-    fmlaLists(Args,Lists).
+int_partition([],0).
+int_partition([N|Ns],S) :-
+    between(1,S,N),
+    plus(N,R,S),
+    int_partition(Ns,R). 
 
+% hasValue(Lg, Ass, F, V) -- formula F has value V under assignment
+% Ass in logic Lg. Assignments are lists of variable:value pairs.
 
-% isDesignated(Lg, F) -- The value of F in logic Lg is
-% designated. If F contains variables, every value combination for
-% these variables for which F is designated is a solution.
-
-isDesignated(Lg, F) :-
+hasValue(Lg, _, V, V) :-
     logTVs(Lg, TVs),
+    member(V, TVs).
+hasValue(_, Ass, v-N, V) :-
+    member(v-N:V, Ass).
+hasValue(Lg, _, F, V) :-
+    logOp(Lg, F/0, [[]:V]).
+hasValue(Lg, Ass, F, V) :-
+    logOp(Lg, Op/Ar, Map),
+    length(Args,Ar),
+    F =.. [Op|Args],
+    maplist(hasValue(Lg,Ass), Args, Vs),
+    member(Vs:V, Map).
+
+% collectVars(+F, -Vars) -- Vars is the list of all variables in Fmla
+
+collectVars(v-N, [v-N]) :- !.
+collectVars(F, Vars) :-
+    F =.. [_|Args],
+    maplist(collectVars, Args, VVars),
+    ord_union(VVars, Vars).
+
+% assignment(TVs, Vars, Ass) -- Ass is an assignment of variables in
+% Vars to truth values in TVs
+
+assignment(_, [], []).
+assignment(TVs, [V|Vars],[V:TV|Ass]) :-
+    member(TV, TVs),
+    assignment(TVs,Vars,Ass).
+
+% valueIn(InTVs, OutTVs, Ass, F) -- Ass assigns truth values from
+% InTVs to the variables in F, and F evaluates to a value in OutTVs.
+
+valueIn(InTVs, OutTVs, Ass, F) :-
+    collectVars(F, Vars), !,
+    assignment(InTVs, Vars, Ass), 
+    hasValue(Lg, Ass, F, V),
+    member(V, OutTVs).
+
+% isDesignated(Lg, Ass, F) -- The value of F in logic Lg on assignment
+% Ass is designated.
+
+isDesignated(Lg, Ass, F) :-
     logDTVs(Lg, DTVs),
-    term_variables(F, Vars), !,
-    listOfTVs(Vars,TVs),
-    valueFmla(Lg, F, V),
-    member(V, DTVs).
-
-% isUnDesignated(Lg, F) -- same, except will find all solutions
-% where F has a non-designated value.
-
-isUnDesignated(Lg, F) :-
     logTVs(Lg, TVs),
-    logNDTVs(Lg, NDTVs),
-    term_variables(F, Vars), !,
-    listOfTVs(Vars,TVs),
-    valueFmla(Lg, F, V),
-    member(V, NDTVs).
+    valueIn(TVs,DTVs,Ass,F).
+
+% isUndesignated(Lg, Ass, F) -- The value of F in logic Lg on assignment
+% Ass is not designated.
+
+isUndesignated(Lg, Ass, F) :-
+    logDTVs(Lg, DTVs),
+    logTVs(Lg, TVs),
+    valueIn(TVs,DTVs,Ass,F).
 
 % isTaut(Lg, F) -- F is a tautology of Lg.
 
 isTaut(Lg, F) :-
-    logTVs(Lg, TVs),
     logDTVs(Lg, DTVs),
-    term_variables(F, Vars), !,
-    forall(listOfTVs(Vars,TVs),
-        (   valueFmla(Lg, F, V),
+    logTVs(Lg, TVs),
+    collectVars(F, Vars), !,
+    forall(assignment(TVs, Vars, Ass),
+        (   hasValue(Lg, Ass, F, V),
             member(V, DTVs))).
 
-% listOfTVs(L, TVs) -- L is a subset of TVs (works as generator of
-% lists of truth values).
+% taut(Lg, F) -- same, except it backtracks through all formulas of F
 
-listOfTVs([], _) :- !.
-listOfTVs([L|Ls], TVs) :-
-    member(L, TVs),
-    listOfTVs(Ls,TVs).
+taut(Lg, F) :-
+    logDTVs(Lg, DTVs),
+    logTVs(Lg, TVs), !,
+    length(Vars, N),
+    varList(N, Vars),
+    isFmla(Lg,Vars,F,N),
+    forall(assignment(TVs, Vars, Ass),
+        (   hasValue(Lg, Ass, F, V),
+            member(V, DTVs))).
 
-% Attempts at making a generator for formulas
+isFmla(Lg,F) :-
+    length(Vars, N),
+    varList(N, Vars),
+    isFmla(Lg,Vars,F,N).
 
-isFormula(Lg, V) :-
-    var(V).
-isFormula(Lg, F) :-
-    logOp(Lg,Op/N,_),
-    functor(F, Op, N),
-    F =.. [Op|Args],
-    areFormulas(Lg, Args).
-
-areFormulas(_, []).
-areFormulas(Lg, [F|Fs]) :-
-    isFormula(Lg, F),
-    areFormulas(Lg, Fs).
-
-
-% fmlaListDepth
-
-fmlaListDepth(_, [V], 1) :-
-    var(V).
-fmlaListDepth(Lg, [Op|Args], D) :-
-    logOp(Lg, Op/Ar, _),
-    length(Args, Ar),
-    fmlaListsDepth(Lg, Args, Ds), D is Ds+1.
-
-fmlaListsDepth(_, [], 0) :- !.
-fmlaListsDepth(Lg, [L|Ls], M) :-
-    fmlaListDepth(Lg, L, D),
-    fmlaListsDepth(Lg, Ls, N), M is D+N.
-
-fmlaPolish(Lg, F, [F]) :-
-    var(F).
-fmlaPolish(Lg, Op, [Op/0]) :-
-    logOp(Lg, Op/0, _).
-fmlaPolish(Lg, F, [Op/N|PArgs]) :-
-    logOp(Lg, Op/N, _), !,
-    fmlasPolish(Lg, Args, PArgs),
-    length(Args, N),
-    F =.. [Op|Args].
-
-fmlasPolish(_, [], []).
-fmlasPolish(Lg,[F],List) :-
-    fmlaPolish(Lg,F,List).
-fmlasPolish(Lg,[F|Fs],List) :-
-    fmlaPolish(Lg,F,L1),
-    fmlasPolish(Lg,Fs,L2),
-    append(L1,L2,List).
+varList(N,Vars) :-
+    numlist(1,N,Nums),
+    maplist(varNo, Nums, Vars).
+    varNo(N,v-N).
