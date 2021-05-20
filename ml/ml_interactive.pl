@@ -101,25 +101,3 @@ listOfTVs([], _) :- !.
 listOfTVs([L|Ls], TVs) :-
     member(L, TVs),
     listOfTVs(Ls, TVs).
-
-% F is a formula skeleton of length N in logic Lg, with variables Vs.
-isFmla(Lg, F, N, Vs) :-
-    length(S, N),
-    isFmla(Lg, F, S, [], Vs, []).
-
-% isFmla(Lg, F, S, S0, Vs, Vs0)
-% F is a formula skeleton of size S-S0, with variables Vs-Vs0
-isFmla(_Lg, F, [_|S], S, [F|Vs], Vs) :-
-    var(F).
-isFmla(Lg, F, [_|S], S0, Vs, Vs0) :-
-    logOp(Lg, Op/Ar, _),
-    functor(F, Op, Ar),
-    F =.. [_|Fs],
-    isFmla_l(Lg, Fs, S, S0, Vs, Vs0).
-
-% isFmla_l(Lg, Fs, S, S0, Vs, Vs0)
-% Fs is a list of formulas with total size S-S0 and variables Vs-Vs0
-isFmla_l(_Lg, [], S, S, Vs, Vs).
-isFmla_l(Lg, [F|Fs], S, S0, Vs, Vs0) :-
-    isFmla(Lg, F, S, S1, Vs, Vs1),
-    isFmla_l(Lg, Fs, S1, S0, Vs1, Vs0).
