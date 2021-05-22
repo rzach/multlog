@@ -572,12 +572,128 @@ are typeset using the macro `\esequent`. By default it is defined as
 ```
 \newcommand{\esequent}[n]{#1 \mid ... \mid #n}
 ```
-where $n$ is the number of truth values. It can be redefined using
+where $$n$$ is the number of truth values. It can be redefined using
 ```
 texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow ##2 \\mid ##3 \\Rightarrow ##4}").
 ```
 (Note the double `#`.)
 
+# Interactive use
+
+The command `multlog` will start Prolog and load the MUltlog source
+files.  This makes it possible to use MUltlog interactively.  This
+feature is in development and has not been tested extensively.
+
+Interactive mode allows you to load the specification files of logics
+and then perform queries and operations on these logics. To load a
+logic, type, e.g.,
+```
+?- loadLogic('lukasiewicz.lgc',luk).
+```
+Here, `?-` is the Prolog prompt; you only enter the text after it. Now
+the definition of Łukasiewicz logic is available using the ID `gl`.
+
+Formulas of a logic are built using the operator names in the `.lgc`
+file, in operator notation.  Prolog variables are used for
+propositional variables. So, e.g., $$X \to \lnot(X \lor Y)$$ would be
+written as `imp(X, neg(or(X, Y)))`.  Instead of variables, you can
+also put truth values of your logic, e.g., `imp(t, neg(or(*,f)))`.
+To find the value of this formula:
+```
+?- hasValue(luk,imp(t, neg(or(*,f))),V).
+```
+Prolog will display `V =  (*)`, i.e., the value is `*`. If you hit
+space, Prolog will try to find other solutions, and display `false.`
+if not other solutions can be found. In this case, `V=*` is the only
+solution.  However, if the formula contains variables, Prolog will
+find all solutions. E.g.,
+```
+?- hasValue(luk,imp(X, neg(or(X,Y))),f).
+```
+will successively find all values for the variables `X` and `Y` so
+that the value is `f`:
+```
+X = t,
+Y = f ;
+X = t,
+Y =  (*) ;
+X = Y, Y = t ;
+false.
+```
+The value can itself be a variable. For instance to find a truth value
+fixed point of $$\lnot X \lor X$$, type.
+```
+?- hasValue(luk, or(X, neg(X)),X).
+```
+This will find solutions `*` and `t`.
+
+If you want to know if a formula is designated (or can be made
+designated), use:
+```
+?- isDesignated(luk, or(X, neg(X))).
+```
+This will find the values `t` and `f`. Use `isUnDesignated` instead if
+you are interested in undesignated values.
+
+To test if a formula is a tautology, say
+```
+?- isTaut(luk, or(X, neg(X))).
+```
+This will just produce `false` since $$X \lor \lnot X$$ is not a
+tautology: if $$X$$ is `*` the result is `*`, which is not designated:
+```
+?- isUnDesignated(luk, or(X, neg(X))).
+X =  (*) 
+```
+To test for consequence, use
+```
+?- isConseq(luk, [X, imp(X,Y)], Y).
+```
+Here, the first argument `[X, imp(X,Y)]` is a *list* of formulas, and
+since in Łukasiewicz logic, $$X, X \to Y \models Y$$, this will result
+in `true`.
+
+You can also test for equivalence of two formulas:
+```
+?- isEquiv(luk, or(X,Y), luk, imp(imp(X, Y), Y)).
+```
+Here, the first formula is evaluated according to the operations
+(truth tables) of the first listed logic, and the second formula
+according to the operations. In this case we use the same logic `luk`
+for both.
+
+To find formulas with various properties, do the following:
+`findFmla(logic, F)` will successively find solutions `F` which are
+formulas of `logic`.  The solutions will be ugly, e.g., `F = and(_100,
+neg(_136))` (`_` followed by a number is Prolog's generic way of
+naming variables). This can then be combined with other tests, e.g.,
+to find all tautologies, say:
+```
+?- findFmla(luk,F), isTaut(luk, F).
+```
+The predicate `findTaut(luk, F)` does the same.
+
+To find a formula equivalent to a given one, use `findEquiv`, e.g.,
+```
+?- findEquiv(luk, or(X,Y), luk, F).
+```
+will find all formulas `F` equivalent to $$X \lor Y$$. The first two are
+boring---$$X \lor Y$$ itself and $$Y \lor X$$---but then it will discover
+that you can express $$X \lor Y$$ using $$(X \to Y) \to Y$$ in Łukasiewicz
+logic.
+
+To find only formulas not involving $$\lor$$ here, you can define a
+second version of Łukasiewicz logic without $$\lor$$:
+```
+?- loadLogic('lukasiewicz.lgc',luk2), delOp(luk2,or/2).
+```
+(`delOp(luk2,op/2)` deletes the 2-place operator `or` from `luk2`.)
+Now
+```
+?- findEquiv(luk, or(X,Y), luk2, F).
+```
+will only find formulas of `luk2` (i.e., formulas not containing `or`)
+that are equivalent to $$X \lor Y$$.
 
 # Troubleshooting
 

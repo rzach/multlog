@@ -21,10 +21,12 @@ user:file_search_path(multlog, Dir) :-
 
 :- (dynamic logName/2, logTVs/2, logDTVs/2, logNDTVs/2, logOp/3).
 
-% defining logics
+% Defining logics
+% ===============
 
-% loadLogic(+Filename,+Lg) -- load definition of logic Lg from file FileName
+% loadLogic(Filename, Lg) -- load definition of logic Lg from file FileName
 % from FileName
+
 loadLogic(FN, Lg) :-
     lgc_in(FN),
     check,
@@ -129,7 +131,7 @@ isUnDesignated(Lg, F) :-
 
 % isTaut(Lg, F) -- F is a tautology of Lg.
 
-isTaut(+Lg, +F) :-
+isTaut(Lg, F) :-
     logTVs(Lg, TVs),
     logDTVs(Lg, DTVs),
     term_variables(F, Vars), !,
@@ -138,7 +140,12 @@ isTaut(+Lg, +F) :-
              member(V, DTVs)
            )).
 
-% isConseq(+Lg, +Fs, +F) -- in logic Lg, F is a consequence of the Fs
+findTaut(Lg, F) :-
+    findFmla(Lg, F),
+    isTaut(Lg, F).
+
+
+% isConseq(Lg, Fs, F) -- in logic Lg, F is a consequence of the Fs
 
 isConseq(Lg, Fs, F) :-
     logTVs(Lg, TVs),
@@ -149,7 +156,7 @@ isConseq(Lg, Fs, F) :-
           hasValueIn(Lg, F, DTVs) ; true
         )).
 
-% areEquiv(+Lg1, +F1, +Lg2, +F2) -- F1 and F2 agree on all assignments of
+% areEquiv(Lg1, F1, Lg2, F2) -- F1 and F2 agree on all assignments of
 % values from Lg1 to the variables of F1 and F2. Assumes that truth
 % values of Lg1 are also truth values of Lg2.
 
@@ -158,11 +165,11 @@ areEquiv(Lg1, F1, Lg2, F2) :-
         hasValue(Lg2, F2, V)
            ).
 
-% findEquiv(+Lg1, +F1, +Lg2, -F2) -- find a formula F2 equivalent to F1.
+% findEquiv(Lg1, F1, Lg2, -F2) -- find a formula F2 equivalent to F1.
 
 findEquiv(Lg1, F1, Lg2, F2) :-
     term_variables(F1, VarsF1),
-    isFmla(Lg2, F2, _, V), 
+    findFmla(Lg2, F2, _, V), 
     maplist(revmember(VarsF1), V),
     areEquiv(Lg1, F1, Lg2, F2).
 
@@ -177,43 +184,43 @@ listOfTVs([L|Ls], TVs) :-
 % Finding formulas
 % ================
 
-% isFmla(+Lg, -F) --- F is a formula of logic L. This will backtrack
+% findFmla(Lg, -F) --- F is a formula of logic L. This will backtrack
 % to find all formulas of Lg. It works by finding all most general
 % formulas, then partitioning the set of variables, and identifying
 % all variables in a set in the partition.
 
-isFmla(Lg, F) :-
-    isFmla(Lg, F, _, V),
+findFmla(Lg, F) :-
+    findFmla(Lg, F, _, V),
     partition(V, Vs),
     unifyPart(Vs).
 
-% isFmla(Lg, F, N, Vs) -- F is a most general formula of length N in
+% findFmla(Lg, F, N, Vs) -- F is a most general formula of length N in
 % logic Lg, with variables Vs.
 
-isFmla(Lg, F, N, Vs) :-
+findFmla(Lg, F, N, Vs) :-
     setof(Op, Map^logOp(Lg, Op, Map), Ops), !,
     length(S, N),
-    isFmla(F, Ops, S, [], Vs, []).
+    findFmla(F, Ops, S, [], Vs, []).
 
-% isFmla(F, Ops, S, S0, Vs, Vs0) F is a formula skeleton built from
+% findFmla(F, Ops, S, S0, Vs, Vs0) F is a formula skeleton built from
 % Ops of size S-S0, with variables Vs-Vs0. Ops is a list of
 % Operator/Arity pairs.
 
-isFmla(F, _Ops, [_|S], S, [F|Vs], Vs) :-
+findFmla(F, _Ops, [_|S], S, [F|Vs], Vs) :-
     var(F).
-isFmla(F, Ops, [_|S], S0, Vs, Vs0) :-
+findFmla(F, Ops, [_|S], S0, Vs, Vs0) :-
     member(Op/Ar, Ops),
     functor(F, Op, Ar),
     F =.. [_|Fs],
-    isFmla_l(Fs, Ops, S, S0, Vs, Vs0).
+    findFmla_l(Fs, Ops, S, S0, Vs, Vs0).
 
 % isMGFmla_l(Lg, Ops, Fs, S, S0, Vs, Vs0) Fs is a list of formulas built
 % from Ops with total size S-S0 and variables Vs-Vs0
 
-isFmla_l([], _, S, S, Vs, Vs).
-isFmla_l([F|Fs], Ops, S, S0, Vs, Vs0) :-
-    isFmla(F, Ops, S, S1, Vs, Vs1),
-    isFmla_l(Fs, Ops, S1, S0, Vs1, Vs0).
+findFmla_l([], _, S, S, Vs, Vs).
+findFmla_l([F|Fs], Ops, S, S0, Vs, Vs0) :-
+    findFmla(F, Ops, S, S1, Vs, Vs1),
+    findFmla_l(Fs, Ops, S1, S0, Vs1, Vs0).
 
 % partition(S, Ps) -- partition S into set of sets P.
 
@@ -257,3 +264,83 @@ varList(N,Vars) :-
 varNo(N,v-N).
 
 revmember(X,Y) :- member(Y,X).
+superset(X, Y) :- subset(Y, X).
+
+% Finding congruences of a matrix
+% ===================
+
+% isCong(Lg, Part) :- Part (a partition of truth values
+% of Lg) is a congruence.
+
+isCong(Lg, Part, Des) :-
+    logTVs(Lg, TVs),
+    logDTVs(Lg, DTVs),
+    partition(TVs, Part),
+    include(superset(DTVs), Part, Des),
+    forall(logOp(Lg, _Op/Ar, Map),
+        congMap(Ar, Map, Part)).
+
+% congMap(Ar, Map, Part) :- Part is a congruence wrt the Ar-place
+% mapping Map, i.e., if [x1] -> y1 and [x2] -> y2 with x_1 ~ x_2 then
+% y1 ~ y2 (where x ~ y iff [x, y] \subset X \in Part.
+
+congMap(0, _, _) :- !.
+congMap(Ar, Map, Part) :-
+    length(ArgCs, Ar),
+    length(Args, Ar),
+    forall(maplist(revmember(Part), ArgCs),
+        (   setof(V, Args^(
+                maplist(revmember, ArgCs, Args),
+                member(Args:V, Map)), 
+                Vs), write(ArgCs), write(->), write(Vs), nl,
+            subClass(Part, Vs))).
+
+% subClass(Part, A) :- A is a subset of a set in P.
+
+subClass([C|_], A) :-
+    subset(A,C), !.
+subClass([_|Cs], A) :-
+    subClass(Cs, A).
+
+equivClass([], _, _) :-
+    fail.
+equivClass([C|_], A, C) :-
+    member(A, C), !.
+equivClass([_|Cs], A, C) :-
+    equivClass(Cs, A, C).
+
+% Products of logics
+% ==================
+
+logProduct(Lg1, Lg2, Lg12) :-
+    logTVs(Lg1, TVs1),
+    logTVs(Lg2, TVs2),
+    setProduct(TVs1, TVs2, TVs),
+    assertz(logTVs(Lg12, TVs)),
+    logDTVs(Lg1, DTVs1),
+    logDTVs(Lg2, DTVs2),
+    setProduct(DTVs1, DTVs2, DTVs),
+    assertz(logDTVs(Lg12, DTVs)),
+    subtract(TVs, DTVs, NDTVs),
+    assertz(logNDTVs(Lg12, NDTVs)),
+    forall(logOp(Lg1, Op/Ar, Map1),
+    (   logOp(Lg2, Op/Ar, Map2),
+        mapProduct(Map1, Map2, Map),
+        assertz(logOp(Lg12, Op/Ar, Map)))).
+
+setProduct(A1,A2,B) :-
+    setof((P1, P2), (member(P1,A1), member(P2,A2)), B).
+
+mapProduct(M1, M2, B) :-
+    setof(Args:V,
+        prodMap(M1, M2, Args, V),
+        B).
+
+prodMap(M1, M2, Args, (V1,V2)) :-
+member(A1:V1, M1),
+member(A2:V2, M2),
+pairUp(A1,A2,Args).
+
+pairUp([],[],[]).
+pairUp([A|As],[B|Bs], [(A,B)|Cs]) :-
+pairUp(As,Bs,Cs).
