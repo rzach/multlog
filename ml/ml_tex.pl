@@ -721,8 +721,8 @@ texESeqOpPrem(C, [TV|TVs]) -->
 
 filterCNF([], _TV, []) :- !.
 filterCNF([N^TV|Ls], TV, [N|Ns]) :-
-	filterCNF(Ls, TV, Ns).
-filterCNF([N^_|Ls], TV, Ns) :-
+	filterCNF(Ls, TV, Ns), !.
+filterCNF([_^_|Ls], TV, Ns) :-
 	filterCNF(Ls, TV, Ns).
 
 texESeqOpComp([]) --> !. 
@@ -731,7 +731,7 @@ texESeqOpComp([N|Ls]) -->
 	texOpAtom(N),
 	texESeqOpComp(Ls).
 
-texESeqOpConcl(N/A, [], TV) --> !.
+texESeqOpConcl(_/_, [], _) --> !.
 texESeqOpConcl(N/A, [TV|TVs], TV) -->
 	"{\\Gamma_{", textv(TV), "}, ", texOpExpr(A, N), "}",
 	texESeqOpConcl(N/A, TVs, TV).
@@ -771,7 +771,7 @@ texESeqQuComp([N|Ls], Cnts) -->
 	")",
 	texESeqQuComp(Ls, Cnts).
 
-texESeqQuConcl(Qu, [], TV) --> !.
+texESeqQuConcl(_, [], _) --> !.
 texESeqQuConcl(Qu, [TV|TVs], TV) -->
 	"{\\Gamma_{", textv(TV), "}, (", texName(Qu), \\(','), "x)A(x) }", !,
 	texESeqQuConcl(Qu, TVs, TV).
