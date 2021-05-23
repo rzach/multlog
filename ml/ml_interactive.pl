@@ -30,6 +30,7 @@ user:file_search_path(multlog, Dir) :-
 loadLogic(FN, Lg) :-
     lgc_in(FN),
     check,
+    deleteLogic(Lg),
     lgcLN(LN),
     assertz(logName(Lg, LN)),
     lgcTVs(TVs),
@@ -45,6 +46,14 @@ loadLogic(FN, Lg) :-
     ;   true
     ),
     format("Logic ~s loaded as '~a'.", [LN, Lg]), nl, !.
+
+deleteLogic(Lg) :-
+(logName(Lg, _) ->
+    (retract(logName(Lg, _)),
+    retract(logTVs(Lg, _)),
+    retract(logDTVs(Lg, _)),
+    retract(logNDTVs(Lg, _)),
+    retract(logOp(Lg, _, _))) ; true), !.
 
 % addOp(Lg, Op/Ar, Map) -- add Op/Ar to logic L with mapping Map.
 % if Ar/Op already defined, it is replaced.
@@ -265,6 +274,7 @@ varNo(N,v-N).
 
 revmember(X,Y) :- member(Y,X).
 superset(X, Y) :- subset(Y, X).
+intersects(X,Y) :- member(Z,X), member(Z,Y).
 
 % Finding congruences of a matrix
 % ===================
@@ -272,13 +282,15 @@ superset(X, Y) :- subset(Y, X).
 % isCong(Lg, Part) :- Part (a partition of truth values
 % of Lg) is a congruence.
 
-isCong(Lg, Part, Des) :-
-    logTVs(Lg, TVs),
+isCong(Lg, Part, DPart) :-
     logDTVs(Lg, DTVs),
-    partition(TVs, Part),
-    include(superset(DTVs), Part, Des),
+    logNDTVs(Lg, NDTVs),
+    partition(DTVs, DPart),
+    partition(NDTVs, NDPart),
+    union(NDPart, DPart, Part),
     forall(logOp(Lg, _Op/Ar, Map),
         congMap(Ar, Map, Part)).
+
 
 % congMap(Ar, Map, Part) :- Part is a congruence wrt the Ar-place
 % mapping Map, i.e., if [x1] -> y1 and [x2] -> y2 with x_1 ~ x_2 then
@@ -287,13 +299,31 @@ isCong(Lg, Part, Des) :-
 congMap(0, _, _) :- !.
 congMap(Ar, Map, Part) :-
     length(ArgCs, Ar),
-    length(Args, Ar),
     forall(maplist(revmember(Part), ArgCs),
-        (   setof(V, Args^(
-                maplist(revmember, ArgCs, Args),
-                member(Args:V, Map)), 
-                Vs), write(ArgCs), write(->), write(Vs), nl,
-            subClass(Part, Vs))).
+        checkCongPart(Map, ArgCs, Part)).
+
+% checkCong(Map, ArgCs, ValC) :- ArgCs is a list of congruence
+% classes; this checks if all values are in ValC (ie if all
+% values are congruent).
+
+% find the congruence class of the value of Map for the first sequence
+% of arguments....
+
+checkCongPart(Map, ArgCs, Part) :-
+    maplist(revmember, ArgCs, Args),
+    member(Args:V, Map),
+    member(ClassV, Part),
+    member(V, ClassV),
+    !,
+    checkCong(Map, ArgCs, ClassV).
+
+% ... then test if the value of Map for all sequences of arguments
+% from the sequence of classes of arguments is in Class
+
+checkCong(Map, ArgCs, ClassV) :-
+    forall(maplist(revmember, ArgCs, Args),
+        (   member(Args:V, Map),
+            member(V, ClassV))).
 
 % subClass(Part, A) :- A is a subset of a set in P.
 
@@ -308,6 +338,13 @@ equivClass([C|_], A, C) :-
     member(A, C), !.
 equivClass([_|Cs], A, C) :-
     equivClass(Cs, A, C).
+
+% display the partition P, D
+
+writeCong(P, D) :-
+    length(P, N1),
+    length(D, N2),
+    format("Found a congruence:~n~d congruence classes, ~d designated~nCongruence   classes:~n~w~nDesignated classes:~n~w~n", [N1, N2, P, D]).
 
 % Products of logics
 % ==================
