@@ -29,7 +29,7 @@
 }
 \usepackage{hyperref}
 \hypersetup{
-            pdftitle={MUltlog 1.15-pre2 \& iLC 1.2 User Manual},
+            pdftitle={MUltlog 1.15-pre3 \& iLC 1.2 User Manual},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -53,7 +53,7 @@
 \makeatother
 
 
-\title{MUltlog 1.15-pre2 \& iLC 1.2 User Manual}
+\title{MUltlog 1.15-pre3 \& iLC 1.2 User Manual}
 \date{}
 
 \begin{document}
@@ -985,6 +985,47 @@ second version of Łukasiewicz logic without \(\lor\):
 
 will only find formulas of \texttt{luk2} (i.e., formulas not containing
 \texttt{or}) that are equivalent to \(X \lor Y\).
+
+If you have two logics loaded or defined, you can have MUltlog define a
+new logic as the direct product of the two.
+
+\begin{verbatim}
+?- logProduct(l1,l2,new).
+\end{verbatim}
+
+The logic \texttt{new} is has truth values that are pairs of truth
+values of the logics \texttt{l1} and \texttt{l2}, with pairs where both
+components are designated in \texttt{l1} and \texttt{l2} being
+designated in \texttt{new}, and operators defined componentwise. This
+assumes that \texttt{l1} and \texttt{l2} have the same operators
+defined.
+
+To find the congruences of a logic, say
+
+\begin{verbatim}
+?- isCong(new, C, D).
+\end{verbatim}
+
+This will bind the variables \texttt{P} and \texttt{D}, successively, to
+lists (set) of lists (classes) of truth values of logic \texttt{new}.
+Each class is a truth value in the factor logic; truth values are
+congruent if they are elements of the same class. Equivalent truth
+values ``behave the same'' on all operators, e.g., if \(v\) and \(u\)
+are equivalent, then \(\lnot v\) and \(\lnot u\) are also equivalent.
+Only ``strong'' congruences are found, i.e., congruences that respect
+the designated values (i.e., designated values are equivalent to other
+designated values, and undesignated values to other undesignated
+values).
+
+Since Prolog's output is not very readable, a \texttt{writeCong}
+predicate is provided. To pretty-print all congruences, say:
+
+\begin{verbatim}
+?- isCong(new, C, D), writeCong(C, D), fail.
+\end{verbatim}
+
+(The first congruence found is always the trivial one: every truth value
+is only equivalent to itself.)
 
 \hypertarget{troubleshooting}{%
 \section{Troubleshooting}\label{troubleshooting}}

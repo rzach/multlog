@@ -1,5 +1,6 @@
 Changes to MUltlog:
 1.15-pre1, 18.05.2021
+- Add interactive mode
 - Add option to make "explicit" sequents, ie, rules don't use the
   compact representation but list all components.
 - Add examples: classical logic with unusual connectives and

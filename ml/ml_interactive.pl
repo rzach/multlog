@@ -381,3 +381,6 @@ pairUp(A1,A2,Args).
 pairUp([],[],[]).
 pairUp([A|As],[B|Bs], [(A,B)|Cs]) :-
 pairUp(As,Bs,Cs).
+
+
+:- format("~s~n~n",["MUtlog @ml_version@ loaded in interactive mode"]).

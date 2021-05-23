@@ -695,6 +695,39 @@ Now
 will only find formulas of `luk2` (i.e., formulas not containing `or`)
 that are equivalent to $$X \lor Y$$.
 
+If you have two logics loaded or defined, you can have MUltlog define
+a new logic as the direct product of the two.
+```
+?- logProduct(l1,l2,new).
+```
+The logic `new` is has truth values that are pairs of truth values of
+the logics `l1` and `l2`, with pairs where both components are
+designated in `l1` and `l2` being designated in `new`, and operators
+defined componentwise. This assumes that `l1` and `l2` have the same
+operators defined.
+
+To find the congruences of a logic, say
+```
+?- isCong(new, C, D).
+```
+This will bind the variables `P` and `D`, successively, to lists (set)
+of lists (classes) of truth values of logic `new`. Each class is a
+truth value in the factor logic; truth values are congruent if they
+are elements of the same class.  Equivalent truth values "behave the
+same" on all operators, e.g., if $$v$$ and $$u$$ are equivalent, then
+$$\lnot v$$ and $$\lnot u$$ are also equivalent.  Only "strong"
+congruences are found, i.e., congruences that respect the designated
+values (i.e., designated values are equivalent to other designated
+values, and undesignated values to other undesignated values).
+
+Since Prolog's output is not very readable, a `writeCong` predicate is
+provided. To pretty-print all congruences, say:
+```
+?- isCong(new, C, D), writeCong(C, D), fail.
+```
+(The first congruence found is always the trivial one: every truth
+value is only equivalent to itself.)
+
 # Troubleshooting
 
 ## Installation errors
