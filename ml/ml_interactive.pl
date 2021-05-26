@@ -45,6 +45,7 @@ loadLogic(FN, Lg) :-
         fail
     ;   true
     ),
+    setColors(Lg,all),
     format("Logic ~s loaded as '~a'.", [LN, Lg]), nl, !.
 
 deleteLogic(Lg) :-
@@ -279,6 +280,31 @@ intersects(X,Y) :- member(Z,X), member(Z,Y).
 % Finding congruences of a matrix
 % ===================
 
+% findCong(Lg) -- find a congruence of a logic and print it
+% say findCong(Lg).
+
+findCong(Lg) :-
+    logDTVs(Lg, DTVs),
+    isCong(Lg, Part, DPart),
+    length(Part, N1),
+    length(DPart, N2),
+    format("~nFound a congruence:~n~d congruence classes, ~d designated~nCongruence classes:~n~w~nDesignated classes:~n~w~n", [N1, N2, Part, DPart]),
+    unionPart(Part, TVs),
+    getColors(TVs, DTVs, partition(Part), Cols),
+    (   logOp(Lg, Op/2, Map), 
+        format('~nOperator ~w/~w:~n~n', [Op, 2]),
+        formatMap(Map, 2, TVs, Cols), fail
+    ;   true).
+
+% unionPart(Part, Union) -- Union is the union of all classes in
+% partition Part -- used to produce the list of truth values in an
+% ordering that guarantees that equivalent truth values are adjacent
+
+unionPart([], []) :- !.
+unionPart([C|Cs], U) :-
+    unionPart(Cs, U1),
+    union(C, U1, U).
+
 % isCong(Lg, Part) :- Part (a partition of truth values
 % of Lg) is a congruence.
 
@@ -291,7 +317,6 @@ isCong(Lg, Part, DPart) :-
     forall(logOp(Lg, _Op/Ar, Map),
         congMap(Ar, Map, Part)).
 
-
 % congMap(Ar, Map, Part) :- Part is a congruence wrt the Ar-place
 % mapping Map, i.e., if [x1] -> y1 and [x2] -> y2 with x_1 ~ x_2 then
 % y1 ~ y2 (where x ~ y iff [x, y] \subset X \in Part.
@@ -303,8 +328,8 @@ congMap(Ar, Map, Part) :-
         checkCongPart(Map, ArgCs, Part)).
 
 % checkCong(Map, ArgCs, ValC) :- ArgCs is a list of congruence
-% classes; this checks if all values are in ValC (ie if all
-% values are congruent).
+% classes; this checks if all values are in ValC (ie if all values are
+% congruent).
 
 % find the congruence class of the value of Map for the first sequence
 % of arguments....
@@ -339,13 +364,6 @@ equivClass([C|_], A, C) :-
 equivClass([_|Cs], A, C) :-
     equivClass(Cs, A, C).
 
-% display the partition P, D
-
-writeCong(P, D) :-
-    length(P, N1),
-    length(D, N2),
-    format("Found a congruence:~n~d congruence classes, ~d designated~nCongruence   classes:~n~w~nDesignated classes:~n~w~n", [N1, N2, P, D]).
-
 % Products of logics
 % ==================
 
@@ -365,22 +383,172 @@ logProduct(Lg1, Lg2, Lg12) :-
         mapProduct(Map1, Map2, Map),
         assertz(logOp(Lg12, Op/Ar, Map)))).
 
-setProduct(A1,A2,B) :-
-    setof((P1, P2), (member(P1,A1), member(P2,A2)), B).
+setProduct(A1, A2, B) :-
+    setof((P1, P2), (member(P1, A1), member(P2, A2)), B).
 
 mapProduct(M1, M2, B) :-
     setof(Args:V,
         prodMap(M1, M2, Args, V),
         B).
 
-prodMap(M1, M2, Args, (V1,V2)) :-
-member(A1:V1, M1),
-member(A2:V2, M2),
-pairUp(A1,A2,Args).
+prodMap(M1, M2, Args, (V1, V2)) :-
+    member(A1:V1, M1),
+    member(A2:V2, M2),
+    pairUp(A1, A2, Args).
 
 pairUp([],[],[]).
 pairUp([A|As],[B|Bs], [(A,B)|Cs]) :-
-pairUp(As,Bs,Cs).
+    pairUp(As,Bs,Cs).
 
+% Formatting and output
+% =====================
 
-:- format("~s~n~n",["MUtlog @ml_version@ loaded in interactive mode"]).
+% formatOp(Lg, Op/Ar) -- format the map for Op/Ar in logic Lg
+
+formatOp(Lg, Op/Ar) :-
+    logColors(Lg, Cols),
+    formatOp(Lg, Op/Ar, Cols).
+
+formatOp(Lg, Op/Ar, Cols) :-
+    logOp(Lg, Op/Ar, Map),
+    logTVs(Lg, TVs),
+    formatMap(Map, Ar, TVs, Cols), !.
+
+% formatMap(Map, Ar, TVs, Cols) -- format Map of arity Ar for truth
+% values in TVs with color mapping Cols
+
+formatMap(Map, 2, TVs, Cols) :-
+    maxLength(TVs, N),
+    length(TVs, M),
+    L is (N+1)*(M+1)+1,
+    format('~*+~t | ', N),
+    formatTVs(Cols, N, TVs),
+    format('~n~`-t~*+~n', L),
+    (   member(TV, TVs),
+        maplist(applyMap(Map, TV), TVs, Vs),
+        formatTV(Cols, N, TV),
+        format(' | '),
+        formatTVs(Cols, N, Vs),
+        format('~n'),
+        fail
+    ; true), !.
+
+formatMap(Map, Ar, TVs, Cols) :-
+    maxLength(TVs, N),
+    L is (N+1)*(Ar+1)+1,
+    format('~`-t~*+~n', L),
+    (   length(Args, Ar),
+        maplist(revmember(TVs), Args),
+        formatTVs(Cols, N, Args),
+        format('| '),
+        member(Args:V, Map),
+        formatTV(Cols, N, V),
+        format('~n'),
+        fail
+    ; true), !.
+
+% formatTV(Cols, N, TV) -- format a truth value of max length N with
+% color map Cols
+
+formatTV(Cols, N, TV) :-
+    member(TV-C, Cols),
+    ansi_format(C, '~|~w~*+~t', [TV,N]).
+
+% format a list of truth values
+
+formatTVs(_Cols, _N, []) :-
+    !.
+formatTVs(Cols, N, [V|Vs]) :-
+    formatTV(Cols, N, V),
+    format(' ', []),
+    formatTVs(Cols, N, Vs).
+
+% apply Map to V1, V2 to find value V
+
+applyMap(Map, V1, V2, V) :-
+    member([V1,V2]:V,Map).
+
+% maxLength(TVs, N) -- find the maximum length N of the truth values in TVs
+
+maxLength([], 0).
+maxLength([V|Vs], M) :-
+    format(codes(S), '~w', [V]),
+    length(S, N),
+    maxLength(Vs, K),
+    ( K < N -> M is N ; M is K ).
+
+% getColors(TVs, DTVs, Scheme, VCs) -- VCs is a list of truth
+% value-ANSI color pairs for the truth values in TVs, with DTVs the
+% designated values.
+
+getColors(TVs, DTVs, Scheme, VCs) :-
+    colors(Colors),
+    mapcolors(Scheme, TVs, DTVs, Colors, Colors, VCs), !.
+
+% setColors(Lg, Scheme) -- set the default colors for logic Lg according 
+% to Scheme
+
+setColors(Lg, Scheme) :-
+    logTVs(Lg,TVs),
+    logDTVs(Lg,DTVs),
+    getColors(TVs, DTVs, Scheme, VCs),
+    (retract(logColors(Lg,_)), fail ; true),
+    assert(logColors(Lg,VCs)), !.
+
+% mapcolors(Scheme, TVs, DTVs, Colors, Colors, VCs) -- used for
+% producing the truth value-color map
+
+% designated -- just use the color in Colors
+
+mapcolors(designated, [], _, _, _, []) :- !.
+mapcolors(designated, [V|Vs], DTVs, [Color|_], _, [VC|VCs]) :-
+    color_designated(DTVs, Color, V, VC),
+    mapcolors(designated, Vs, DTVs, [Color], [Color], VCs).
+
+% all -- distribute all colors in Colors across the truth values
+
+mapcolors(all, [], _, _, _, []) :- !.
+mapcolors(all, Vs, DTVs, [], Colors, VCs) :- 
+    mapcolors(all, Vs, DTVs, Colors, Colors, VCs), !.
+mapcolors(all, [V|Vs], DTVs, [C|Cs], Colors, [VC|VCs]) :-
+    color_designated(DTVs, C, V, VC),
+    mapcolors(all, Vs, DTVs, Cs, Colors, VCs).
+
+% partition(P) -- use all colors, but color all truth values in one
+% equivalence class the same
+
+mapcolors(partition(P), TVs, DTVs, Colors, Colors, VCs) :-
+    partition_colors(TVs, P, P, Colors, Colors, PCs),
+    mapcolors(all, TVs, DTVs, PCs, PCs, VCs).
+
+% color_designated(DTVs, Color, V, CMap) --
+% make value V have color Color, reversed if V is in DTVs
+
+color_designated(DTVs, Color, V, V-[bg(Color),fg(black)]) :-
+    member(V,DTVs), !.
+color_designated(_DTVs, Color, V, V-[fg(Color)]).
+
+% provide a list of colors
+
+colors(['#FA602D', '#D729E3', '#3953FA', '#29E3C1', '#86FF3B',
+    '#FAA341', '#E33B57', '#904DFA', '#3BABE3', '#4FFF78',
+    '#FABF1F', '#E35727', '#FA37F7', '#2728E3', '#38FDFF',
+    '#FAE464', '#E39B66', '#FA7EAF', '#8D66E3', '#80D6FF']).
+
+% make a list of colors for TVs on the basis of Colors and Partition Part
+
+partition_colors([], _, _, _, _, []) :- !.
+partition_colors(Vs, Part, Ps, Colors, [], PCs) :-
+    partition_colors(Vs, Part, Ps, Colors, Colors, PCs).
+partition_colors([V|Vs], Part, [P|Ps], Colors, [C|Cs], [C|PCs]) :-
+    member(V, P),
+    partition_colors(Vs, Part, [P|Ps], Colors, [C|Cs], PCs).
+partition_colors(Vs, Part, [_|Ps], Colors, [_|Cs], PCs) :-
+    partition_colors(Vs, Part, Ps, Colors, Cs, PCs).
+partition_colors(Vs, Part, _, Colors, _, PCs) :-
+    partition_colors(Vs, Part, Part, Colors, Colors, PCs).
+
+% Announce MUltlog loaded
+
+:- format('~s~n~n',
+    ["MUtlog @ml_version@ loaded in interactive mode"]).
