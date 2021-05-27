@@ -19,7 +19,7 @@ user:file_search_path(multlog, Dir) :-
 :- [multlog(ml_minimize)].
 :- [multlog(ml_compactrepr)].
 
-:- (dynamic logName/2, logTVs/2, logDTVs/2, logNDTVs/2, logOp/3).
+:- (dynamic logName/2, logTVs/2, logDTVs/2, logNDTVs/2, logOp/3, logColors/2, foundTaut/2).
 
 % Defining logics
 % ===============
@@ -61,7 +61,7 @@ deleteLogic(Lg) :-
 
 addOp(Lg, Op/Ar, Map) :-
     retract(logOp(Lg, Op/Ar, _)),
-    assert(logOp(Lg, Op/Ar, Map)).
+    assertz(logOp(Lg, Op/Ar, Map)).
 
 % delOp(Lg, Op/Ar) -- delete Op/Ar from logic Lg
 
@@ -152,7 +152,17 @@ isTaut(Lg, F) :-
 
 findTaut(Lg, F) :-
     findFmla(Lg, F),
-    isTaut(Lg, F).
+    \+ foundTaut(Lg, F),
+    isTaut(Lg, F),
+    assertz(foundTaut(Lg, F)).
+
+findTaut(Lg) :-
+    logName(Lg, N),
+    format('Tautologies of ~s logic:~n', [N]),
+    findTaut(Lg, F),
+    numbervars(F, 0, _), 
+    write_term(F, [numbervars(true), ignore_ops(true), spacing(next_argument)]), 
+    nl, fail.
 
 
 % isConseq(Lg, Fs, F) -- in logic Lg, F is a consequence of the Fs
@@ -278,10 +288,9 @@ superset(X, Y) :- subset(Y, X).
 intersects(X,Y) :- member(Z,X), member(Z,Y).
 
 % Finding congruences of a matrix
-% ===================
+% ===============================
 
 % findCong(Lg) -- find a congruence of a logic and print it
-% say findCong(Lg).
 
 findCong(Lg) :-
     logDTVs(Lg, DTVs),
@@ -291,9 +300,9 @@ findCong(Lg) :-
     format("~nFound a congruence:~n~d congruence classes, ~d designated~nCongruence classes:~n~w~nDesignated classes:~n~w~n", [N1, N2, Part, DPart]),
     unionPart(Part, TVs),
     getColors(TVs, DTVs, partition(Part), Cols),
-    (   logOp(Lg, Op/2, Map), 
-        format('~nOperator ~w/~w:~n~n', [Op, 2]),
-        formatMap(Map, 2, TVs, Cols), fail
+    (   logOp(Lg, Op/Ar, Map), 
+        format('~nOperator ~w/~w:~n~n', [Op, Ar]),
+        formatMap(Map, Ar, TVs, Cols), fail
     ;   true).
 
 % unionPart(Part, Union) -- Union is the union of all classes in
@@ -403,65 +412,140 @@ pairUp([A|As],[B|Bs], [(A,B)|Cs]) :-
 % Formatting and output
 % =====================
 
-% formatOp(Lg, Op/Ar) -- format the map for Op/Ar in logic Lg
+% formatOp(Lg, Op/Ar, Format) -- format the map for Op/Ar in logic Lg
 
-formatOp(Lg, Op/Ar) :-
+formatOp(Lg, Op/Ar) :- formatOp(Lg, Op/Ar, ansi).
+formatOp(Lg, Op/Ar, Format) :-
     logColors(Lg, Cols),
-    formatOp(Lg, Op/Ar, Cols).
+    formatOp(Lg, Op/Ar, Cols, Format).
 
-formatOp(Lg, Op/Ar, Cols) :-
+formatOp(Lg, Op/Ar, Cols, Format) :-
     logOp(Lg, Op/Ar, Map),
     logTVs(Lg, TVs),
-    formatMap(Map, Ar, TVs, Cols), !.
+    formatMap(Map, Ar, TVs, Cols, Format), !.
 
-% formatMap(Map, Ar, TVs, Cols) -- format Map of arity Ar for truth
+% formatMap(Map, Ar, TVs, Cols, Format) -- format Map of arity Ar for truth
 % values in TVs with color mapping Cols
 
-formatMap(Map, 2, TVs, Cols) :-
+formatMap([[]:TV], 0, _, Cols, ansi) :-
+    format('= '),
+    maxLength([TV], N),
+    formatTV(Cols, N, TV, ansi),
+    format('~n'), !.
+
+formatMap(Map, 2, TVs, Cols, ansi) :-
     maxLength(TVs, N),
     length(TVs, M),
     L is (N+1)*(M+1)+1,
-    format('~*+~t | ', N),
-    formatTVs(Cols, N, TVs),
-    format('~n~`-t~*+~n', L),
+    format('~*+~t | ', [N]),
+    formatTVs(Cols, N, TVs, ansi),
+    format('~n~`-t~*+~n', [L]),
     (   member(TV, TVs),
         maplist(applyMap(Map, TV), TVs, Vs),
-        formatTV(Cols, N, TV),
+        formatTV(Cols, N, TV, ansi),
         format(' | '),
-        formatTVs(Cols, N, Vs),
+        formatTVs(Cols, N, Vs, ansi),
         format('~n'),
         fail
     ; true), !.
 
-formatMap(Map, Ar, TVs, Cols) :-
+formatMap(Map, Ar, TVs, Cols, ansi) :-
     maxLength(TVs, N),
     L is (N+1)*(Ar+1)+1,
-    format('~`-t~*+~n', L),
+    format('~`-t~*+~n', [L]),
     (   length(Args, Ar),
         maplist(revmember(TVs), Args),
-        formatTVs(Cols, N, Args),
-        format('| '),
+        formatTVs(Cols, N, Args, ansi),
+        format(' | '),
         member(Args:V, Map),
-        formatTV(Cols, N, V),
+        formatTV(Cols, N, V, ansi),
         format('~n'),
         fail
     ; true), !.
 
-% formatTV(Cols, N, TV) -- format a truth value of max length N with
+formatMap([[]:TV], 0, _, Cols, tex) :-
+    format('= '),
+    formatTV(Cols, _, TV, tex),
+    format('~n'), !.
+
+formatMap(Map, 2, TVs, Cols, tex) :-
+    format('\\begin{array}{c|'),
+    format_arrayheader(TVs),
+    format('}\\\\~n & '),
+    formatTVs(Cols, N, TVs, tex),
+    format('\\\\ \\hline~n'),
+    (   member(TV, TVs),
+        maplist(applyMap(Map, TV), TVs, Vs),
+        formatTV(Cols, N, TV, tex),
+        format(' & '),
+        formatTVs(Cols, N, Vs, tex),
+        format('\\\\~n'),
+        fail
+    ; format('\\end{array}~n')), !.
+
+formatMap(Map, Ar, TVs, Cols, tex) :-
+    format('\\begin{array}{'),
+    length(N, Ar),
+    format_arrayheader(N),
+    format('|c}~n\\hline~n'),
+    (   length(Args, Ar),
+        maplist(revmember(TVs), Args),
+        formatTVs(Cols, N, Args, tex),
+        format(' & '),
+        member(Args:V, Map),
+        formatTV(Cols, N, V, tex),
+        format('\\\\~n'),
+        fail
+    ; format('\\end{array}~n')), !.
+
+format_arrayheader([]) :- !.
+format_arrayheader([_|T]) :-
+    format('c'),
+    format_arrayheader(T).
+
+% formatTV(Cols, N, TV, Format) -- format a truth value of max length N with
 % color map Cols
 
-formatTV(Cols, N, TV) :-
+formatTV(Cols, N, TV, ansi) :-
     member(TV-C, Cols),
     ansi_format(C, '~|~w~*+~t', [TV,N]).
+formatTV(Cols, _, TV, tex) :-
+    member(TV-C, Cols),
+    tex_format(C, TV).
+
+tex_format([bg(BG),fg(FG)], A) :-
+    tex_color(BG, TexBG),
+    tex_color(FG, TexFG),
+    format('\\colorbox~w}{\\color~w}~w}', [TexBG,TexFG,A]).
+tex_format([fg(FG)], A) :-
+    tex_color(FG, TexFG),
+    format('{\\color~w}~w}', [TexFG,A]).
+tex_format([], A) :-
+    format('~w', [A]).
+
+tex_color(white, '{black') :- !.
+tex_color(black, '{white') :- !.
+tex_color(C, TC) :-
+    atom_codes(C, [0'#|S]),
+    atom_codes(TC, [91, 72, 84, 77, 76, 93, 123 |S]), !.
+tex_color(C, TC) :-
+    atom_codes(C, S),
+    atom_codes(TC, [123 |S]), !.
+
 
 % format a list of truth values
 
-formatTVs(_Cols, _N, []) :-
-    !.
-formatTVs(Cols, N, [V|Vs]) :-
-    formatTV(Cols, N, V),
+formatTVs(Cols, N, [TV], Format) :-
+    formatTV(Cols, N, TV, Format), !.
+formatTVs(Cols, N, [V|Vs], ansi) :-
+    formatTV(Cols, N, V, ansi),
     format(' ', []),
-    formatTVs(Cols, N, Vs).
+    formatTVs(Cols, N, Vs, ansi).
+
+formatTVs(Cols, N, [V|Vs], tex) :-
+    formatTV(Cols, N, V, tex),
+    format(' & ', []),
+    formatTVs(Cols, N, Vs, tex).
 
 % apply Map to V1, V2 to find value V
 
@@ -498,12 +582,18 @@ setColors(Lg, Scheme) :-
 % mapcolors(Scheme, TVs, DTVs, Colors, Colors, VCs) -- used for
 % producing the truth value-color map
 
-% designated -- just use the color in Colors
+% plain -- just use white
+
+mapcolors(plain, [], _, _, _, []) :- !.
+mapcolors(plain, [V|Vs], DTVs, _, _, [V-[]|VCs]) :-
+    mapcolors(plain, Vs, DTVs, [], [], VCs).
+
+% designated -- just use white with reversed for designated
 
 mapcolors(designated, [], _, _, _, []) :- !.
-mapcolors(designated, [V|Vs], DTVs, [Color|_], _, [VC|VCs]) :-
-    color_designated(DTVs, Color, V, VC),
-    mapcolors(designated, Vs, DTVs, [Color], [Color], VCs).
+mapcolors(designated, [V|Vs], DTVs, _, _, [VC|VCs]) :-
+    color_designated(DTVs, white, V, VC),
+    mapcolors(designated, Vs, DTVs, [], [], VCs).
 
 % all -- distribute all colors in Colors across the truth values
 
