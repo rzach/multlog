@@ -49,12 +49,11 @@ loadLogic(FN, Lg) :-
     format("Logic ~s loaded as '~a'.", [LN, Lg]), nl, !.
 
 deleteLogic(Lg) :-
-(logName(Lg, _) ->
-    (retract(logName(Lg, _)),
-    retract(logTVs(Lg, _)),
-    retract(logDTVs(Lg, _)),
-    retract(logNDTVs(Lg, _)),
-    retract(logOp(Lg, _, _))) ; true), !.
+    retractall(logName(Lg, _)),
+    retractall(logTVs(Lg, _)),
+    retractall(logDTVs(Lg, _)),
+    retractall(logNDTVs(Lg, _)),
+    retractall(logOp(Lg, _, _)).
 
 % addOp(Lg, Op/Ar, Map) -- add Op/Ar to logic L with mapping Map.
 % if Ar/Op already defined, it is replaced.
@@ -373,10 +372,91 @@ equivClass([C|_], A, C) :-
 equivClass([_|Cs], A, C) :-
     equivClass(Cs, A, C).
 
+makeFactor(Lg, Cong, FL) :-
+    logNDTVs(Lg, NDTVs),
+    logDTVs(Lg, DTVs),
+    include(intersects(NDTVs), Cong, NDCls),
+    include(intersects(DTVs), Cong, DCls),
+    format(atom(LN), '~w/~w', [Lg,Cong]),
+    assertz(logName(FL,LN)),
+    assertz(logTVs(FL, Cong)),
+    assertz(logNDTVs(FL, NDCls)),
+    assertz(logDTVs(FL, DCls)),
+    (   logOp(Lg, Op/Ar, Map),
+        factorMap(Map, Ar, Cong, FMap),
+        assertz(logOp(FL, Op/Ar, FMap)),
+        fail
+    ;   true),
+    setColors(FL, all).
+
+factorMap(Map, Ar, Cong, FMap) :-
+    length(CArgs, Ar),
+    setof(CArgs:CV, 
+        (   maplist(revmember(Cong), CArgs),
+            factorValue(CArgs, Cong, Map, CV)), 
+        FMap).
+
+factorValue(CArgs, Cong, Map, CV) :-
+    maplist(first, CArgs, Args),
+    member(Args:V,Map), 
+    classOf(V, Cong, CV).
+
+first([A|_],A) :-!.
+classOf(V, [C|_], C) :-
+    member(V, C).
+classOf(V, [_|Cs], C) :-
+    classOf(V, Cs, C).
+
+% Isomorphisms of logics
+% ======================
+
+isIso(Iso, Lg1, Lg2) :-
+    logTVs(Lg1, TVs),
+    logDTVs(Lg1, DTVs1),
+    logDTVs(Lg2, DTVs2),
+    logNDTVs(Lg1, NDTVs1),
+    logNDTVs(Lg2, NDTVs2),
+    permutation(DTVs2, DP2),
+    permutation(NDTVs2, NP2),
+    pairUp(NDTVs1,NP2, NIso),
+    pairUp(DTVs1, DP2, DIso),
+    union(NIso, DIso, Iso),
+    forall(logOp(Lg1,Op/N, Map1),
+        (   logOp(Lg2,Op/N,Map2),
+            isIso(TVs, Iso, N, Map1, Map2))).
+
+isIso(_, Iso, 0, [[]:V1], [[]:V2]) :-
+    mapIso(Iso, V1, V2), !.
+isIso(TVs, Iso, N, Map1, Map2) :-
+    length(Args1, N),
+    forall(maplist(revmember(TVs), Args1),
+        (   member(Args1:V1,Map1),
+            maplist(mapIso(Iso), Args1, Args2),
+            member(Args2:V2,Map2),
+            mapIso(Iso, V1, V2))).
+
+mapIso(Iso, V1, V2) :-
+    member((V1,V2), Iso).
+
+sortIso(Lg, Iso) :-
+    maplist(second, Iso, TVs),
+    logDTVs(Lg, DTVs),
+    retractall(logTVs(Lg,_)),
+    retractall(logDTVs(Lg,_)),
+    retractall(logNDTVs(Lg,_)),
+    include(revmember(DTVs), TVs, NewDTVs),
+    subtract(TVs, DTVs, NewNDTVs),
+    assertz(logTVs(Lg, TVs)),
+    assertz(logDTVs(Lg, NewDTVs)),
+    assertz(logNDTVs(Lg, NewNDTVs)).
+
+
+second((_,B), B).
+
 % Products of logics
 % ==================
 
-logProduct(Lg1, Lg2, Lg12) :-
+makeProduct(Lg1, Lg2, Lg12) :-
     logTVs(Lg1, TVs1),
     logTVs(Lg2, TVs2),
     setProduct(TVs1, TVs2, TVs),
@@ -390,7 +470,10 @@ logProduct(Lg1, Lg2, Lg12) :-
     forall(logOp(Lg1, Op/Ar, Map1),
     (   logOp(Lg2, Op/Ar, Map2),
         mapProduct(Map1, Map2, Map),
-        assertz(logOp(Lg12, Op/Ar, Map)))).
+        assertz(logOp(Lg12, Op/Ar, Map)))),
+    format(atom(LN), '~w x ~w', [Lg1,Lg2]),
+    assertz(logName(Lg12, LN)),
+    setColors(Lg12, all).
 
 setProduct(A1, A2, B) :-
     setof((P1, P2), (member(P1, A1), member(P2, A2)), B).
@@ -412,6 +495,16 @@ pairUp([A|As],[B|Bs], [(A,B)|Cs]) :-
 % Formatting and output
 % =====================
 
+formatLogic(Lg) :- formatLogic(Lg, ansi).
+
+formatLogic(Lg, Format) :-
+    logName(Lg, N),
+    logTVs(Lg, TVs),
+    logDTVs(Lg, DTVs),
+    format('Logic ~s (~w)~nTruth values: ~w~nDesignated: ~w~n', 
+        [N, Lg, TVs, DTVs]),
+    (   formatOp(Lg, _, Format), fail ; true).
+
 % formatOp(Lg, Op/Ar, Format) -- format the map for Op/Ar in logic Lg
 
 formatOp(Lg, Op/Ar) :- formatOp(Lg, Op/Ar, ansi).
@@ -422,11 +515,14 @@ formatOp(Lg, Op/Ar, Format) :-
 formatOp(Lg, Op/Ar, Cols, Format) :-
     logOp(Lg, Op/Ar, Map),
     logTVs(Lg, TVs),
-    formatMap(Map, Ar, TVs, Cols, Format), !.
+    format('~nOperator ~w/~w:~n~n', [Op, Ar]),
+    formatMap(Map, Ar, TVs, Cols, Format).
 
 % formatMap(Map, Ar, TVs, Cols, Format) -- format Map of arity Ar for truth
 % values in TVs with color mapping Cols
 
+formatMap(Map, N, TVs, Cols) :-
+    formatMap(Map, N, TVs, Cols, ansi).
 formatMap([[]:TV], 0, _, Cols, ansi) :-
     format('= '),
     maxLength([TV], N),
