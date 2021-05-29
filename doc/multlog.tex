@@ -29,7 +29,7 @@
 }
 \usepackage{hyperref}
 \hypersetup{
-            pdftitle={MUltlog 1.15-pre3 \& iLC 1.2 User Manual},
+            pdftitle={MUltlog 1.15 \& iLC 1.2 User Manual},
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
@@ -53,7 +53,7 @@
 \makeatother
 
 
-\title{MUltlog 1.15-pre3 \& iLC 1.2 User Manual}
+\title{MUltlog 1.15 \& iLC 1.2 User Manual}
 \date{}
 
 \begin{document}
@@ -841,7 +841,8 @@ texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow
 
 The command \texttt{multlog} will start Prolog and load the MUltlog
 source files. This makes it possible to use MUltlog interactively. This
-feature is in development and has not been tested extensively.
+feature is expermiental and has not been tested extensively. In
+particular, it does not yet include detailed error checks.
 
 Interactive mode allows you to load the specification files of logics
 and then perform queries and operations on these logics. To load a
@@ -853,7 +854,24 @@ logic, type, e.g.,
 
 Here, \texttt{?-} is the Prolog prompt; you only enter the text after
 it. Now the definition of Łukasiewicz logic is available using the ID
-\texttt{gl}.
+\texttt{luk}.
+
+To display the truth values and truth tables of your logic, say
+
+\begin{verbatim}
+?- showLogic(luk).
+\end{verbatim}
+
+This will display the truth tables using the currently selected color
+scheme. Color schemes are \texttt{plain}, \texttt{designated}, and
+\texttt{all} and can be set using, e.g., \texttt{setColors(luk,plain)}.
+By default, logics have color scheme \texttt{all} which displays
+different values in different colors, with designated values reversed.
+This requires an up-to-date version of SWI Prolog. You can also output
+the truth tables in LaTeX format by saying
+\texttt{showLogic(luk,\ tex)}. This will require some definitions
+included in the preamble of your LaTeX document, which can be displayed
+using \texttt{showTexDefs}.
 
 Formulas of a logic are built using the operator names in the
 \texttt{.lgc} file, in operator notation. Prolog variables are used for
@@ -990,7 +1008,7 @@ If you have two logics loaded or defined, you can have MUltlog define a
 new logic as the direct product of the two.
 
 \begin{verbatim}
-?- logProduct(l1,l2,new).
+?- makeProduct(l1,l2,new).
 \end{verbatim}
 
 The logic \texttt{new} is has truth values that are pairs of truth
@@ -1003,29 +1021,43 @@ defined.
 To find the congruences of a logic, say
 
 \begin{verbatim}
-?- isCong(new, C, D).
+?- showCong(new).
 \end{verbatim}
 
-This will bind the variables \texttt{P} and \texttt{D}, successively, to
-lists (set) of lists (classes) of truth values of logic \texttt{new}.
-Each class is a truth value in the factor logic; truth values are
-congruent if they are elements of the same class. Equivalent truth
-values ``behave the same'' on all operators, e.g., if \(v\) and \(u\)
-are equivalent, then \(\lnot v\) and \(\lnot u\) are also equivalent.
-Only ``strong'' congruences are found, i.e., congruences that respect
-the designated values (i.e., designated values are equivalent to other
-designated values, and undesignated values to other undesignated
-values).
+This will look through all partitions of the designated and undesignated
+values of logic \texttt{new} and test if the partition is a congruence.
+If it is, it will display the partition of truth values and the
+resulting truth tables, with congruent values colored identically. Each
+class in the partition is a truth value in the factor logic; truth
+values are congruent if they are elements of the same class. Equivalent
+truth values ``behave the same'' on all operators, e.g., if \(v\) and
+\(u\) are equivalent, then \(\lnot v\) and \(\lnot u\) are also
+equivalent. Only ``strong'' congruences are found, i.e., congruences
+that respect the designated values (i.e., designated values are
+equivalent to other designated values, and undesignated values to other
+undesignated values). (The first congruence found is always the trivial
+one: every truth value is only equivalent to itself.)
 
-Since Prolog's output is not very readable, a \texttt{writeCong}
-predicate is provided. To pretty-print all congruences, say:
+Once you have a congruence, you can define a new logic as the factor
+logic of the old one by
 
 \begin{verbatim}
-?- isCong(new, C, D), writeCong(C, D), fail.
+?- makeFactor(logic, Part, factor).
 \end{verbatim}
 
-(The first congruence found is always the trivial one: every truth value
-is only equivalent to itself.)
+where \texttt{logic} is the ID of the old logic, \texttt{Part} is the
+set of sets of truth values that defines the congruence (displayed by
+\texttt{showCong}) and \texttt{factor} is the ID of the new logic.
+
+MUltlog can test if two logics are isomorphic:
+
+\begin{verbatim}
+?- isIso(Iso, log1, log2).
+\end{verbatim}
+
+will succeed with \texttt{Iso} bound to a list of pairs of truth values
+of logics \texttt{log1} and \texttt{log2} which represents an
+isomorphism, and fail if no isomorphism exists.
 
 \hypertarget{troubleshooting}{%
 \section{Troubleshooting}\label{troubleshooting}}

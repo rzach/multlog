@@ -582,7 +582,8 @@ texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow
 
 The command `multlog` will start Prolog and load the MUltlog source
 files.  This makes it possible to use MUltlog interactively.  This
-feature is in development and has not been tested extensively.
+feature is expermiental and has not been tested extensively. In
+particular, it does not yet include detailed error checks.
 
 Interactive mode allows you to load the specification files of logics
 and then perform queries and operations on these logics. To load a
@@ -591,7 +592,21 @@ logic, type, e.g.,
 ?- loadLogic('lukasiewicz.lgc',luk).
 ```
 Here, `?-` is the Prolog prompt; you only enter the text after it. Now
-the definition of Łukasiewicz logic is available using the ID `gl`.
+the definition of Łukasiewicz logic is available using the ID `luk`.
+
+To display the truth values and truth tables of your logic, say
+```
+?- showLogic(luk).
+```
+This will display the truth tables using the currently selected color
+scheme. Color schemes are `plain`, `designated`, and `all` and can be
+set using, e.g., `setColors(luk,plain)`. By default, logics have color
+scheme `all` which displays different values in different colors, with
+designated values reversed. This requires an up-to-date version of SWI
+Prolog.  You can also output the truth tables in LaTeX format by
+saying `showLogic(luk, tex)`.  This will require some definitions
+included in the preamble of your LaTeX document, which can be
+displayed using `showTexDefs`.
 
 Formulas of a logic are built using the operator names in the `.lgc`
 file, in operator notation.  Prolog variables are used for
@@ -698,7 +713,7 @@ that are equivalent to $$X \lor Y$$.
 If you have two logics loaded or defined, you can have MUltlog define
 a new logic as the direct product of the two.
 ```
-?- logProduct(l1,l2,new).
+?- makeProduct(l1,l2,new).
 ```
 The logic `new` is has truth values that are pairs of truth values of
 the logics `l1` and `l2`, with pairs where both components are
@@ -708,25 +723,39 @@ operators defined.
 
 To find the congruences of a logic, say
 ```
-?- isCong(new, C, D).
+?- showCong(new).
 ```
-This will bind the variables `P` and `D`, successively, to lists (set)
-of lists (classes) of truth values of logic `new`. Each class is a
-truth value in the factor logic; truth values are congruent if they
-are elements of the same class.  Equivalent truth values "behave the
-same" on all operators, e.g., if $$v$$ and $$u$$ are equivalent, then
-$$\lnot v$$ and $$\lnot u$$ are also equivalent.  Only "strong"
-congruences are found, i.e., congruences that respect the designated
-values (i.e., designated values are equivalent to other designated
-values, and undesignated values to other undesignated values).
+This will look through all partitions of the designated and
+undesignated values of logic `new` and test if the partition is a
+congruence. If it is, it will display the partition of truth values
+and the resulting truth tables, with congruent values colored
+identically. Each class in the partition is a truth value in the
+factor logic; truth values are congruent if they are elements of the
+same class.  Equivalent truth values "behave the same" on all
+operators, e.g., if $$v$$ and $$u$$ are equivalent, then $$\lnot v$$
+and $$\lnot u$$ are also equivalent.  Only "strong" congruences are
+found, i.e., congruences that respect the designated values (i.e.,
+designated values are equivalent to other designated values, and
+undesignated values to other undesignated values). (The first
+congruence found is always the trivial one: every truth value is only
+equivalent to itself.)
 
-Since Prolog's output is not very readable, a `writeCong` predicate is
-provided. To pretty-print all congruences, say:
+Once you have a congruence, you can define a new logic as the factor
+logic of the old one by
 ```
-?- isCong(new, C, D), writeCong(C, D), fail.
+?- makeFactor(logic, Part, factor).
 ```
-(The first congruence found is always the trivial one: every truth
-value is only equivalent to itself.)
+where `logic` is the ID of the old logic, `Part` is the set of sets of
+truth values that defines the congruence (displayed by `showCong`) and
+`factor` is the ID of the new logic.
+
+MUltlog can test if two logics are isomorphic:
+```
+?- isIso(Iso, log1, log2).
+```
+will succeed with `Iso` bound to a list of pairs of truth values of
+logics `log1` and `log2` which represents an isomorphism, and fail if no
+isomorphism exists.
 
 # Troubleshooting
 
