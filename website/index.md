@@ -71,7 +71,8 @@ people that contributed to MUltlog are (in alphabetical order):
 - Markus Schranz:
     author of the HTML/Perl-based web interface to MUltlog.
 - [Richard Zach](https://richardzach.org):
-    updated the LaTeX code for the 25 anniversary and included
-    tableaux systems.
+    updated the LaTeX code for the 25 anniversary, included
+    tableaux systems and (optional) explicit sequents in the LaTeX
+    output, and implemented the "interactive mode."
 
 ## References
