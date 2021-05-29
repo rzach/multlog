@@ -1,4 +1,5 @@
 %% ml_interactive.pl -- Run MUltlog interactively
+
 multlog.
 
 user:file_search_path(multlog, Dir) :-
@@ -289,9 +290,10 @@ intersects(X,Y) :- member(Z,X), member(Z,Y).
 % Finding congruences of a matrix
 % ===============================
 
-% findCong(Lg) -- find a congruence of a logic and print it
+% showCong(Lg) -- find a congruence of a logic and show the resulting
+% factor logic
 
-findCong(Lg) :-
+showCong(Lg) :-
     logDTVs(Lg, DTVs),
     isCong(Lg, Part, DPart),
     length(Part, N1),
@@ -301,7 +303,7 @@ findCong(Lg) :-
     getColors(TVs, DTVs, partition(Part), Cols),
     (   logOp(Lg, Op/Ar, Map), 
         format('~nOperator ~w/~w:~n~n', [Op, Ar]),
-        formatMap(Map, Ar, TVs, Cols), fail
+        showMap(Map, Ar, TVs, Cols), fail
     ;   true).
 
 % unionPart(Part, Union) -- Union is the union of all classes in
@@ -372,12 +374,16 @@ equivClass([C|_], A, C) :-
 equivClass([_|Cs], A, C) :-
     equivClass(Cs, A, C).
 
+% makeFactor(Lg, Cong, FL) -- takes logic Lg and congruence relation
+% Cong and defines a new logic FL that's Lg/Cong.
+
 makeFactor(Lg, Cong, FL) :-
     logNDTVs(Lg, NDTVs),
     logDTVs(Lg, DTVs),
     include(intersects(NDTVs), Cong, NDCls),
     include(intersects(DTVs), Cong, DCls),
     format(atom(LN), '~w/~w', [Lg,Cong]),
+    deleteLogic(FL),
     assertz(logName(FL,LN)),
     assertz(logTVs(FL, Cong)),
     assertz(logNDTVs(FL, NDCls)),
@@ -407,8 +413,26 @@ classOf(V, [C|_], C) :-
 classOf(V, [_|Cs], C) :-
     classOf(V, Cs, C).
 
+sortCong(Lg, Cong) :-
+    logNDTVs(Lg, NDTVs),
+    logDTVs(Lg, DTVs),
+    include(intersects(NDTVs), Cong, NDCls),
+    include(intersects(DTVs), Cong, DCls),
+    unionPart(NDCls, NewNDTVs),
+    unionPart(DCls, NewDTVs),
+    unionPart(Cong, NewTVs),
+    retractall(logTVs(Lg,_)),
+    retractall(logDTVs(Lg,_)),
+    retractall(logNDTVs(Lg,_)),
+    assertz(logTVs(FL, NewTVs)),
+    assertz(logNDTVs(FL, NewNDTVs)),
+    assertz(logDTVs(FL, NewDTVs)).
+
 % Isomorphisms of logics
 % ======================
+
+% isIso(Iso, Lg1, Lg2) -- Iso (a set of pairs of truth values from Lg1
+% and Lg2) is an isomorphism from Lg1 to Lg2
 
 isIso(Iso, Lg1, Lg2) :-
     logTVs(Lg1, TVs),
@@ -438,6 +462,9 @@ isIso(TVs, Iso, N, Map1, Map2) :-
 mapIso(Iso, V1, V2) :-
     member((V1,V2), Iso).
 
+% sortIso(Lg, Iso) -- assuming Iso is a map onto the truth values of
+% Lg, sort the truth values of Lg in the same way they appear in Iso
+
 sortIso(Lg, Iso) :-
     maplist(second, Iso, TVs),
     logDTVs(Lg, DTVs),
@@ -450,22 +477,25 @@ sortIso(Lg, Iso) :-
     assertz(logDTVs(Lg, NewDTVs)),
     assertz(logNDTVs(Lg, NewNDTVs)).
 
-
 second((_,B), B).
 
 % Products of logics
 % ==================
 
+% makeProduct(Lg1, Lg2, Lg12) -- defines a new logic Lg12 as the
+% direct product of logics Lg1 and Lg2
+
 makeProduct(Lg1, Lg2, Lg12) :-
     logTVs(Lg1, TVs1),
     logTVs(Lg2, TVs2),
     setProduct(TVs1, TVs2, TVs),
-    assertz(logTVs(Lg12, TVs)),
     logDTVs(Lg1, DTVs1),
     logDTVs(Lg2, DTVs2),
     setProduct(DTVs1, DTVs2, DTVs),
-    assertz(logDTVs(Lg12, DTVs)),
     subtract(TVs, DTVs, NDTVs),
+    deleteLogic(Lg12),
+    assertz(logTVs(Lg12, TVs)),
+    assertz(logDTVs(Lg12, DTVs)),
     assertz(logNDTVs(Lg12, NDTVs)),
     forall(logOp(Lg1, Op/Ar, Map1),
     (   logOp(Lg2, Op/Ar, Map2),
@@ -475,8 +505,13 @@ makeProduct(Lg1, Lg2, Lg12) :-
     assertz(logName(Lg12, LN)),
     setColors(Lg12, all).
 
+% setProduct(A1, A2, B) -- B is the Cartesian product of sets A1 and A2
+
 setProduct(A1, A2, B) :-
     setof((P1, P2), (member(P1, A1), member(P2, A2)), B).
+
+% mapProduct(M1, M2, B) -- B is the map resulting from applying maps
+% M1 and M2 component-wise
 
 mapProduct(M1, M2, B) :-
     setof(Args:V,
@@ -495,41 +530,46 @@ pairUp([A|As],[B|Bs], [(A,B)|Cs]) :-
 % Formatting and output
 % =====================
 
-formatLogic(Lg) :- formatLogic(Lg, ansi).
+% showLogic(Lg)
+% showLogic(Lg, Format) -- output truth values and truth tables of
+% logic Lg in Format (ansi) if not specifified. Current options for
+% Format are ansi (terminal display) or tex for LaTeX arrays
 
-formatLogic(Lg, Format) :-
+showLogic(Lg) :- showLogic(Lg, ansi).
+
+showLogic(Lg, Format) :-
     logName(Lg, N),
     logTVs(Lg, TVs),
     logDTVs(Lg, DTVs),
     format('Logic ~s (~w)~nTruth values: ~w~nDesignated: ~w~n', 
         [N, Lg, TVs, DTVs]),
-    (   formatOp(Lg, _, Format), fail ; true).
+    (   showOp(Lg, _, Format), fail ; true).
 
-% formatOp(Lg, Op/Ar, Format) -- format the map for Op/Ar in logic Lg
+% showOp(Lg, Op/Ar, Format) -- format the map for Op/Ar in logic Lg
 
-formatOp(Lg, Op/Ar) :- formatOp(Lg, Op/Ar, ansi).
-formatOp(Lg, Op/Ar, Format) :-
+showOp(Lg, Op/Ar) :- showOp(Lg, Op/Ar, ansi).
+showOp(Lg, Op/Ar, Format) :-
     logColors(Lg, Cols),
-    formatOp(Lg, Op/Ar, Cols, Format).
+    showOp(Lg, Op/Ar, Cols, Format).
 
-formatOp(Lg, Op/Ar, Cols, Format) :-
+showOp(Lg, Op/Ar, Cols, Format) :-
     logOp(Lg, Op/Ar, Map),
     logTVs(Lg, TVs),
     format('~nOperator ~w/~w:~n~n', [Op, Ar]),
-    formatMap(Map, Ar, TVs, Cols, Format).
+    showMap(Map, Ar, TVs, Cols, Format).
 
-% formatMap(Map, Ar, TVs, Cols, Format) -- format Map of arity Ar for truth
+% showMap(Map, Ar, TVs, Cols, Format) -- format Map of arity Ar for truth
 % values in TVs with color mapping Cols
 
-formatMap(Map, N, TVs, Cols) :-
-    formatMap(Map, N, TVs, Cols, ansi).
-formatMap([[]:TV], 0, _, Cols, ansi) :-
+showMap(Map, N, TVs, Cols) :-
+    showMap(Map, N, TVs, Cols, ansi).
+showMap([[]:TV], 0, _, Cols, ansi) :-
     format('= '),
     maxLength([TV], N),
     formatTV(Cols, N, TV, ansi),
     format('~n'), !.
 
-formatMap(Map, 2, TVs, Cols, ansi) :-
+showMap(Map, 2, TVs, Cols, ansi) :-
     maxLength(TVs, N),
     length(TVs, M),
     L is (N+1)*(M+1)+1,
@@ -545,7 +585,7 @@ formatMap(Map, 2, TVs, Cols, ansi) :-
         fail
     ; true), !.
 
-formatMap(Map, Ar, TVs, Cols, ansi) :-
+showMap(Map, Ar, TVs, Cols, ansi) :-
     maxLength(TVs, N),
     L is (N+1)*(Ar+1)+1,
     format('~`-t~*+~n', [L]),
@@ -559,13 +599,13 @@ formatMap(Map, Ar, TVs, Cols, ansi) :-
         fail
     ; true), !.
 
-formatMap([[]:TV], 0, _, Cols, tex) :-
+showMap([[]:TV], 0, _, Cols, tex) :-
     format('= '),
     formatTV(Cols, _, TV, tex),
     format('~n'), !.
 
-formatMap(Map, 2, TVs, Cols, tex) :-
-    format('\\begin{array}{c|'),
+showMap(Map, 2, TVs, Cols, tex) :-
+    format('\\[\\begin{array}{c|'),
     format_arrayheader(TVs),
     format('}\\\\~n & '),
     formatTVs(Cols, N, TVs, tex),
@@ -577,10 +617,10 @@ formatMap(Map, 2, TVs, Cols, tex) :-
         formatTVs(Cols, N, Vs, tex),
         format('\\\\~n'),
         fail
-    ; format('\\end{array}~n')), !.
+    ; format('\\end{array}\\]~n')), !.
 
-formatMap(Map, Ar, TVs, Cols, tex) :-
-    format('\\begin{array}{'),
+showMap(Map, Ar, TVs, Cols, tex) :-
+    format('\\[\\begin{array}{'),
     length(N, Ar),
     format_arrayheader(N),
     format('|c}~n\\hline~n'),
@@ -592,7 +632,7 @@ formatMap(Map, Ar, TVs, Cols, tex) :-
         formatTV(Cols, N, V, tex),
         format('\\\\~n'),
         fail
-    ; format('\\end{array}~n')), !.
+    ; format('\\end{array}\\]~n')), !.
 
 format_arrayheader([]) :- !.
 format_arrayheader([_|T]) :-
@@ -609,25 +649,23 @@ formatTV(Cols, _, TV, tex) :-
     member(TV-C, Cols),
     tex_format(C, TV).
 
-tex_format([bg(BG),fg(FG)], A) :-
+tex_format([bg(BG),fg(_FG)], A) :-
     tex_color(BG, TexBG),
-    tex_color(FG, TexFG),
-    format('\\colorbox~w}{\\color~w}~w}', [TexBG,TexFG,A]).
+    format('\\dc{~w}{~w}', [TexBG,A]).
 tex_format([fg(FG)], A) :-
     tex_color(FG, TexFG),
-    format('{\\color~w}~w}', [TexFG,A]).
+    format('\\nc{~w}{~w}', [TexFG,A]).
 tex_format([], A) :-
     format('~w', [A]).
 
-tex_color(white, '{black') :- !.
-tex_color(black, '{white') :- !.
+tex_color(white, 'black') :- !.
+tex_color(black, 'white') :- !.
 tex_color(C, TC) :-
     atom_codes(C, [0'#|S]),
-    atom_codes(TC, [91, 72, 84, 77, 76, 93, 123 |S]), !.
+    atom_codes(TC, S), !.
 tex_color(C, TC) :-
     atom_codes(C, S),
-    atom_codes(TC, [123 |S]), !.
-
+    atom_codes(TC, S), !.
 
 % format a list of truth values
 
@@ -733,6 +771,11 @@ partition_colors(Vs, Part, [_|Ps], Colors, [_|Cs], PCs) :-
     partition_colors(Vs, Part, Ps, Colors, Cs, PCs).
 partition_colors(Vs, Part, _, Colors, _, PCs) :-
     partition_colors(Vs, Part, Part, Colors, Colors, PCs).
+
+% showTexDefs
+
+showTexDefs :-
+format('\\usepackage{xcolor}~n\\def\\nc#1#2{{\\color[HTML]{#1}#2}}~n\\def\\dc#1#2{\\colorbox[HTML]{#1}{\\color{white}#2}}~n').
 
 % Announce MUltlog loaded
 
