@@ -24,6 +24,10 @@ iLC, the interactive Logic Creator, offers a graphical user interface
 (written in a Tcl/Tk) for producing logic specification files for use
 with MUltlog.
 
+The experimental "interactive mode" lets you investigate many-valued
+logics: find tautologies, check for entailment, define products and
+factors of logics, or test for isomorphisms.
+
 ## Installation
 
 MUltlog can be obtained from
