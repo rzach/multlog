@@ -459,8 +459,79 @@ isIso(TVs, Iso, N, Map1, Map2) :-
             member(Args2:V2,Map2),
             mapIso(Iso, V1, V2))).
 
+% mapIso -- map V1 to V2 using Iso
+% (succeeds if V1 is not in domain of Iso)
+
 mapIso(Iso, V1, V2) :-
-    member((V1,V2), Iso).
+    ( member((V1,V), Iso) ->
+        V = V2
+    ; true).
+
+% isIsoX -- new version that's much more intelligent and doesn't try
+% billions of permutations if it can be avoided.
+
+isIsoX(Iso, Lg1, Lg2) :-
+    logTVs(Lg1, TVs),
+    logDTVs(Lg1, DTVs1),
+    logDTVs(Lg2, DTVs2),
+    logNDTVs(Lg1, NDTVs1),
+    logNDTVs(Lg2, NDTVs2),
+    permutation(DTVs2, DP2), % being stupid about the designated values still
+    pairUp(DTVs1, DP2, DIso),
+    isPartIso(NDTVs1, [], NDTVs2, DIso, DTVs1, Lg1, Lg2, [], I),
+    union(I, DIso, Iso).
+
+% isPartIso(Vals, Domain, Vals2, DIso, DTVs, Lg1, Lg2, I, Iso) --
+% - I is an injective mapping from Domain to the (non-designated)
+%   truth values of Lg2.
+% - Vals are the non-designated values of Lg1 not in the domain of I
+% - Vals2 are the non-designated values of Lg2 not in the range of I
+% - DIso is a bijection from the designated values DTVs of Lg1 to
+%   those of Lg2
+% - Iso is the final Isomorphism we're constructing.
+
+% If Vals is empty, Domain is all of the NDTVs of Lg1, and Iso is a
+% total bijection. So we just have to check that it is an iso; if yes,
+% we've found a full Iso.
+
+isPartIso([], Domain, [], DIso, DTVs1, Lg1, Lg2, Iso, Iso) :-
+    checkIso(Iso, Domain,  DIso, DTVs1, Lg1, Lg2).
+
+% If Vals is not empty, it contains at least one value NewV
+% - First we check if I + DIso is a partial isomorphism between Lg1 and
+%   Lg2. If not, we can give up on I -- it won't becom an isomorphism by
+%   expanding the domain.
+% - If it is, we continue by assigning a potential value to NewV by
+%   picking an element NewV2 of Vs2. The remainder RestVs2 are still
+%   available as values of the full isomorphism. We recursively check
+%   if the resulting expanded map is a partial isomorphism.
+
+isPartIso([NewV|Vs], Domain, Vs2, DIso, DTVs1, Lg1, Lg2, I, Iso) :-
+    checkIso(I, Domain, DIso, DTVs1, Lg1, Lg2),
+    memberrest(NewV2, Vs2, RestVs2),
+    isPartIso(Vs, [NewV|Domain], RestVs2,
+        DIso, DTVs1, Lg1, Lg2, [(NewV,NewV2)|I], Iso).
+
+% checkIso(Iso, Domain, DIso, DTVs, Lg1, Lg2) -- check if Iso + DIso
+% is a partial isomorphism on Domain + DTVs from Lg1 to Lg2 (ie,
+% Iso applied to the result R of an operator applied in Lg1 to arguments from
+% Domain + DIso yields the same as applying the operator in Lg2 to the
+% result of Iso applied to the arguments. (If R is not in Domain +
+% DIso we don't complain -- eventually R will be in the domain.
+
+checkIso(Iso, Domain, DIso, DTVs1, Lg1, Lg2) :-
+    union(Domain, DTVs1, D),
+    union(Iso, DIso, I),
+    forall(logOp(Lg1,Op/N, Map1),
+        (   logOp(Lg2,Op/N,Map2),
+            isIso(D, I, N, Map1, Map2))).
+
+% memberrest(X, B, R) -- X is a member of B and R is B minus X
+
+memberrest(B, [B|R], R).
+memberrest(X, [B|Bs], [B|R]) :-
+    memberrest(X, Bs, R).
+
 
 % sortIso(Lg, Iso) -- assuming Iso is a map onto the truth values of
 % Lg, sort the truth values of Lg in the same way they appear in Iso
