@@ -15,7 +15,7 @@ examples: $(EXPDF)
 manual: ../doc/multlog.pdf ../doc/multlog.html ../Version
 
 ../doc/multlog.tex: ../doc/multlog.md ../Version
-	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --toc -N --toc-depth=2 --output=$@
+	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --listings -H latex-listings.tex --toc -N --toc-depth=2 --output=$@
 
 ../doc/multlog.html: ../doc/multlog.md ../Version
 	pandoc --template=$< </dev/null -V ml_version="$(MLVER)" -V ilc_version="$(ILCVER)" --metadata pagetitle="MUltlog $(MLVER)$ & iLC $(ILCVER) Manual" | pandoc --standalone --toc -N --toc-depth=1 -c https://www.logic.at/user/themes/logic/assets/css/main.css -B before.html -A after.html -H header.html --output=$@

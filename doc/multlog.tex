@@ -33,6 +33,8 @@
             pdfborder={0 0 0},
             breaklinks=true}
 \urlstyle{same}  % don't use monospace font for urls
+\usepackage{listings}
+\newcommand{\passthrough}[1]{#1}
 \setlength{\emergencystretch}{3em}  % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
@@ -52,6 +54,13 @@
 \def\fps@figure{htbp}
 \makeatother
 
+\lstset{
+    basicstyle=\ttfamily,
+    breaklines=true,
+    breakautoindent=true,
+    showstringspaces=true,
+    linewidth=\linewidth
+}
 
 \title{MUltlog 1.15-pre1 \& iLC 1.2 User Manual}
 \date{}
@@ -118,15 +127,15 @@ script language
 \item
   \href{https://www.tcl.tk/}{Tcl/Tk} (version 7.4/4.0 or later). Many
   Linux systems include Tcl/Tk by default (check for a program named
-  \texttt{wish}).
+  \passthrough{\lstinline!wish!}).
 \end{itemize}
 
 On Debian/Ubuntu Linux, for instance, you can install the requirements
 using the command
 
-\begin{verbatim}
+\begin{lstlisting}
 sudo apt install swi-prolog tk texlive-latex-extra
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{installation}{%
 \section{Installation}\label{installation}}
@@ -152,27 +161,28 @@ Before running the script:
   result as a default to the user.
 \item
   decide where to put MUltlog. If run as root, the default locations are
-  \texttt{/usr/local/bin} for executables, \texttt{/usr/local/lib} for
-  library files, and \texttt{/usr/share/doc} for documentation. If not
-  run as root, the script will install into
-  \texttt{\textasciitilde{}/.local/bin,}
-  \texttt{\textasciitilde{}/.local/lib}, and
-  \texttt{\textasciitilde{}/.local/doc}. Note that these directories
+  \passthrough{\lstinline!/usr/local/bin!} for executables,
+  \passthrough{\lstinline!/usr/local/lib!} for library files, and
+  \passthrough{\lstinline!/usr/share/doc!} for documentation. If not run
+  as root, the script will install into
+  \passthrough{\lstinline!\~/.local/bin,!}
+  \passthrough{\lstinline!\~/.local/lib!}, and
+  \passthrough{\lstinline!\~/.local/doc!}. Note that these directories
   must exist; the script will not try to create them.
 \end{itemize}
 
 To run the installation script, change to the installation directory
-\texttt{multlog} and type
+\passthrough{\lstinline!multlog!} and type
 
-\begin{verbatim}
+\begin{lstlisting}
 ./ml_install
-\end{verbatim}
+\end{lstlisting}
 
 The script will - determine the location of some Unix commands - ask the
 user for the Prolog to use - ask the user for the place where to put
-MUltlog - generate the deinstallation script \texttt{ml\_deinstall} -
-insert the correct paths in some of MUltlog's files - copy the MUltlog
-files in the right places.
+MUltlog - generate the deinstallation script
+\passthrough{\lstinline!ml\_deinstall!} - insert the correct paths in
+some of MUltlog's files - copy the MUltlog files in the right places.
 
 In case of problems see the section on
 \protect\hyperlink{troubleshooting}{troubleshooting} below.
@@ -187,23 +197,25 @@ script.
 
 Run the script
 
-\begin{verbatim}
+\begin{lstlisting}
 ml_deinstall
-\end{verbatim}
+\end{lstlisting}
 
-to remove files installed by \texttt{ml\_install}. The deinstallation
-script is located in the same directory as the other MUltlog commands
-like \texttt{lgc2tex}, \texttt{lgc2pdf}, \ldots{}
-(\texttt{/usr/local/bin} or \texttt{\textasciitilde{}/.local/bin} by
-default).
+to remove files installed by \passthrough{\lstinline!ml\_install!}. The
+deinstallation script is located in the same directory as the other
+MUltlog commands like \passthrough{\lstinline!lgc2tex!},
+\passthrough{\lstinline!lgc2pdf!}, \ldots{}
+(\passthrough{\lstinline!/usr/local/bin!} or
+\passthrough{\lstinline!\~/.local/bin!} by default).
 
 \hypertarget{using-multlog}{%
 \section{Using MUltlog}\label{using-multlog}}
 
 The examples below assume that MUltlog was installed into the standard
-place \texttt{/usr/local/*}, and assumes that the locations of the
-MUltlog scripts \texttt{lgc2tex} and \texttt{lgc2pdf} are your command
-path. If you use different settings, change the examples accordingly.
+place \passthrough{\lstinline!/usr/local/*!}, and assumes that the
+locations of the MUltlog scripts \passthrough{\lstinline!lgc2tex!} and
+\passthrough{\lstinline!lgc2pdf!} are your command path. If you use
+different settings, change the examples accordingly.
 
 \hypertarget{guide-for-the-impatient}{%
 \subsection{Guide for the impatient}\label{guide-for-the-impatient}}
@@ -212,79 +224,82 @@ path. If you use different settings, change the examples accordingly.
 \item
   Move to a temporary directory, e.g.,
 
-\begin{verbatim}
+\begin{lstlisting}
 mkdir tmp; cd tmp
-\end{verbatim}
+\end{lstlisting}
 \item
-  Get the sample logic from the \texttt{doc} directory, e.g.,
+  Get the sample logic from the \passthrough{\lstinline!doc!} directory,
+  e.g.,
 
-\begin{verbatim}
+\begin{lstlisting}
 cp /usr/share/doc/multlog/sample.lgc .
-\end{verbatim}
+\end{lstlisting}
 \item
   Generate the paper in PDF format
 
-\begin{verbatim}
+\begin{lstlisting}
 lgc2pdf sample
-\end{verbatim}
+\end{lstlisting}
 
-  You should now be able to open \texttt{sample.pdf} using the PDF
-  reader of your choice.
+  You should now be able to open \passthrough{\lstinline!sample.pdf!}
+  using the PDF reader of your choice.
 \item
   To edit the specification of the logic before generating the paper,
   type
 
-\begin{verbatim}
+\begin{lstlisting}
 ilc &
-\end{verbatim}
+\end{lstlisting}
 
-  Select ``Open'' from the menu ``File'' and type \texttt{sample} as the
-  name of the file to be loaded.
+  Select ``Open'' from the menu ``File'' and type
+  \passthrough{\lstinline!sample!} as the name of the file to be loaded.
 \end{itemize}
 
-The \texttt{examples/} directory of the distribution contains other
-example specification and configuration files.
+The \passthrough{\lstinline!examples/!} directory of the distribution
+contains other example specification and configuration files.
 
 \hypertarget{creating-the-specification-of-a-logic}{%
 \subsection{Creating the specification of a
 logic}\label{creating-the-specification-of-a-logic}}
 
 You can either use your favourite text editor, or the ``interactive
-Logic Creator'' \texttt{ilc}.
+Logic Creator'' \passthrough{\lstinline!ilc!}.
 
 In the first case specify your many-valued logic in the syntax described
-in the sample specification \texttt{/usr/share/doc/multlog/sample.lgc}
-and save the result as \texttt{\textless{}name\textgreater{}.lgc}.
+in the sample specification
+\passthrough{\lstinline!/usr/share/doc/multlog/sample.lgc!} and save the
+result as \passthrough{\lstinline!<name>.lgc!}.
 
-To start \texttt{ilc}, type
+To start \passthrough{\lstinline!ilc!}, type
 
-\begin{verbatim}
+\begin{lstlisting}
 ilc &
-\end{verbatim}
+\end{lstlisting}
 
 A window pops up, and you are able to edit a new logic or re-edit an
 already exisiting one, and to save the result in a textual format
 suitable for MUltlog. Note that you have to store the logic as
-\texttt{\textless{}name\textgreater{}}, the extension \texttt{.lgc}
-being added automatically.
+\passthrough{\lstinline!<name>!}, the extension
+\passthrough{\lstinline!.lgc!} being added automatically.
 
 \hypertarget{creating-the-paper-pdf}{%
 \subsection{Creating the paper (PDF)}\label{creating-the-paper-pdf}}
 
 To obtain the paper corresponding to your logic, type
 
-\begin{verbatim}
+\begin{lstlisting}
 lgc2pdf <name>
-\end{verbatim}
+\end{lstlisting}
 
-where \texttt{\textless{}name\textgreater{}} is the name under which you
-saved your logic. This invokes MUltlog as well as PDFLaTeX and BibTeX
-(or alternatively, if \texttt{pdflatex} was not found upon installation,
-LaTeX, BibTeX, \texttt{dvips} and \texttt{ps2pdf}).
+where \passthrough{\lstinline!<name>!} is the name under which you saved
+your logic. This invokes MUltlog as well as PDFLaTeX and BibTeX (or
+alternatively, if \passthrough{\lstinline!pdflatex!} was not found upon
+installation, LaTeX, BibTeX, \passthrough{\lstinline!dvips!} and
+\passthrough{\lstinline!ps2pdf!}).
 
-If \texttt{\textless{}name\textgreater{}.bib} exists, it should contain
-a bibliography entry with key \texttt{ml}, which will be cited as the
-source for the definition of the logic.
+If \passthrough{\lstinline!<name>.bib!} exists, it should contain a
+bibliography entry with key \passthrough{\lstinline!ml!}, which will be
+cited as the source for the definition of the logic.
 
 Additionally, all files are deleted except the specification of the
 logic and the PDF file.
@@ -293,46 +308,47 @@ logic and the PDF file.
 \subsection{Creating the paper (LaTeX)}\label{creating-the-paper-latex}}
 
 If you are interested in the LaTeX source of the paper, use
-\texttt{lgc2tex} instead of \texttt{lgc2pdf}:
+\passthrough{\lstinline!lgc2tex!} instead of
+\passthrough{\lstinline!lgc2pdf!}:
 
-\begin{verbatim}
+\begin{lstlisting}
 lgc2tex <name>
-\end{verbatim}
+\end{lstlisting}
 
 This will invoke MUltlog, but does neither LaTeXing nor cleaning up. It
-will produce two files: \texttt{\textless{}name\textgreater{}.tex} and
-\texttt{\textless{}name\textgreater{}.sty}.
-\texttt{\textless{}name\textgreater{}.tex} is a template LaTeX file
-which loads \texttt{\textless{}name\textgreater{}.sty}. The latter
-contains the difinitions specific to your logic.
+will produce two files: \passthrough{\lstinline!<name>.tex!} and
+\passthrough{\lstinline!<name>.sty!}.
+\passthrough{\lstinline!<name>.tex!} is a template LaTeX file which
+loads \passthrough{\lstinline!<name>.sty!}. The latter contains the
+difinitions specific to your logic.
 
-The source will be \texttt{\textless{}name\textgreater{}.tex} and will
-require \texttt{\textless{}name\textgreater{}.sty} and to be compiled.
-\texttt{\textless{}name\textgreater{}.sty} contains the definitions
-produced by MUltlog.
+The source will be \passthrough{\lstinline!<name>.tex!} and will require
+\passthrough{\lstinline!<name>.sty!} and to be compiled.
+\passthrough{\lstinline!<name>.sty!} contains the definitions produced
+by MUltlog.
 
 \hypertarget{creating-the-paper-dvi}{%
 \subsection{Creating the paper (DVI)}\label{creating-the-paper-dvi}}
 
 The command
 
-\begin{verbatim}
+\begin{lstlisting}
 lgc2dvi <name>
-\end{verbatim}
+\end{lstlisting}
 
-where \texttt{\textless{}name\textgreater{}} is the name under which you
-saved your logic, will produce a DVI file of the paper.
+where \passthrough{\lstinline!<name>!} is the name under which you saved
+your logic, will produce a DVI file of the paper.
 
 \hypertarget{specification-of-a-logic}{%
 \section{Specification of a logic}\label{specification-of-a-logic}}
 
-The directory \texttt{/usr/share/doc/multlog} (or whatever you chose)
-contains a documented example of the configuration file format (as does
-the \texttt{doc} subdirectory of the source distribution itself),
-\texttt{sample.lgc}.
+The directory \passthrough{\lstinline!/usr/share/doc/multlog!} (or
+whatever you chose) contains a documented example of the configuration
+file format (as does the \passthrough{\lstinline!doc!} subdirectory of
+the source distribution itself), \passthrough{\lstinline!sample.lgc!}.
 
-To specify a logic, your specification (\texttt{.lgc}) file has to
-contain the following:
+To specify a logic, your specification (\passthrough{\lstinline!.lgc!})
+file has to contain the following:
 
 \hypertarget{the-name-of-the-logic-mandatory}{%
 \subsection{The name of the logic
@@ -342,28 +358,28 @@ Here you specify the name of the logic to be used in the PDF.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 logic "<logname>".
-\end{verbatim}
+\end{lstlisting}
 
-where \texttt{\textless{}logname\textgreater{}} is a string described by
-the regular expression RE1
+where \passthrough{\lstinline!<logname>!} is a string described by the
+regular expression RE1
 
 ({[}
-\texttt{!\#\$\%\&\textquotesingle{}()*+,./0-9:;\textless{}=\textgreater{}?@A-Z{[}\textbackslash{}{]}\^{}\_\textasciigrave{}a-z\{\textbar{}\}\textasciitilde{}-}{]}
-\textbar{} \texttt{""} )*
+\passthrough{\lstinline"!#$\%\&'()*+,./0-9:;<=>?@A-Z[\\]^\_`a-z\{|\}\~-"}{]}
+\textbar{} \passthrough{\lstinline!""!} )*
 
 of up to 40 characters. In other words, the string may consist of any
 printable ASCII character, where quotes (") have to be doubled.
-\texttt{\textless{}logname\textgreater{}} may contain LaTeX code (e.g.,
-for accented characters), where \texttt{\textbackslash{}} does
-\emph{not} need to be escaped.
+\passthrough{\lstinline!<logname>!} may contain LaTeX code (e.g., for
+accented characters), where \passthrough{\lstinline!\\!} does \emph{not}
+need to be escaped.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 logic "G\""odel".
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{truth-values-mandatory}{%
 \subsection{Truth values (mandatory)}\label{truth-values-mandatory}}
@@ -374,28 +390,31 @@ presentation of truth tables. Every truth value may appear only once.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 truth_values { <v 1>, ..., <v n> }.
-\end{verbatim}
+\end{lstlisting}
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 truth_values {f,*,t}.
-\end{verbatim}
+\end{lstlisting}
 
-where each of the truth values \texttt{\textless{}v\ 1\textgreater{}},
-\ldots{}, \texttt{\textless{}v\ n\textgreater{}} (\(n \ge 2\)) is
-described by the regular expression RE2
+where each of the truth values \passthrough{\lstinline!<v 1>!},
+\ldots{}, \passthrough{\lstinline!<v n>!} (\(n \ge 2\)) is described by
+the regular expression RE2
 
-( {[}\texttt{a}-\texttt{z}{]}{[}\texttt{A-Za-z0-9\_}{]}* \textbar{}
-{[}\texttt{-+*\^{}\textless{}\textgreater{}=\textasciitilde{}?@\#\$\&}{]}+
-\textbar{} \texttt{0} \textbar{} {[}\texttt{1-9}{]}{[}\texttt{0-9}{]}* )
+(
+{[}\passthrough{\lstinline!a!}-\passthrough{\lstinline!z!}{]}{[}\passthrough{\lstinline!A-Za-z0-9\_!}{]}*
+\textbar{} {[}\passthrough{\lstinline!-+*^<>=\~?@#$\&!}{]}+ \textbar{}
+\passthrough{\lstinline!0!} \textbar{}
+{[}\passthrough{\lstinline!1-9!}{]}{[}\passthrough{\lstinline!0-9!}{]}*
+)
 
 The truth values may consist of up to 10 characters. Unless you specify
-how they should be typeset in the corresponding \texttt{.cfg} file, the
-paper will use the names \texttt{\textless{}vn\textgreater{}} in italics
-in the generated PDF.
+how they should be typeset in the corresponding
+\passthrough{\lstinline!.cfg!} file, the paper will use the names
+\passthrough{\lstinline!<vn>!} in italics in the generated PDF.
 
 \hypertarget{designated-truth-values-mandatory}{%
 \subsection{Designated truth values
@@ -407,15 +426,15 @@ braces. Every truth value may appear at most once.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 designated_truth_values { <v 1>, ..., <v n> }.
-\end{verbatim}
+\end{lstlisting}
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 designated_truth_values {t}.
-\end{verbatim}
+\end{lstlisting}
 
 where each of the truth values \textless{}v 1\textgreater{}, \ldots{},
 (n\textgreater{}0) is described by the regular expression RE2 above and
@@ -435,55 +454,55 @@ or quantifier as being the ``inf'' (greatest lower bound) or ``sup''
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 ordering(<ordname>, "<ordspec>").
-\end{verbatim}
+\end{lstlisting}
 
-where \texttt{\textless{}ordname\textgreater{}} is defined according to
-RE2 above and may consist of up to 10 characters.
-\texttt{\textless{}ordspec\textgreater{}} is a string of up to 200
-characters satisfying RE1 above. This string is either a single chain,
-or a set of chains in \texttt{\{}\ldots{}\texttt{\}}. A chain, in turn,
-is a seqence of either elements separated by \texttt{\textless{}}, where
-each element is either a truth value (as defined by
-\texttt{truth\_values}) or itself a set of chains.
+where \passthrough{\lstinline!<ordname>!} is defined according to RE2
+above and may consist of up to 10 characters.
+\passthrough{\lstinline!<ordspec>!} is a string of up to 200 characters
+satisfying RE1 above. This string is either a single chain, or a set of
+chains in
+\passthrough{\lstinline!\{!}\ldots{}\passthrough{\lstinline!\}!}. A
+chain, in turn, is a seqence of either elements separated by
+\passthrough{\lstinline!<!}, where each element is either a truth value
+(as defined by \passthrough{\lstinline!truth\_values!}) or itself a set
+of chains.
 
 In order to avoid ambiguities, spaces may be used to separate the
-\texttt{\textless{}} sign from truth values (which may also contain the
-character \texttt{\textless{}}).
+\passthrough{\lstinline!<!} sign from truth values (which may also
+contain the character \passthrough{\lstinline!<!}).
 
 The semantics of order specifications is as follows:
 
 \begin{itemize}
 \tightlist
 \item
-  Chains like
-  ``\texttt{a\ \textless{}\ b\ \textless{}\ c\ \textless{}\ d\ \textless{}\ e}''
-  are interpreted as an abbreviation for
-  ``\texttt{a\ \textless{}\ b,\ b\ \textless{}\ c,\ c\ \textless{}\ d,\ d\ \textless{}\ e}''.
+  Chains like ``\passthrough{\lstinline!a < b < c < d < e!}'' are
+  interpreted as an abbreviation for
+  ``\passthrough{\lstinline!a < b, b < c, c < d, d < e!}''.
 \item
   Independent chains are collected in sets:
-  ``\texttt{\{a\ \textless{}\ b,\ c\ \textless{}\ d\ \textless{}e,\ ...\}}'';
+  ``\passthrough{\lstinline!\{a < b, c < d <e, ...\}!}'';
 \item
   Sets and chains can be nested. E.g.,
-  ``\texttt{a\ \textless{}\ \{b,\ c\ \textless{}\ d\}\ \textless{}\ e}''
-  is the same as
-  ``\texttt{\{a\ \textless{}\ b,\ a\ \textless{}\ c,\ c\ \textless{}\ d,\ b\ \textless{}\ e,\ d\ \textless{}\ e\}}''.
+  ``\passthrough{\lstinline!a < \{b, c < d\} < e!}'' is the same as
+  ``\passthrough{\lstinline!\{a < b, a < c, c < d, b < e, d < e\}!}''.
 \end{itemize}
 
 Let \(R\) be the relation defined by this specification. The ordering
 induced by \(R\) is the smallest reflexive, anti-symmetric and
 transitive relation containing \(R\). Note that truth values with
 different names are treated as being different from each other. Hence a
-specification containing \texttt{a\textless{}b} and
-\texttt{b\textless{}a} induces no ordering, since anti-symmetry would
-imply \texttt{a}=\texttt{b}.
+specification containing \passthrough{\lstinline!a<b!} and
+\passthrough{\lstinline!b<a!} induces no ordering, since anti-symmetry
+would imply \passthrough{\lstinline!a!}=\passthrough{\lstinline!b!}.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 ordering(linear, "f < * < t").
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{definitions-of-operators}{%
 \subsection{Definitions of operators}\label{definitions-of-operators}}
@@ -499,34 +518,33 @@ the order in which the input tuples are assigned output values is of no
 significance. The definitions should be complete: every \(k\)-tuple has
 to be assigned exactly one value, where \(k>0\) is the arity of the
 operator. There may be several operators with the same
-\texttt{\textless{}opname\textgreater{}} but with different
-\texttt{\textless{}arity\textgreater{}}.
+\passthrough{\lstinline!<opname>!} but with different
+\passthrough{\lstinline!<arity>!}.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 operator(<opname>/<arity>, mapping { <ass 1>, ..., <ass m> }).
-\end{verbatim}
+\end{lstlisting}
 
-\texttt{\textless{}opname\textgreater{}} is defined according to RE2
-above and may consist of up to 10 characters.
-\texttt{\textless{}arity\textgreater{}} is a non-negative integer.
-\texttt{\textless{}ass\ 1\textgreater{}}, \ldots{},
-\texttt{\textless{}ass\ m\textgreater{}} are assignments of the form
+\passthrough{\lstinline!<opname>!} is defined according to RE2 above and
+may consist of up to 10 characters. \passthrough{\lstinline!<arity>!} is
+a non-negative integer. \passthrough{\lstinline!<ass 1>!}, \ldots{},
+\passthrough{\lstinline!<ass m>!} are assignments of the form
 
-\begin{verbatim}
+\begin{lstlisting}
 ( <v 1>, ..., <v k> ) : <v>
-\end{verbatim}
+\end{lstlisting}
 
 where
-\texttt{\textless{}v\ 1\textgreater{}},\ldots{},\texttt{\textless{}v\ k\textgreater{}},
-and \texttt{\textless{}v\textgreater{}} are truth values. Assignments
-must be separated by commas. For \(k = 0\), the mapping consists of a
-single truth value.
+\passthrough{\lstinline!<v 1>!},\ldots{},\passthrough{\lstinline!<v k>!},
+and \passthrough{\lstinline!<v>!} are truth values. Assignments must be
+separated by commas. For \(k = 0\), the mapping consists of a single
+truth value.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 operator(true /0, mapping { t }).
 operator(and  /2, mapping { (t,t): t,
                             (t,*): *,
@@ -538,7 +556,7 @@ operator(and  /2, mapping { (t,t): t,
                             (f,*): f,
                             (f,f): f
                           }
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{tables}{%
 \subsubsection{Tables}\label{tables}}
@@ -549,27 +567,27 @@ braces.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 operator(<opname>/2, table [ <v 1>, ..., <v m> ]).
-\end{verbatim}
+\end{lstlisting}
 
-\texttt{\textless{}opname\textgreater{}} is defined according to RE2
-above and may consist of up to 10 characters.
-\texttt{\textless{}v\ 1\textgreater{}},\ldots{},\texttt{\textless{}v\ m\textgreater{}}
+\passthrough{\lstinline!<opname>!} is defined according to RE2 above and
+may consist of up to 10 characters.
+\passthrough{\lstinline!<v 1>!},\ldots{},\passthrough{\lstinline!<v m>!}
 are truth values. The number of elements in the table, \(m\), has to be
 equal to \((n+1)^2-1\), where \(n\) is the number of different truth
 values.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 operator(and/2, table   [     t, *, f,
                           t,  t, *, f,
                           *,  *, *, f,
                           f,  f, f, f
                         ]
         ).
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{inf-and-sup}{%
 \subsubsection{Inf and sup}\label{inf-and-sup}}
@@ -580,16 +598,16 @@ ordering.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 operator(<opname>/<arity>, sup(<ordname>)).
 operator(<opname>/<arity>, inf(<ordname>)).
-\end{verbatim}
+\end{lstlisting}
 
-Here, \texttt{\textless{}opname\textgreater{}} is defined according to
-RE2 above and may consist of up to 10 characters.
-\texttt{\textless{}arity\textgreater{}} is a non-negative integer
-greater than one. \texttt{\textless{}ordname\textgreater{}} is the name
-of an appropriate ordering defined by an \texttt{ordering} statement.
+Here, \passthrough{\lstinline!<opname>!} is defined according to RE2
+above and may consist of up to 10 characters.
+\passthrough{\lstinline!<arity>!} is a non-negative integer greater than
+one. \passthrough{\lstinline!<ordname>!} is the name of an appropriate
+ordering defined by an \passthrough{\lstinline!ordering!} statement.
 
 ``sup'' stands for the least-upper-bound (= supremum) operation w.r.t.
 the given ordering. The value of the operator is determined as the least
@@ -603,10 +621,10 @@ values.
 
 Examples:
 
-\begin{verbatim}
+\begin{lstlisting}
 operator(and  /2, inf(linear)).
 operator(or   /2, sup(linear)).
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{definitions-of-distribution-quantifiers}{%
 \subsection{Definitions of (distribution)
@@ -624,23 +642,22 @@ non-empty subset should be assigned exactly one value.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 quantifier(<quname>, mapping { <ass 1>, ..., <ass m> }).
-\end{verbatim}
+\end{lstlisting}
 
-\texttt{\textless{}quname\textgreater{}} is defined according to RE2
-above and may consist of up to 10 characters.
-\texttt{\textless{}ass\ 1\textgreater{}},\ldots{},\texttt{\textless{}ass\ m\textgreater{}}
+\passthrough{\lstinline!<quname>!} is defined according to RE2 above and
+may consist of up to 10 characters.
+\passthrough{\lstinline!<ass 1>!},\ldots{},\passthrough{\lstinline!<ass m>!}
 are assignments of the form
-\texttt{\{\ \textless{}v\ 1\textgreater{},\ ...,\ \textless{}v\ k\textgreater{}\ \}\ :\ \textless{}v\textgreater{}},
-where
-\texttt{\textless{}v\ 1\textgreater{}},\ldots{},\texttt{\textless{}v\ k\textgreater{}},
-and \texttt{\textless{}v\textgreater{}} are truth values. \(k\) has to
-be greater than one.
+\passthrough{\lstinline!\{ <v 1>, ..., <v k> \} : <v>!}, where
+\passthrough{\lstinline!<v 1>!},\ldots{},\passthrough{\lstinline!<v k>!},
+and \passthrough{\lstinline!<v>!} are truth values. \(k\) has to be
+greater than one.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 quantifier(forall, mapping { {t}    : t,
                              {t,*}  : *,
                              {t,f}  : f,
@@ -650,7 +667,7 @@ quantifier(forall, mapping { {t}    : t,
                              {f}    : f
                            }
           ).
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{induced-quantifiers}{%
 \subsubsection{Induced quantifiers}\label{induced-quantifiers}}
@@ -661,22 +678,21 @@ associative, commutative and idempotent.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 quantifier(<quname>, induced_by <opname>/<arity>).
-\end{verbatim}
+\end{lstlisting}
 
-\texttt{\textless{}quname\textgreater{}} is defined according to RE2
-above and may consist of up to 10 characters.
-\texttt{\textless{}opname\textgreater{}} is defined according to RE2
-above and may consist of up to 10 characters, and should be an operator
-defined as above. \texttt{\textless{}arity\textgreater{}} is an integer
-greater than one.
+\passthrough{\lstinline!<quname>!} is defined according to RE2 above and
+may consist of up to 10 characters. \passthrough{\lstinline!<opname>!}
+is defined according to RE2 above and may consist of up to 10
+characters, and should be an operator defined as above.
+\passthrough{\lstinline!<arity>!} is an integer greater than one.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 quantifier(forall, induced_by and/2).
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{inf-and-sup-1}{%
 \subsubsection{Inf and sup}\label{inf-and-sup-1}}
@@ -685,379 +701,400 @@ Quantifiers can also be induced by a lub/glb operator.
 
 Syntax:
 
-\begin{verbatim}
+\begin{lstlisting}
 quantifier(<quname>, induced_by <bop>(<ordname>)).
-\end{verbatim}
+\end{lstlisting}
 
-\texttt{\textless{}quname\textgreater{}} is defined according to RE2
-above and may consist of up to 10 characters.
-\texttt{\textless{}bop\textgreater{}} is either sup or inf.
-\texttt{\textless{}ordname\textgreater{}} is the name of an appropriate
-ordering defined by an ``\texttt{ordering}''-statement.
+\passthrough{\lstinline!<quname>!} is defined according to RE2 above and
+may consist of up to 10 characters. \passthrough{\lstinline!<bop>!} is
+either sup or inf. \passthrough{\lstinline!<ordname>!} is the name of an
+appropriate ordering defined by an
+``\passthrough{\lstinline!ordering!}''-statement.
 
 Example:
 
-\begin{verbatim}
+\begin{lstlisting}
 quantifier(forall, induced_by inf(linear)).
-\end{verbatim}
+\end{lstlisting}
 
 \hypertarget{interactive-logic-creator}{%
 \subsection{interactive Logic Creator}\label{interactive-logic-creator}}
 
-\texttt{ilc} is a graphical front-end to make creating \texttt{.lgc}
-files a little easier. It requires Tcl/Tk (version 7.4/4.0 or later). To
-be exact, you only need the executable \texttt{wish} (the windowing
-shell) but not the libraries and none of the extensions.
+\passthrough{\lstinline!ilc!} is a graphical front-end to make creating
+\passthrough{\lstinline!.lgc!} files a little easier. It requires Tcl/Tk
+(version 7.4/4.0 or later). To be exact, you only need the executable
+\passthrough{\lstinline!wish!} (the windowing shell) but not the
+libraries and none of the extensions.
 
 The program should be rather self-explanatory once you know what goes
-into the \texttt{.lgc} file. You can load and save \texttt{.lgc} files
-from the ``File'' menu. Before you can specify orderings, operators, and
-quantifiers, you have to enter the name of the logic and the list of
-truth values.
+into the \passthrough{\lstinline!.lgc!} file. You can load and save
+\passthrough{\lstinline!.lgc!} files from the ``File'' menu. Before you
+can specify orderings, operators, and quantifiers, you have to enter the
+name of the logic and the list of truth values.
 
 \hypertarget{tex-configuration-files}{%
 \section{TeX configuration files}\label{tex-configuration-files}}
 
-MUltlog will generate a \texttt{.tex} and \texttt{.sty} file from a
-given \texttt{.lgc} file. If present, it will also use the content of a
-corresponding \texttt{.cfg} file, which can be used to fine-tune the
-formatted output.
+MUltlog will generate a \passthrough{\lstinline!.tex!} and
+\passthrough{\lstinline!.sty!} file from a given
+\passthrough{\lstinline!.lgc!} file. If present, it will also use the
+content of a corresponding \passthrough{\lstinline!.cfg!} file, which
+can be used to fine-tune the formatted output.
 
-The \texttt{.cfg} file for a logic can contain three kinds of
-declaration:
+The \passthrough{\lstinline!.cfg!} file for a logic can contain three
+kinds of declaration:
 
 \begin{itemize}
 \item
-  \texttt{texName(\textless{}name\textgreater{},\ \textless{}definition\textgreater{})}
-  associates the name \texttt{\textless{}name\textgreater{}} of a truth
-  value, operator, or quantifier used in the \texttt{.lgc} file with
-  LaTeX code used to typeset it. For instance, if \texttt{t} is a truth
-  value in the \texttt{.lgc} file, then
+  \passthrough{\lstinline!texName(<name>, <definition>)!} associates the
+  name \passthrough{\lstinline!<name>!} of a truth value, operator, or
+  quantifier used in the \passthrough{\lstinline!.lgc!} file with LaTeX
+  code used to typeset it. For instance, if \passthrough{\lstinline!t!}
+  is a truth value in the \passthrough{\lstinline!.lgc!} file, then
 
-\begin{verbatim}
+\begin{lstlisting}
 texName(t, "\\mathbf{T}").
-\end{verbatim}
+\end{lstlisting}
 
-  will result in the truth value \texttt{t} be typset as \(\mathbf{T}\).
-  (Note that \texttt{\textbackslash{}} have to be doubled.) If the LaTeX
-  replacement is a simple command beginning with a lowercase letter, the
-  quotation marks can be left off, e.g.,
+  will result in the truth value \passthrough{\lstinline!t!} be typset
+  as \(\mathbf{T}\). (Note that \passthrough{\lstinline!\\!} have to be
+  doubled.) If the LaTeX replacement is a simple command beginning with
+  a lowercase letter, the quotation marks can be left off, e.g.,
 
-\begin{verbatim}
+\begin{lstlisting}
 texName(and,    \\wedge  ).
-\end{verbatim}
+\end{lstlisting}
 \item
-  \texttt{texInfix(\textless{}op\textgreater{})} and
-  \texttt{texPrefix(\textless{}op\textgreater{})} will cause formulas
+  \passthrough{\lstinline!texInfix(<op>)!} and
+  \passthrough{\lstinline!texPrefix(<op>)!} will cause formulas
   involving an operator to be set either as infix or prefix, as opposed
-  to the default operator notation. Of course, \texttt{texInfix} can
-  only be applied to binary operators, and \texttt{texPrefix} only to
-  unary operators. For instance:
+  to the default operator notation. Of course,
+  \passthrough{\lstinline!texInfix!} can only be applied to binary
+  operators, and \passthrough{\lstinline!texPrefix!} only to unary
+  operators. For instance:
 
-\begin{verbatim}
+\begin{lstlisting}
 texInfix(or).
 texPrefix(neg).
-\end{verbatim}
+\end{lstlisting}
 \item
-  \texttt{texExtra(\textless{}macro\textgreater{},\ \textless{}definition\textgreater{})}
-  will insert a definition for
-  \texttt{\textbackslash{}\textless{}macro\textgreater{}} with body
-  \texttt{\textless{}definition\textgreater{}} in the \texttt{.sty}
-  file, which will be loaded in the preamble. This can be used to
-  (re-)define any macro used in the LaTeX file. For instance,
+  \passthrough{\lstinline!texExtra(<macro>, <definition>)!} will insert
+  a definition for \passthrough{\lstinline!\\<macro>!} with body
+  \passthrough{\lstinline!<definition>!} in the
+  \passthrough{\lstinline!.sty!} file, which will be loaded in the
+  preamble. This can be used to (re-)define any macro used in the LaTeX
+  file. For instance,
 
-\begin{verbatim}
+\begin{lstlisting}
 texExtra("ShortName", "\\textbf{\\L}_3").
-\end{verbatim}
+\end{lstlisting}
 
-  will define \texttt{\textbackslash{}ShortName} as
-  \texttt{\textbackslash{}textbf\{\textbackslash{}L\}\_3}, and this
-  macro will be available in the LaTeX file. The LaTeX template file
-  makes use of a number of macros which can be defined in this way:
+  will define \passthrough{\lstinline!\\ShortName!} as
+  \passthrough{\lstinline!\\textbf\{\\L\}\_3!}, and this macro will be
+  available in the LaTeX file. The LaTeX template file makes use of a
+  number of macros which can be defined in this way:
 
   \begin{itemize}
   \item
-    \texttt{\textbackslash{}Preamble} will be executed in the preamble
-    just before \texttt{\textbackslash{}begin\{document\}}. It can be
-    used, e.g., to load packages needed for some of the operator
-    symbols, or to change the document font.
+    \passthrough{\lstinline!\\Preamble!} will be executed in the
+    preamble just before \passthrough{\lstinline!\\begin\{document\}!}.
+    It can be used, e.g., to load packages needed for some of the
+    operator symbols, or to change the document font.
   \item
-    \texttt{\textbackslash{}ShortName} may contain code for an
+    \passthrough{\lstinline!\\ShortName!} may contain code for an
     abbreviation or symbol for the logic.
-    \texttt{\textbackslash{}ShortName} will be called in math mode.
+    \passthrough{\lstinline!\\ShortName!} will be called in math mode.
   \item
-    \texttt{\textbackslash{}FullNameOfLogic} is the macro used to insert
-    the name of the logic. By default it will be
-    ``\texttt{\textless{}logname\textgreater{}} logic''. Sometimes this
+    \passthrough{\lstinline!\\FullNameOfLogic!} is the macro used to
+    insert the name of the logic. By default it will be
+    ``\passthrough{\lstinline!<logname>!} logic''. Sometimes this
     doesn't work, so, e.g., you could say:
 
-\begin{verbatim}
+\begin{lstlisting}
 texExtra("FullNameOfLogic", "Halld\\'en's logic of nonsense").
-\end{verbatim}
+\end{lstlisting}
   \item
-    \texttt{\textbackslash{}Intro} will be called (if defined) after the
-    first paragraph of the introduction, and can be used to print a
+    \passthrough{\lstinline!\\Intro!} will be called (if defined) after
+    the first paragraph of the introduction, and can be used to print a
     paragraph on the history or motivation of the logic. This paragraph
-    can use \texttt{\textbackslash{}cite} to generate references to any
-    entries in \texttt{\textless{}logname\textgreater{}.bib}.
+    can use \passthrough{\lstinline!\\cite!} to generate references to
+    any entries in \passthrough{\lstinline!<logname>.bib!}.
   \item
-    \texttt{\textbackslash{}Semantics} will be called just before the
+    \passthrough{\lstinline!\\Semantics!} will be called just before the
     definition of the matrix of the logic. It can be used to print a
     paragraph, say, about the intuitive interpretation of the truth
     values, or how the truth functions of the operators are defined
     (say, on the basis of an ordering).
   \item
-    \texttt{\textbackslash{}Link} will be added as a download link to
+    \passthrough{\lstinline!\\Link!} will be added as a download link to
     the citation information at the bottom of the first page.
   \end{itemize}
 \end{itemize}
 
 Using
 
-\begin{verbatim}
+\begin{lstlisting}
 texExtra("Preamble","\\ESequentstrue").
-\end{verbatim}
+\end{lstlisting}
 
 you can tell MUltlog to not use the compact representations of sequents,
 but to explicitly list all components. This will only make sense if the
 number of truth values is small. In this case, sequents are typeset
-using the macro \texttt{\textbackslash{}esequent}. By default it is
+using the macro \passthrough{\lstinline!\\esequent!}. By default it is
 defined as
 
-\begin{verbatim}
+\begin{lstlisting}
 \newcommand{\esequent}[n]{#1 \mid ... \mid #n}
-\end{verbatim}
+\end{lstlisting}
 
 where \(n\) is the number of truth values. It can be redefined using
 
-\begin{verbatim}
+\begin{lstlisting}
 texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow ##2 \\mid ##3 \\Rightarrow ##4}").
-\end{verbatim}
+\end{lstlisting}
 
-(Note the double \texttt{\#}.)
+(Note the double \passthrough{\lstinline!#!}.)
 
 \hypertarget{interactive-use}{%
 \section{Interactive use}\label{interactive-use}}
 
-The command \texttt{multlog} will start Prolog and load the MUltlog
-source files. This makes it possible to use MUltlog interactively. This
-feature is expermiental and has not been tested extensively. In
-particular, it does not yet include detailed error checks.
+The command \passthrough{\lstinline!multlog!} will start Prolog and load
+the MUltlog source files. This makes it possible to use MUltlog
+interactively. This feature is expermiental and has not been tested
+extensively. In particular, it does not yet include detailed error
+checks.
 
 Interactive mode allows you to load the specification files of logics
 and then perform queries and operations on these logics. To load a
 logic, type, e.g.,
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- loadLogic('lukasiewicz.lgc',luk).
-\end{verbatim}
+\end{lstlisting}
 
-Here, \texttt{?-} is the Prolog prompt; you only enter the text after
-it. Now the definition of Łukasiewicz logic is available using the ID
-\texttt{luk}.
+Here, \passthrough{\lstinline!?-!} is the Prolog prompt; you only enter
+the text after it. Now the definition of Łukasiewicz logic is available
+using the ID \passthrough{\lstinline!luk!}.
 
 To display the truth values and truth tables of your logic, say
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- showLogic(luk).
-\end{verbatim}
+\end{lstlisting}
 
 This will display the truth tables using the currently selected color
-scheme. Color schemes are \texttt{plain}, \texttt{designated}, and
-\texttt{all} and can be set using, e.g., \texttt{setColors(luk,plain)}.
-By default, logics have color scheme \texttt{all} which displays
-different values in different colors, with designated values reversed.
-This requires an up-to-date version of SWI Prolog. You can also output
-the truth tables in LaTeX format by saying
-\texttt{showLogic(luk,\ tex)}. This will require some definitions
-included in the preamble of your LaTeX document, which can be displayed
-using \texttt{showTexDefs}.
+scheme. Color schemes are \passthrough{\lstinline!plain!},
+\passthrough{\lstinline!designated!}, and \passthrough{\lstinline!all!}
+and can be set using, e.g.,
+\passthrough{\lstinline!setColors(luk,plain)!}. By default, logics have
+color scheme \passthrough{\lstinline!all!} which displays different
+values in different colors, with designated values reversed. This
+requires an up-to-date version of SWI Prolog. You can also output the
+truth tables in LaTeX format by saying
+\passthrough{\lstinline!showLogic(luk, tex)!}. This will require some
+definitions included in the preamble of your LaTeX document, which can
+be displayed using \passthrough{\lstinline!showTexDefs!}.
 
 Formulas of a logic are built using the operator names in the
-\texttt{.lgc} file, in operator notation. Prolog variables are used for
-propositional variables. So, e.g., \(X \to \lnot(X \lor Y)\) would be
-written as \texttt{imp(X,\ neg(or(X,\ Y)))}. Instead of variables, you
-can also put truth values of your logic, e.g.,
-\texttt{imp(t,\ neg(or(*,f)))}. To find the value of this formula:
+\passthrough{\lstinline!.lgc!} file, in operator notation. Prolog
+variables are used for propositional variables. So, e.g.,
+\(X \to \lnot(X \lor Y)\) would be written as
+\passthrough{\lstinline!imp(X, neg(or(X, Y)))!}. Instead of variables,
+you can also put truth values of your logic, e.g.,
+\passthrough{\lstinline!imp(t, neg(or(*,f)))!}. To find the value of
+this formula:
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- hasValue(luk,imp(t, neg(or(*,f))),V).
-\end{verbatim}
+\end{lstlisting}
 
-Prolog will display \texttt{V\ =\ \ (*)}, i.e., the value is \texttt{*}.
-If you hit space, Prolog will try to find other solutions, and display
-\texttt{false.} if not other solutions can be found. In this case,
-\texttt{V=*} is the only solution. However, if the formula contains
-variables, Prolog will find all solutions. E.g.,
+Prolog will display \passthrough{\lstinline!V =  (*)!}, i.e., the value
+is \passthrough{\lstinline!*!}. If you hit space, Prolog will try to
+find other solutions, and display \passthrough{\lstinline!false.!} if
+not other solutions can be found. In this case,
+\passthrough{\lstinline!V=*!} is the only solution. However, if the
+formula contains variables, Prolog will find all solutions. E.g.,
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- hasValue(luk,imp(X, neg(or(X,Y))),f).
-\end{verbatim}
+\end{lstlisting}
 
-will successively find all values for the variables \texttt{X} and
-\texttt{Y} so that the value is \texttt{f}:
+will successively find all values for the variables
+\passthrough{\lstinline!X!} and \passthrough{\lstinline!Y!} so that the
+value is \passthrough{\lstinline!f!}:
 
-\begin{verbatim}
+\begin{lstlisting}
 X = t,
 Y = f ;
 X = t,
 Y =  (*) ;
 X = Y, Y = t ;
 false.
-\end{verbatim}
+\end{lstlisting}
 
 The value can itself be a variable. For instance to find a truth value
 fixed point of \(\lnot X \lor X\), type.
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- hasValue(luk, or(X, neg(X)),X).
-\end{verbatim}
+\end{lstlisting}
 
-This will find solutions \texttt{*} and \texttt{t}.
+This will find solutions \passthrough{\lstinline!*!} and
+\passthrough{\lstinline!t!}.
 
 If you want to know if a formula is designated (or can be made
 designated), use:
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- isDesignated(luk, or(X, neg(X))).
-\end{verbatim}
+\end{lstlisting}
 
-This will find the values \texttt{t} and \texttt{f}. Use
-\texttt{isUnDesignated} instead if you are interested in undesignated
-values.
+This will find the values \passthrough{\lstinline!t!} and
+\passthrough{\lstinline!f!}. Use
+\passthrough{\lstinline!isUnDesignated!} instead if you are interested
+in undesignated values.
 
 To test if a formula is a tautology, say
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- isTaut(luk, or(X, neg(X))).
-\end{verbatim}
+\end{lstlisting}
 
-This will just produce \texttt{false} since \(X \lor \lnot X\) is not a
-tautology: if \(X\) is \texttt{*} the result is \texttt{*}, which is not
-designated:
+This will just produce \passthrough{\lstinline!false!} since
+\(X \lor \lnot X\) is not a tautology: if \(X\) is
+\passthrough{\lstinline!*!} the result is \passthrough{\lstinline!*!},
+which is not designated:
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- isUnDesignated(luk, or(X, neg(X))).
 X =  (*) 
-\end{verbatim}
+\end{lstlisting}
 
 To test for consequence, use
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- isConseq(luk, [X, imp(X,Y)], Y).
-\end{verbatim}
+\end{lstlisting}
 
-Here, the first argument \texttt{{[}X,\ imp(X,Y){]}} is a \emph{list} of
-formulas, and since in Łukasiewicz logic, \(X, X \to Y \models Y\), this
-will result in \texttt{true}.
+Here, the first argument \passthrough{\lstinline![X, imp(X,Y)]!} is a
+\emph{list} of formulas, and since in Łukasiewicz logic,
+\(X, X \to Y \models Y\), this will result in
+\passthrough{\lstinline!true!}.
 
 You can also test for equivalence of two formulas:
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- isEquiv(luk, or(X,Y), luk, imp(imp(X, Y), Y)).
-\end{verbatim}
+\end{lstlisting}
 
 Here, the first formula is evaluated according to the operations (truth
 tables) of the first listed logic, and the second formula according to
-the operations. In this case we use the same logic \texttt{luk} for
-both.
+the operations. In this case we use the same logic
+\passthrough{\lstinline!luk!} for both.
 
 To find formulas with various properties, do the following:
-\texttt{findFmla(logic,\ F)} will successively find solutions \texttt{F}
-which are formulas of \texttt{logic}. The solutions will be ugly, e.g.,
-\texttt{F\ =\ and(\_100,\ neg(\_136))} (\texttt{\_} followed by a number
-is Prolog's generic way of naming variables). This can then be combined
-with other tests, e.g., to find all tautologies, say:
+\passthrough{\lstinline!findFmla(logic, F)!} will successively find
+solutions \passthrough{\lstinline!F!} which are formulas of
+\passthrough{\lstinline!logic!}. The solutions will be ugly, e.g.,
+\passthrough{\lstinline!F = and(\_100, neg(\_136))!}
+(\passthrough{\lstinline!\_!} followed by a number is Prolog's generic
+way of naming variables). This can then be combined with other tests,
+e.g., to find all tautologies, say:
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- findFmla(luk,F), isTaut(luk, F).
-\end{verbatim}
+\end{lstlisting}
 
-The predicate \texttt{findTaut(luk,\ F)} does the same.
+The predicate \passthrough{\lstinline!findTaut(luk, F)!} does the same.
 
-To find a formula equivalent to a given one, use \texttt{findEquiv},
-e.g.,
+To find a formula equivalent to a given one, use
+\passthrough{\lstinline!findEquiv!}, e.g.,
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- findEquiv(luk, or(X,Y), luk, F).
-\end{verbatim}
+\end{lstlisting}
 
-will find all formulas \texttt{F} equivalent to \(X \lor Y\). The first
-two are boring---\(X \lor Y\) itself and \(Y \lor X\)---but then it will
-discover that you can express \(X \lor Y\) using \((X \to Y) \to Y\) in
-Łukasiewicz logic.
+will find all formulas \passthrough{\lstinline!F!} equivalent to
+\(X \lor Y\). The first two are boring---\(X \lor Y\) itself and
+\(Y \lor X\)---but then it will discover that you can express
+\(X \lor Y\) using \((X \to Y) \to Y\) in Łukasiewicz logic.
 
 To find only formulas not involving \(\lor\) here, you can define a
 second version of Łukasiewicz logic without \(\lor\):
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- loadLogic('lukasiewicz.lgc',luk2), delOp(luk2,or/2).
-\end{verbatim}
+\end{lstlisting}
 
-(\texttt{delOp(luk2,op/2)} deletes the 2-place operator \texttt{or} from
-\texttt{luk2}.) Now
+(\passthrough{\lstinline!delOp(luk2,op/2)!} deletes the 2-place operator
+\passthrough{\lstinline!or!} from \passthrough{\lstinline!luk2!}.) Now
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- findEquiv(luk, or(X,Y), luk2, F).
-\end{verbatim}
+\end{lstlisting}
 
-will only find formulas of \texttt{luk2} (i.e., formulas not containing
-\texttt{or}) that are equivalent to \(X \lor Y\).
+will only find formulas of \passthrough{\lstinline!luk2!} (i.e.,
+formulas not containing \passthrough{\lstinline!or!}) that are
+equivalent to \(X \lor Y\).
 
 If you have two logics loaded or defined, you can have MUltlog define a
 new logic as the direct product of the two.
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- makeProduct(l1,l2,new).
-\end{verbatim}
+\end{lstlisting}
 
-The logic \texttt{new} is has truth values that are pairs of truth
-values of the logics \texttt{l1} and \texttt{l2}, with pairs where both
-components are designated in \texttt{l1} and \texttt{l2} being
-designated in \texttt{new}, and operators defined componentwise. This
-assumes that \texttt{l1} and \texttt{l2} have the same operators
-defined.
+The logic \passthrough{\lstinline!new!} is has truth values that are
+pairs of truth values of the logics \passthrough{\lstinline!l1!} and
+\passthrough{\lstinline!l2!}, with pairs where both components are
+designated in \passthrough{\lstinline!l1!} and
+\passthrough{\lstinline!l2!} being designated in
+\passthrough{\lstinline!new!}, and operators defined componentwise. This
+assumes that \passthrough{\lstinline!l1!} and
+\passthrough{\lstinline!l2!} have the same operators defined.
 
 To find the congruences of a logic, say
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- showCong(new).
-\end{verbatim}
+\end{lstlisting}
 
 This will look through all partitions of the designated and undesignated
-values of logic \texttt{new} and test if the partition is a congruence.
-If it is, it will display the partition of truth values and the
-resulting truth tables, with congruent values colored identically. Each
-class in the partition is a truth value in the factor logic; truth
-values are congruent if they are elements of the same class. Equivalent
-truth values ``behave the same'' on all operators, e.g., if \(v\) and
-\(u\) are equivalent, then \(\lnot v\) and \(\lnot u\) are also
-equivalent. Only ``strong'' congruences are found, i.e., congruences
-that respect the designated values (i.e., designated values are
-equivalent to other designated values, and undesignated values to other
-undesignated values). (The first congruence found is always the trivial
-one: every truth value is only equivalent to itself.)
+values of logic \passthrough{\lstinline!new!} and test if the partition
+is a congruence. If it is, it will display the partition of truth values
+and the resulting truth tables, with congruent values colored
+identically. Each class in the partition is a truth value in the factor
+logic; truth values are congruent if they are elements of the same
+class. Equivalent truth values ``behave the same'' on all operators,
+e.g., if \(v\) and \(u\) are equivalent, then \(\lnot v\) and
+\(\lnot u\) are also equivalent. Only ``strong'' congruences are found,
+i.e., congruences that respect the designated values (i.e., designated
+values are equivalent to other designated values, and undesignated
+values to other undesignated values). (The first congruence found is
+always the trivial one: every truth value is only equivalent to itself.)
 
 Once you have a congruence, you can define a new logic as the factor
 logic of the old one by
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- makeFactor(logic, Part, factor).
-\end{verbatim}
+\end{lstlisting}
 
-where \texttt{logic} is the ID of the old logic, \texttt{Part} is the
-set of sets of truth values that defines the congruence (displayed by
-\texttt{showCong}) and \texttt{factor} is the ID of the new logic.
+where \passthrough{\lstinline!logic!} is the ID of the old logic,
+\passthrough{\lstinline!Part!} is the set of sets of truth values that
+defines the congruence (displayed by \passthrough{\lstinline!showCong!})
+and \passthrough{\lstinline!factor!} is the ID of the new logic.
 
 MUltlog can test if two logics are isomorphic:
 
-\begin{verbatim}
+\begin{lstlisting}
 ?- isIso(Iso, log1, log2).
-\end{verbatim}
+\end{lstlisting}
 
-will succeed with \texttt{Iso} bound to a list of pairs of truth values
-of logics \texttt{log1} and \texttt{log2} which represents an
-isomorphism, and fail if no isomorphism exists.
+will succeed with \passthrough{\lstinline!Iso!} bound to a list of pairs
+of truth values of logics \passthrough{\lstinline!log1!} and
+\passthrough{\lstinline!log2!} which represents an isomorphism, and fail
+if no isomorphism exists.
 
 \hypertarget{troubleshooting}{%
 \section{Troubleshooting}\label{troubleshooting}}
@@ -1069,14 +1106,15 @@ The installation script may produce the following warnings and errors.
 
 \begin{itemize}
 \item
-  ``Error: \texttt{\textless{}directory\textgreater{}} does not exist.''
+  ``Error: \passthrough{\lstinline!<directory>!} does not exist.''
 
   The installation script did not find the directory for executables,
-  library, or documentation (\texttt{/usr/local/bin},
-  \texttt{/usr/local/lib}, and \texttt{/usr/share/doc} or
-  \texttt{\textasciitilde{}/.local/bin},
-  \texttt{\textasciitilde{}/.local/lib},
-  \texttt{\textasciitilde{}./local/doc} by default). Create the
+  library, or documentation (\passthrough{\lstinline!/usr/local/bin!},
+  \passthrough{\lstinline!/usr/local/lib!}, and
+  \passthrough{\lstinline!/usr/share/doc!} or
+  \passthrough{\lstinline!\~/.local/bin!},
+  \passthrough{\lstinline!\~/.local/lib!},
+  \passthrough{\lstinline!\~./local/doc!} by default). Create the
   directories before running the script or select different directories
   when prompted.
 
@@ -1084,94 +1122,107 @@ The installation script may produce the following warnings and errors.
   \tightlist
   \item
     ``Error: could not find Unix command
-    \texttt{\textless{}command\textgreater{}}.'' where
-    \texttt{\textless{}command\textgreater{}} is one of
+    \passthrough{\lstinline!<command>!}.'' where
+    \passthrough{\lstinline!<command>!} is one of
   \end{itemize}
 
-\begin{verbatim}
+\begin{lstlisting}
 basename chmod cp dirname false grep mkdir pwd rm sed true.
-\end{verbatim}
+\end{lstlisting}
 
   The installation script and the scripts for starting MUltlog
-  (\texttt{lgc2tex}, \texttt{lgc2dvi}, \texttt{lgc2pdf}, and
-  \texttt{lgc2ilc}) need these Unix commands. The error message means
-  that could not be located, neither on the current command search path
-  nor in the directories \texttt{/usr/local/bin},
-  \texttt{/usr/local/sbin}, \texttt{/usr/bin}, \texttt{/usr/sbin},
-  \texttt{/bin}, or \texttt{/sbin}. Locate the directory containing
-  \texttt{\textless{}command\textgreater{}} and put it on your command
-  search path during installation.
+  (\passthrough{\lstinline!lgc2tex!}, \passthrough{\lstinline!lgc2dvi!},
+  \passthrough{\lstinline!lgc2pdf!}, and
+  \passthrough{\lstinline!lgc2ilc!}) need these Unix commands. The error
+  message means that could not be located, neither on the current
+  command search path nor in the directories
+  \passthrough{\lstinline!/usr/local/bin!},
+  \passthrough{\lstinline!/usr/local/sbin!},
+  \passthrough{\lstinline!/usr/bin!},
+  \passthrough{\lstinline!/usr/sbin!}, \passthrough{\lstinline!/bin!},
+  or \passthrough{\lstinline!/sbin!}. Locate the directory containing
+  \passthrough{\lstinline!<command>!} and put it on your command search
+  path during installation.
 
-  If your Unix system does not have
-  \texttt{\textless{}command\textgreater{}} at all, submit an issue on
-  https://github.com/rzach/multlog/.
+  If your Unix system does not have \passthrough{\lstinline!<command>!}
+  at all, submit an issue on https://github.com/rzach/multlog/.
 \item
   ``Warning: could not find TeX command
-  \texttt{\textless{}command\textgreater{}}.'' where
-  \texttt{\textless{}command\textgreater{}} is one of
+  \passthrough{\lstinline!<command>!}.'' where
+  \passthrough{\lstinline!<command>!} is one of
 
-\begin{verbatim}
+\begin{lstlisting}
 latex bibtex.
-\end{verbatim}
+\end{lstlisting}
 
-  The script \texttt{lgc2dvi} needs latex and bibtex to produce a
-  DVI-file from the TeX document created by MUltlog. The warning means
-  that \texttt{\textless{}command\textgreater{}} could not be located,
-  neither on the current command search path nor in the directories
+  The script \passthrough{\lstinline!lgc2dvi!} needs latex and bibtex to
+  produce a DVI-file from the TeX document created by MUltlog. The
+  warning means that \passthrough{\lstinline!<command>!} could not be
+  located, neither on the current command search path nor in the
+  directories
 
-  \texttt{/usr/local/bin} \texttt{/usr/local/}sbin
-  /usr/bin\texttt{}/usr/sbin\texttt{}/bin\texttt{}/sbin`
+  \passthrough{\lstinline!/usr/local/bin!}
+  \passthrough{\lstinline!/usr/local/!}sbin
+  /usr/bin\passthrough{\lstinline!!}/usr/sbin\passthrough{\lstinline!!}/bin\passthrough{\lstinline!!}/sbin`
 
   Check whether TeX is properly installed and put the directory
-  containing \texttt{\textless{}command\textgreater{}} on your command
-  search path during installation.
+  containing \passthrough{\lstinline!<command>!} on your command search
+  path during installation.
 \item
   ``Warning: couldn't find any PDF converters.''
 
-  The script \texttt{lgc2pdf} needs either \texttt{pdflatex} or
-  \texttt{latex}, \texttt{dvips} and \texttt{ps2pdf} to produce a
-  PDF-file from the TeX document created by MUltlog. The warning means
-  that either \texttt{pdflatex} or \texttt{dvips} and \texttt{ps2pdf}
+  The script \passthrough{\lstinline!lgc2pdf!} needs either
+  \passthrough{\lstinline!pdflatex!} or \passthrough{\lstinline!latex!},
+  \passthrough{\lstinline!dvips!} and \passthrough{\lstinline!ps2pdf!}
+  to produce a PDF-file from the TeX document created by MUltlog. The
+  warning means that either \passthrough{\lstinline!pdflatex!} or
+  \passthrough{\lstinline!dvips!} and \passthrough{\lstinline!ps2pdf!}
   could not be located, neither on the current command search path nor
-  in the directories \texttt{/usr/local/bin}, \texttt{/usr/local/sbin},
-  \texttt{/usr/bin}, \texttt{/usr/sbin}, \texttt{/bin}, or
-  \texttt{/sbin}. Check whether TeX and Ghostscript are properly
-  installed and put the directory containing the PDF converter on your
-  command search path during installation.
+  in the directories \passthrough{\lstinline!/usr/local/bin!},
+  \passthrough{\lstinline!/usr/local/sbin!},
+  \passthrough{\lstinline!/usr/bin!},
+  \passthrough{\lstinline!/usr/sbin!}, \passthrough{\lstinline!/bin!},
+  or \passthrough{\lstinline!/sbin!}. Check whether TeX and Ghostscript
+  are properly installed and put the directory containing the PDF
+  converter on your command search path during installation.
 \item
   ``Warning: could not find Tcl/Tk command wish.''
 
-  The editor \texttt{ilc} needs the Tcl/Tk package, in particular the
-  program \texttt{wish}. The warning means that \texttt{wish} could not
-  be located, neither on the current command search path nor in the in
-  the directories \texttt{/usr/local/bin}, \texttt{/usr/local/sbin},
-  \texttt{/usr/bin}, \texttt{/usr/sbin}, \texttt{/bin}, or
-  \texttt{/sbin}. Check whether Tcl/Tk is properly installed and put the
-  directory containing \texttt{wish} on your command search path during
+  The editor \passthrough{\lstinline!ilc!} needs the Tcl/Tk package, in
+  particular the program \passthrough{\lstinline!wish!}. The warning
+  means that \passthrough{\lstinline!wish!} could not be located,
+  neither on the current command search path nor in the in the
+  directories \passthrough{\lstinline!/usr/local/bin!},
+  \passthrough{\lstinline!/usr/local/sbin!},
+  \passthrough{\lstinline!/usr/bin!},
+  \passthrough{\lstinline!/usr/sbin!}, \passthrough{\lstinline!/bin!},
+  or \passthrough{\lstinline!/sbin!}. Check whether Tcl/Tk is properly
+  installed and put the directory containing
+  \passthrough{\lstinline!wish!} on your command search path during
   installation.
 \item
-  ``Error: \texttt{\textless{}command\textgreater{}} does not exist or
-  has no execute permission.''
+  ``Error: \passthrough{\lstinline!<command>!} does not exist or has no
+  execute permission.''
 
-  \texttt{\textless{}command\textgreater{}} (suggested by the user as
-  Prolog interpreter) does not exist or cannot be executed.
+  \passthrough{\lstinline!<command>!} (suggested by the user as Prolog
+  interpreter) does not exist or cannot be executed.
 \item
-  ``Error: \texttt{\textless{}command\textgreater{}} does not behave
-  like Prolog.''
+  ``Error: \passthrough{\lstinline!<command>!} does not behave like
+  Prolog.''
 
-  \texttt{\textless{}command\textgreater{}} (suggested by the user as
-  Prolog interpreter) exists but fails the test performed by the
-  installation script. This test is a heuristic check whether
-  \texttt{\textless{}command\textgreater{}} is indeed a Prolog system;
-  more precisely, the output of
+  \passthrough{\lstinline!<command>!} (suggested by the user as Prolog
+  interpreter) exists but fails the test performed by the installation
+  script. This test is a heuristic check whether
+  \passthrough{\lstinline!<command>!} is indeed a Prolog system; more
+  precisely, the output of
 
-\begin{verbatim}
+\begin{lstlisting}
 echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
-\end{verbatim}
+\end{lstlisting}
 
   is checked for the string ``gernot''. If
-  \texttt{\textless{}command\textgreater{}} is a Prolog system but fails
-  this test, or if it is no Prolog system but passes the test, submit an
+  \passthrough{\lstinline!<command>!} is a Prolog system but fails this
+  test, or if it is no Prolog system but passes the test, submit an
   issue on https://github.com/rzach/multlog/.
 \end{itemize}
 
@@ -1181,45 +1232,46 @@ echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
 \begin{itemize}
 \item
   Warnings/errors about stack or heap overflows, like
-  \texttt{Out\ of\ global\ stack}.
+  \passthrough{\lstinline!Out of global stack!}.
 
   Such messages indicate that the Prolog system needs more space for the
   computation than it is currently granted. Check out by which option
   the space can be increased with your Prolog system. For SWI-Prolog,
-  the command-line option \texttt{-\/-stack-limit=2g} will increase the
-  total stack limit from 1GB on 64-bit-architectures (512MB on
-  32-bit-architectures) to 2GB. There are three ways to tell MUltlog to
-  use this option.
+  the command-line option \passthrough{\lstinline!--stack-limit=2g!}
+  will increase the total stack limit from 1GB on 64-bit-architectures
+  (512MB on 32-bit-architectures) to 2GB. There are three ways to tell
+  MUltlog to use this option.
 
   \begin{itemize}
   \item
     \emph{For a single run:} Add the Prolog option as a further argument
     on the command line.
 
-\begin{verbatim}
+\begin{lstlisting}
 lgc2pdf sample --stack-limit=2g
-\end{verbatim}
+\end{lstlisting}
   \item
     \emph{Permanently during installation:} Re-install MUltlog. When the
     installation script asks for the Prolog to be used, type e.g.,
-    \texttt{/usr/bin/swipl\ -\/-stack-limit=2g}.
+    \passthrough{\lstinline!/usr/bin/swipl --stack-limit=2g!}.
   \item
     \emph{Permanently after installation:} Add the option
-    \texttt{-\/-stack-limit=2g} manually, by editing the files
+    \passthrough{\lstinline!--stack-limit=2g!} manually, by editing the
+    files
 
-\begin{verbatim}
+\begin{lstlisting}
 /usr/local/bin/lgc2tex
 /usr/local/bin/lgc2dvi
 /usr/local/bin/lgc2pdf
 /usr/local/lib/multlog/ilc/lgc2ilc
-\end{verbatim}
+\end{lstlisting}
 
-    Near their top there is a line starting with \texttt{PROLOG=}.
-    Replace this line, e.g., by
+    Near their top there is a line starting with
+    \passthrough{\lstinline!PROLOG=!}. Replace this line, e.g., by
 
-\begin{verbatim}
+\begin{lstlisting}
 PROLOG='/usr/bin/swipl --stack-limit=2g'
-\end{verbatim}
+\end{lstlisting}
 
     Make sure that the files have still execute permission after saving.
   \end{itemize}
