@@ -1,59 +1,53 @@
-\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
 \PassOptionsToPackage{hyphens}{url}
 %
-\documentclass[]{article}
+\documentclass[
+]{article}
 \usepackage{lmodern}
 \usepackage{amssymb,amsmath}
 \usepackage{ifxetex,ifluatex}
-\usepackage{fixltx2e} % provides \textsubscript
 \ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provides euro and other symbols
-\else % if luatex or xelatex
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
   \usepackage{unicode-math}
-  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
 \fi
-% use upquote if available, for straight quotes in verbatim environments
+% Use upquote if available, for straight quotes in verbatim environments
 \IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-% use microtype if available
-\IfFileExists{microtype.sty}{%
-\usepackage[]{microtype}
-\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
 }{}
-\IfFileExists{parskip.sty}{%
-\usepackage{parskip}
-}{% else
-\setlength{\parindent}{0pt}
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
-}
-\usepackage{hyperref}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-            pdftitle={MUltlog 1.15-pre1 \& iLC 1.2 User Manual},
-            pdfborder={0 0 0},
-            breaklinks=true}
-\urlstyle{same}  % don't use monospace font for urls
+  pdftitle={MUltlog 1.16-pre2 \& iLC 1.2 User Manual},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+\urlstyle{same} % disable monospaced font for URLs
 \usepackage{listings}
 \newcommand{\passthrough}[1]{#1}
-\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\lstset{defaultdialect=[5.3]Lua}
+\lstset{defaultdialect=[x86masm]Assembler}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
 \setcounter{secnumdepth}{5}
-% Redefines (sub)paragraphs to behave more like sections
-\ifx\paragraph\undefined\else
-\let\oldparagraph\paragraph
-\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
-\fi
-\ifx\subparagraph\undefined\else
-\let\oldsubparagraph\subparagraph
-\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
-\fi
-
-% set default figure placement to htbp
-\makeatletter
-\def\fps@figure{htbp}
-\makeatother
-
 \lstset{
     basicstyle=\ttfamily,
     breaklines=true,
@@ -62,7 +56,8 @@
     linewidth=\linewidth
 }
 
-\title{MUltlog 1.15-pre1 \& iLC 1.2 User Manual}
+\title{MUltlog 1.16-pre2 \& iLC 1.2 User Manual}
+\author{}
 \date{}
 
 \begin{document}
@@ -366,7 +361,7 @@ where \passthrough{\lstinline!<logname>!} is a string described by the
 regular expression RE1
 
 ({[}
-\passthrough{\lstinline"!#$\%\&'()*+,./0-9:;<=>?@A-Z[\\]^\_`a-z\{|\}\~-"}{]}
+\passthrough{\lstinline"!\#$\%\&'()*+,./0-9:;<=>?@A-Z[\\]^\_`a-z\{|\}\~-"}{]}
 \textbar{} \passthrough{\lstinline!""!} )*
 
 of up to 40 characters. In other words, the string may consist of any
@@ -400,13 +395,13 @@ Example:
 truth_values {f,*,t}.
 \end{lstlisting}
 
-where each of the truth values \passthrough{\lstinline!<v 1>!},
-\ldots{}, \passthrough{\lstinline!<v n>!} (\(n \ge 2\)) is described by
-the regular expression RE2
+where each of the truth values \passthrough{\lstinline!<v 1>!}, \ldots,
+\passthrough{\lstinline!<v n>!} (\(n \ge 2\)) is described by the
+regular expression RE2
 
 (
 {[}\passthrough{\lstinline!a!}-\passthrough{\lstinline!z!}{]}{[}\passthrough{\lstinline!A-Za-z0-9\_!}{]}*
-\textbar{} {[}\passthrough{\lstinline!-+*^<>=\~?@#$\&!}{]}+ \textbar{}
+\textbar{} {[}\passthrough{\lstinline!-+*^<>=\~?@\#$\&!}{]}+ \textbar{}
 \passthrough{\lstinline!0!} \textbar{}
 {[}\passthrough{\lstinline!1-9!}{]}{[}\passthrough{\lstinline!0-9!}{]}*
 )
@@ -436,8 +431,8 @@ Example:
 designated_truth_values {t}.
 \end{lstlisting}
 
-where each of the truth values \textless{}v 1\textgreater{}, \ldots{},
-(n\textgreater{}0) is described by the regular expression RE2 above and
+where each of the truth values \textless v 1\textgreater, \ldots,
+(n\textgreater0) is described by the regular expression RE2 above and
 may consist of up to 10 characters.
 
 The choice of designated truth values has no effect on the generated
@@ -529,7 +524,7 @@ operator(<opname>/<arity>, mapping { <ass 1>, ..., <ass m> }).
 
 \passthrough{\lstinline!<opname>!} is defined according to RE2 above and
 may consist of up to 10 characters. \passthrough{\lstinline!<arity>!} is
-a non-negative integer. \passthrough{\lstinline!<ass 1>!}, \ldots{},
+a non-negative integer. \passthrough{\lstinline!<ass 1>!}, \ldots,
 \passthrough{\lstinline!<ass m>!} are assignments of the form
 
 \begin{lstlisting}
@@ -537,7 +532,7 @@ a non-negative integer. \passthrough{\lstinline!<ass 1>!}, \ldots{},
 \end{lstlisting}
 
 where
-\passthrough{\lstinline!<v 1>!},\ldots{},\passthrough{\lstinline!<v k>!},
+\passthrough{\lstinline!<v 1>!},\ldots,\passthrough{\lstinline!<v k>!},
 and \passthrough{\lstinline!<v>!} are truth values. Assignments must be
 separated by commas. For \(k = 0\), the mapping consists of a single
 truth value.
@@ -573,7 +568,7 @@ operator(<opname>/2, table [ <v 1>, ..., <v m> ]).
 
 \passthrough{\lstinline!<opname>!} is defined according to RE2 above and
 may consist of up to 10 characters.
-\passthrough{\lstinline!<v 1>!},\ldots{},\passthrough{\lstinline!<v m>!}
+\passthrough{\lstinline!<v 1>!},\ldots,\passthrough{\lstinline!<v m>!}
 are truth values. The number of elements in the table, \(m\), has to be
 equal to \((n+1)^2-1\), where \(n\) is the number of different truth
 values.
@@ -648,10 +643,10 @@ quantifier(<quname>, mapping { <ass 1>, ..., <ass m> }).
 
 \passthrough{\lstinline!<quname>!} is defined according to RE2 above and
 may consist of up to 10 characters.
-\passthrough{\lstinline!<ass 1>!},\ldots{},\passthrough{\lstinline!<ass m>!}
+\passthrough{\lstinline!<ass 1>!},\ldots,\passthrough{\lstinline!<ass m>!}
 are assignments of the form
 \passthrough{\lstinline!\{ <v 1>, ..., <v k> \} : <v>!}, where
-\passthrough{\lstinline!<v 1>!},\ldots{},\passthrough{\lstinline!<v k>!},
+\passthrough{\lstinline!<v 1>!},\ldots,\passthrough{\lstinline!<v k>!},
 and \passthrough{\lstinline!<v>!} are truth values. \(k\) has to be
 greater than one.
 
@@ -853,7 +848,7 @@ where \(n\) is the number of truth values. It can be redefined using
 texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow ##2 \\mid ##3 \\Rightarrow ##4}").
 \end{lstlisting}
 
-(Note the double \passthrough{\lstinline!#!}.)
+(Note the double \passthrough{\lstinline!\#!}.)
 
 \hypertarget{interactive-use}{%
 \section{Interactive use}\label{interactive-use}}
@@ -875,6 +870,12 @@ logic, type, e.g.,
 Here, \passthrough{\lstinline!?-!} is the Prolog prompt; you only enter
 the text after it. Now the definition of Łukasiewicz logic is available
 using the ID \passthrough{\lstinline!luk!}.
+
+You can save a logic as an \passthrough{\lstinline!.lgc!} file as well:
+
+\begin{lstlisting}
+?- saveLogic('name.lgc',id).
+\end{lstlisting}
 
 To display the truth values and truth tables of your logic, say
 
@@ -1232,7 +1233,7 @@ echo 'f(X,not)=f(ger,Y), print(X),print(Y),halt.' | <command>
 \begin{itemize}
 \item
   Warnings/errors about stack or heap overflows, like
-  \passthrough{\lstinline!Out of global stack!}.
+  \passthrough{\lstinline!Out of global   stack!}.
 
   Such messages indicate that the Prolog system needs more space for the
   computation than it is currently granted. Check out by which option

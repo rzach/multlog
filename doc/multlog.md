@@ -594,6 +594,11 @@ logic, type, e.g.,
 Here, `?-` is the Prolog prompt; you only enter the text after it. Now
 the definition of Łukasiewicz logic is available using the ID `luk`.
 
+You can save a logic as an `.lgc` file as well:
+```
+?- saveLogic('name.lgc',id).
+```
+
 To display the truth values and truth tables of your logic, say
 ```
 ?- showLogic(luk).

@@ -49,6 +49,52 @@ loadLogic(FN, Lg) :-
     setColors(Lg,all),
     format("Logic ~s loaded as '~a'.", [LN, Lg]), nl, !.
 
+% saveLogic(FN, Lg) -- save Lg as .lgc file FN.
+
+saveLogic(FN, Lg) :-
+    tell(FN),
+    logName(Lg, Name),
+    format('logic "~s".~n~n', [Name]),
+    logTVs(Lg, TVs),
+    format('truth_values { '),
+    format_csl(TVs),
+    format(' }.~n~n'),
+    logDTVs(Lg, DTVs),
+    format('designated_truth_values { '),
+    format_csl(DTVs),
+    format(' }.~n~n'),
+    (   logOp(Lg, Op/Ar, Map),
+        format('operator(~a/~a, mapping {~n', [Op,Ar]),
+        format_map(Map),
+        format(' }).~n~n'),
+        fail ; 
+    true ),
+    told.
+
+format_csl([H]) :- print_phrase(ftv(H)), !.
+format_csl([H|T]) :- 
+    print_phrase(ftv(H)),
+    format(', '), 
+    format_csl(T).
+
+format_map([H]) :- format_map(H), !.
+format_map([H|T]) :- format_map(H), format(',~n'), format_map(T).
+
+format_map([]:V) :- print_phrase(ftv(V)), !.
+
+format_map(A:V) :- 
+    format('    ( '),
+    format_csl(A),
+    format(' ) : '),
+    print_phrase(ftv(V)), !.
+
+% Convert truth value pairs, sets into legal truth value names.
+
+ftv((T1,T2)) --> ftv(T1), "_", ftv(T2), !.
+ftv([T]) --> ftv(T), !.
+ftv([T|Ts]) --> ftv(T), "_", ftv(Ts), !.
+ftv(T) --> str(T), !.
+
 deleteLogic(Lg) :-
     retractall(logName(Lg, _)),
     retractall(logTVs(Lg, _)),
@@ -63,9 +109,9 @@ addOp(Lg, Op/Ar, Map) :-
     retract(logOp(Lg, Op/Ar, _)),
     assertz(logOp(Lg, Op/Ar, Map)).
 
-% delOp(Lg, Op/Ar) -- delete Op/Ar from logic Lg
+% deleteOp(Lg, Op/Ar) -- delete Op/Ar from logic Lg
 
-delOp(Lg, Op/Ar) :- 
+deleteOp(Lg, Op/Ar) :- 
     retract(logOp(Lg,Op/Ar,_)).
 
 % logOps(Lg, Ops) -- Ops is the list of operators of Lg
