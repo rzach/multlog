@@ -134,15 +134,22 @@ TabQuprem\romannumeral#1X\romannumeral#2\endcsname}
 \def\TVss{\TV1\FOR\n=2\TO\NoTVs\DO,\allowbreak \TV\n \ENDFOR}
 \newcommand\DTV[1]{\IfIsDTV{#1}\loopcomma\TV{#1}\def\loopcomma{,\allowbreak} \fi}%
 \def\DTVss{\def\loopcomma{}%
-\FOR\n=1\TO\NoTVs\DO%
-   \DTV{\n}
+   \FOR\n=1\TO\NoTVs\DO%
+      \DTV{\n}
    \ENDFOR}
-\newcommand\NDTV[1]{\IfIsDTV{#1}\else\loopcomma{}
-\TV{#1}\def\loopcomma{,\allowbreak}\fi}%
+\newcommand\NDTV[1]{\IfIsDTV{#1}\else
+   \loopcomma{}%
+   \TV{#1}%
+   \def\loopcomma{,\allowbreak}%
+   \fi}%
 \def\NDTVss{\def\loopcomma{}%
    \FOR\n=1\TO\NoTVs\DO%
       \NDTV{\n}
-      \ENDFOR}
+   \ENDFOR}
+\def\esequent#1{%
+   \def\loopcomma{}%
+   \def\do##1{\loopcomma ##1\def\loopcomma{\mid}}%
+   \docsvlist{#1}}
 
 %%% Theorem environments
 
@@ -658,7 +665,9 @@ A \emph{sequent $\Gamma$\/} is
 \fi
 %%% Idea: If we are dealing with excessively many TVs, we could insert
 %%% some dots instead of listing them all.
-$\samplesequent$
+\begin{rules}
+\setrule{$\samplesequent$}
+\end{rules}
 of finite sequences~$\Gamma_v$ of formulas, where $v \in \TVs$.
 The $\Gamma_v$ are called the \emph{components} of $\Gamma$.
 

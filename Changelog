@@ -1,7 +1,8 @@
 Changes to MUltlog:
-1.16-pre2, 16.06.2021
-- saveLogic
-1.16-pre1, 01.06.2021
+1.16-pre3, 17.06.2021
+- change how explicit sequents are processed (previous way didn't
+allow more than 9 truth values).
+- saveLogic to enable saving logics as .lgc files in interactive mode
 - Make isomorphism testing more efficient
 1.15, 28.05.2021
 - Add interactive mode

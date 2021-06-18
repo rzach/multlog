@@ -835,17 +835,21 @@ texExtra("Preamble","\\ESequentstrue").
 you can tell MUltlog to not use the compact representations of sequents,
 but to explicitly list all components. This will only make sense if the
 number of truth values is small. In this case, sequents are typeset
-using the macro \passthrough{\lstinline!\\esequent!}. By default it is
-defined as
+using the macro \passthrough{\lstinline!\\esequent!}. It expects an
+argument consisting of the components of the sequent, separated by
+commas. By default,
 
 \begin{lstlisting}
-\newcommand{\esequent}[n]{#1 \mid ... \mid #n}
+\esequent{{\Gamma_1}, ..., {\Gamma_n}}
 \end{lstlisting}
 
-where \(n\) is the number of truth values. It can be redefined using
+produces \(\Gamma_1 \mid \dots \mid \Gamma_n\). It can be redefined;
+e.g., if you have a three-valued logic and want sequents displayed as
+\(\Gamma_1 \Rightarrow \Gamma_2 \mid \Gamma_3\) you could do it using
+the following \passthrough{\lstinline!Preamble!} declaration:
 
 \begin{lstlisting}
-texExtra("Preamble","\\ESequentstrue\\newcommand{\\esequent}[4]{##1 \\Rightarrow ##2 \\mid ##3 \\Rightarrow ##4}").
+texExtra("Preamble","\\ESequentstrue\\renewcommand{\\esequent}[1]{\\sequent##1}\\def\\sequent##1,##2,##3{##1 \\Rightarrow ##2 \\mid ##3}").
 \end{lstlisting}
 
 (Note the double \passthrough{\lstinline!\#!}.)

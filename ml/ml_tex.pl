@@ -701,15 +701,15 @@ texESeqOpRule(Op, TV, TVs, Cnf) -->
 	\\def, texeseqopprem(Op, TV), eol,
 	"   {", texESeqOpPrems(Cnf, TVs), "}", eol,
 	\\def, texeseqopconcl(Op, TV), eol,
-	"   {\\esequent", texESeqOpConcl(Op, TVs, TV), "}", eol, !.
+	"   {\\esequent{", texESeqOpConcl(Op, TVs, TV), "}}", eol, !.
 
 texESeqOpPrems([], _TVs) --> !.
 texESeqOpPrems([C], TVs) -->
 	!, 
-	\\esequent, texESeqOpPrem(C, TVs).
+	"\\esequent{", texESeqOpPrem(C, TVs), "}".
 texESeqOpPrems([C|Cs], TVs) -->
-	"\\esequent",
-	texESeqOpPrem(C, TVs), " & ",
+	"\\esequent{",
+	texESeqOpPrem(C, TVs), "} & ",
 	texESeqOpPrems(Cs, TVs).
 
 texESeqOpPrem(_C, []) --> !.
@@ -717,6 +717,7 @@ texESeqOpPrem(C, [TV|TVs]) -->
 	"{\\Gamma_{", textv(TV), "}", 
 	{filterCNF(C, TV, D)}, 
 	texESeqOpComp(D), "}",
+	( { TVs == []} ; "," ),
 	texESeqOpPrem(C, TVs). 
 
 filterCNF([], _TV, []) :- !.
@@ -734,9 +735,11 @@ texESeqOpComp([N|Ls]) -->
 texESeqOpConcl(_/_, [], _) --> !.
 texESeqOpConcl(N/A, [TV|TVs], TV) -->
 	"{\\Gamma_{", textv(TV), "}, ", texOpExpr(A, N), "}",
+	( { TVs == []} ; "," ),
 	texESeqOpConcl(N/A, TVs, TV).
 texESeqOpConcl(N/A, [T|TVs], TV) -->
 	"{\\Gamma_{", textv(T), "}}",
+	( { TVs == []} ; "," ),
 	texESeqOpConcl(N/A, TVs, TV).
 
 texESeqQuRule(Qu, TV, TVs, Cnf0) -->
@@ -744,15 +747,15 @@ texESeqQuRule(Qu, TV, TVs, Cnf0) -->
 	\\def, texeseqquprems(Qu, TV), eol,
 	"   {", texESeqQuPrems(Cnf1, Cnts, TVs), "}", eol,
 	\\def, texeseqquconcl(Qu, TV), eol,
-	"   {\\esequent", texESeqQuConcl(Qu, TVs, TV), "}", eol, !.
+	"   {\\esequent{", texESeqQuConcl(Qu, TVs, TV), "}}", eol, !.
 
 texESeqQuPrems([], _, _) --> "".
 texESeqQuPrems([C], Cnts, TVs) -->
-	"\\esequent", texESeqQuPrem(C, Cnts, TVs).
+	"\\esequent{", texESeqQuPrem(C, Cnts, TVs), "}".
 texESeqQuPrems([C|Cs], Cnts, TVs) -->
-	"\\esequent",
+	"\\esequent{",
 	texESeqQuPrem(C, Cnts, TVs), 
-	" & ",
+	"} & ",
 	texESeqQuPrems(Cs, Cnts, TVs).
 
 texESeqQuPrem(_, _, []) --> "".
@@ -762,6 +765,7 @@ texESeqQuPrem(C, Cnts, [TV|TVs]) -->
 	\\'Gamma', "_{", textv(TV), "}",
 	texESeqQuComp(D, Cnts), 
 	"}",
+	( { TVs == []} ; "," ),
 	texESeqQuPrem(C, Cnts, TVs). 
 
 texESeqQuComp([], _) --> "".
@@ -774,48 +778,39 @@ texESeqQuComp([N|Ls], Cnts) -->
 texESeqQuConcl(_, [], _) --> !.
 texESeqQuConcl(Qu, [TV|TVs], TV) -->
 	"{\\Gamma_{", textv(TV), "}, (", texName(Qu), \\(','), "x)A(x) }", !,
+	( { TVs == []} ; "," ),
 	texESeqQuConcl(Qu, TVs, TV).
 texESeqQuConcl(Qu, [T|TVs], TV) -->
 	"{\\Gamma_{", textv(T), "}}", !,
+	( { TVs == []} ; "," ),
 	texESeqQuConcl(Qu, TVs, TV).
 
 texESeqDef(TVs, DTVs) --> 
-	"\\newcommand{\\esequent}[", 
-	{ length(TVs, N) }, 
-	str(N), 
-	"]{",
-	texESeqDef1(N),
-	"}", eol,
-	"\\newcommand{\\consequent}[2]{\\esequent",
+	"\\newcommand{\\consequent}[2]{\\esequent{",
 	texConSeqDef(TVs, DTVs),
-	"}", eol,
-	"\\newcommand{\\samplesequent}{\\esequent",
+	"}}", eol,
+	"\\newcommand{\\samplesequent}{\\esequent{",
 	texSampSeqDef(TVs),
-	"}", eol.
-
-texESeqDef1(1) --> 
-	"{ #1 }", !.
-texESeqDef1(N) --> 
-	{M is N-1, !}, 
-	texESeqDef1(M), 
-	"\\mid { #", 
-	str(N), "}".
+	"}}", eol.
 
 texConSeqDef([],_) --> 
 	"", !.
 texConSeqDef([TV|TVs], DTVs) -->  
-	"{ #",
+	"{#",
 	( { member(TV, DTVs) } ->
 		"2"
 	;	"1" ),
 	"}",
+	( {TVs == []} ; "," ),
 	texConSeqDef(TVs, DTVs).
 
 texSampSeqDef([]) --> 
 	"", !.
 texSampSeqDef([TV|TVs]) -->  
-	"{\\Gamma_{",textv(TV),
+	"{\\Gamma_{",
+	textv(TV),
 	"}}",
+	( {TVs == []} ; "," ),
 	texSampSeqDef(TVs).
 
 
