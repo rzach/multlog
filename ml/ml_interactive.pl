@@ -216,7 +216,7 @@ findTaut(Lg) :-
 isConseq(Lg, Fs, F) :-
     logTVs(Lg, TVs),
     logDTVs(Lg, DTVs),
-    term_variables(Fs, Vars),
+    term_variables((Fs,F), Vars),
     forall(listOfTVs(Vars, TVs),
         ( haveValuesIn(Lg, Fs, DTVs) ->
           hasValueIn(Lg, F, DTVs) ; true
@@ -317,7 +317,8 @@ unifySet(_, []).
 unifySet(A, [A|As]) :- 
     unifySet(A,As).
 
-prettyFmla(F) :-
+prettyFmla(F) :- prettyFmla(F, _).
+prettyFmla(F, Vars) :-
     term_variables(F, Vars),
     length(Vars, N),
     varList(N,Vars),
@@ -477,47 +478,58 @@ sortCong(Lg, Cong) :-
 % Isomorphisms of logics
 % ======================
 
-% isIso(Iso, Lg1, Lg2) -- Iso (a set of pairs of truth values from Lg1
-% and Lg2) is an isomorphism from Lg1 to Lg2
+% isIsoBruteForce(Iso, Lg1, Lg2) -- Iso (a set of pairs of truth values from Lg1
+% and Lg2) is an isomorphism from Lg1 to Lg2. Does this by brute force
+% search -- tests every possible bijection between
+% designated/non-designated truth values.
 
-isIso(Iso, Lg1, Lg2) :-
+isIsoBruteFoce(Iso, Lg1, Lg2) :-
+    % recover all the truth value sets
     logTVs(Lg1, TVs),
     logDTVs(Lg1, DTVs1),
     logDTVs(Lg2, DTVs2),
     logNDTVs(Lg1, NDTVs1),
     logNDTVs(Lg2, NDTVs2),
+    % find all permutations of designated/non-designated values of Lg2
     permutation(DTVs2, DP2),
     permutation(NDTVs2, NP2),
+    % map the designated/non-designated values of Lg1 to those of Lg2
     pairUp(NDTVs1,NP2, NIso),
     pairUp(DTVs1, DP2, DIso),
+    % the union is the isomorphism
     union(NIso, DIso, Iso),
+    % check if Iso is preserved under all operations
     forall(logOp(Lg1,Op/N, Map1),
         (   logOp(Lg2,Op/N,Map2),
-            isIso(TVs, Iso, N, Map1, Map2))).
+            isHomOp(TVs, Iso, N, Map1, Map2))).
 
-isIso(_, Iso, 0, [[]:V1], [[]:V2]) :-
-    mapIso(Iso, V1, V2), !.
-isIso(TVs, Iso, N, Map1, Map2) :-
+% isHomOp(TVs, H, N, Map1, Map2) -- Map1 and Map2 are N-ary operations
+% Tests if operations are presered under mapping H.
+
+isHomOp(_, H, 0, [[]:V1], [[]:V2]) :-
+    mapHom(H, V1, V2), !.
+isHomOp(TVs, H, N, Map1, Map2) :-
     length(Args1, N),
     forall(maplist(revmember(TVs), Args1),
         (   member(Args1:V1,Map1),
-            maplist(mapIso(Iso), Args1, Args2),
+            maplist(mapHom(H), Args1, Args2),
             member(Args2:V2,Map2),
-            mapIso(Iso, V1, V2))).
+            mapHom(H, V1, V2))).
 
-% mapIso -- map V1 to V2 using Iso
-% (succeeds if V1 is not in domain of Iso)
+% mapHom -- map V1 to V2 using H
+% (succeeds if V1 is not in domain of H)
 
-mapIso(Iso, V1, V2) :-
-    ( member((V1,V), Iso) ->
+mapHom(H, V1, V2) :-
+    ( member((V1,V), H) ->
         V = V2
     ; true).
 
-% isIsoX -- new version that's much more intelligent and doesn't try
-% billions of permutations if it can be avoided.
+% isIso(Iso, Lg1, Lg2) -- Iso is a mapping of the TVs of Lg1 to Lg2
+% that's an isomorphism. If Iso is a variable, it will find one. It
+% does so relatively smartly, building partial maps, and rejecting
+% them and any extension if it fails the congruence check.
 
-isIsoX(Iso, Lg1, Lg2) :-
-    logTVs(Lg1, TVs),
+isIso(Iso, Lg1, Lg2) :-
     logDTVs(Lg1, DTVs1),
     logDTVs(Lg2, DTVs2),
     logNDTVs(Lg1, NDTVs1),
@@ -570,7 +582,7 @@ checkIso(Iso, Domain, DIso, DTVs1, Lg1, Lg2) :-
     union(Iso, DIso, I),
     forall(logOp(Lg1,Op/N, Map1),
         (   logOp(Lg2,Op/N,Map2),
-            isIso(D, I, N, Map1, Map2))).
+            isHomOp(D, I, N, Map1, Map2))).
 
 % memberrest(X, B, R) -- X is a member of B and R is B minus X
 
@@ -595,6 +607,121 @@ sortIso(Lg, Iso) :-
     assertz(logNDTVs(Lg, NewNDTVs)).
 
 second((_,B), B).
+
+% Homomorphisms
+% =============
+
+% isHom(Hom, Lg1, Lg2) -- Hom is a mapping of the TVs of Lg1 to Lg2
+% that's a homomorphism. If Hom is a variable, it will find one if one
+% exists. It does so relatively smartly, building partial maps, and
+% rejecting them and any extension if it fails the congruence check.
+
+isHom(Hom, Lg1, Lg2) :-
+    % find us the designated & non-designated values of Lg1 and Lg2
+    logDTVs(Lg1, DTVs1),
+    logDTVs(Lg2, DTVs2),
+    logNDTVs(Lg1, NDTVs1),
+    logNDTVs(Lg2, NDTVs2),
+    % build a homomorphism
+    isPartHom(NDTVs1, [], NDTVs2, DTVs1, [], DTVs2, Lg1, Lg2, [], NDHom, [], DHom),
+    union(NDHom, DHom, Hom).
+
+% isPartHom(NDVals, NDDomain, NDTVs2, 
+%   DVals, DDomain, DTVs2, 
+%   Lg1, Lg2, NDH, NDHom, DH, DHom) --
+% - NDH and DH are partial maps from the (non-)designated truth values
+%   of Lg1 to those of Lg2.
+% - NDDomain and DDomain are the (non-)designated truth values of Lg1
+%   in the domain of H.
+% - NDVals are the non-designated values of Lg1 not in NDDomain
+% - DVals are the designated values of Lg1 not in DDomain
+% - NDTVs2 and DTVs2 are the (non-)designated values of Lg2, i.e.,
+%   potential values of NDH and DH.
+% - NDHom and DHom are the final homomorphism we're constructing.
+
+% If NDVals and DVals are empty, NDDomain is all of the NDTVs of Lg1,
+% DDomain is all of the DTVs of Lg1, and consequently DH and NDH are
+% total maps. So we just have to check that together they are a
+% homomorphism; if yes, we've found a full homomorphism.
+
+isPartHom([], NDDomain, _NDTVs2, 
+    [], DDomain, _DTVs2, 
+    Lg1, Lg2, NDHom, NDHom, DHom, DHom) :-
+    checkHom(NDHom, NDDomain, DHom, DDomain, Lg1, Lg2).
+
+% If NDVals/DVals is not empty, it contains at least one value NewV.
+% - First we check if ND + DHom is a partial homomorphism between Lg1
+%   and Lg2. If not, we can give up on it -- it won't become a
+%   homomorphism by expanding the domain.
+% - If it is, we continue by assigning a potential value to NewV by
+%   picking an element NewV2 of NDTVs2/DTVs2. We recursively check if
+%   the resulting expanded map is a partial homomorphism.
+% - Recurse first into NDVals, building the non-designated part of the
+%   homomorphism. Once that's done (NDVals = []) we recurse into
+%   DVals.
+
+isPartHom([], NDDomain, NDTVs2, 
+    [NewV|Vs], DDomain, DTVs2, 
+    Lg1, Lg2, NDH, NDHom, DH, DHom) :-
+    checkHom(NDH, NDDomain, DH, DDomain, Lg1, Lg2),
+    member(NewV2, DTVs2),
+    isPartHom([], NDDomain, NDTVs2,
+        Vs, [NewV|DDomain], DTVs2, Lg1, Lg2,
+        NDH, NDHom, [(NewV,NewV2)|DH], DHom).
+
+isPartHom([NewV|Vs], NDDomain, NDTVs2, 
+    DVals, DDomain, DTVs2, 
+    Lg1, Lg2, NDH, NDHom, DH, DHom) :-
+    checkHom(NDH, NDDomain, DH, DDomain, Lg1, Lg2),
+    member(NewV2, NDTVs2),
+    isPartHom(Vs, [NewV|NDDomain], NDTVs2,
+        DVals, DDomain, DTVs2, Lg1, Lg2,
+        [(NewV,NewV2)|NDH], NDHom, DH, DHom).
+
+% checkHom(NDHom, NDDomain, DHom, DDomain, Lg1, Lg2) -- check if NDHom
+% + DHom is a partial homomorphism on NDDomain + DDomain from Lg1 to
+%   Lg2 (ie, NDHom + DHom applied to the result R of an operator
+%   applied in Lg1 to arguments from NDDomain + DDomain yields the
+%   same as applying the operator in Lg2 to the result of Hom applied
+%   to the arguments. (If R is not in NDDomain + DDomain we don't
+%   complain -- eventually R will be in the domain.
+
+checkHom(NDHom, NDDomain, DHom, DDomain, Lg1, Lg2) :-
+    union(NDDomain, DDomain, D),
+    union(NDHom, DHom, H),
+    forall(logOp(Lg1,Op/N, Map1),
+        (   logOp(Lg2,Op/N,Map2),
+            isHomOp(D, H, N, Map1, Map2))).
+
+% homRange(Hom, Ran) :- The range of Hom is Ran
+
+homRange(Hom, Ran) :-
+    setof(TV2, TV1^member((TV1,TV2), Hom), Ran).
+
+% showHom(Hom, Lg1, lg2) - pretty-print a homomorphism from Lg1 to Lg2.
+
+showHom(Hom, Lg1, Lg2) :-
+    logTVs(Lg1, TVs1),
+    maxLength(TVs1, N1),
+    logTVs(Lg2, TVs2),
+    maxLength(TVs2, N2),
+    logColors(Lg1, Cols1),
+    logColors(Lg2, Cols2),
+    format('Homomorphism from ~w to ~w:~n', [Lg1,Lg2]),
+    (   member(TV1, TVs1),
+        member((TV1,TV2), Hom),
+        formatTV(Cols1, N1, TV1, ansi),
+        format(' -> '),
+        formatTV(Cols2, N2, TV2, ansi),
+        format('~n'),
+        fail
+    ; true),
+    homRange(Hom, Range),
+    format('Range is ~w', [Range]),
+    (subset(TVs2, Range) -> format(' (surjective)~n') ;
+        format(' (proper subset)~n')).
+
+
 
 % Products of logics
 % ==================

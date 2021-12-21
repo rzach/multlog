@@ -629,8 +629,8 @@ To find the value of this formula:
 ?- hasValue(luk,imp(t, neg(or(*,f))),V).
 ```
 Prolog will display `V =  (*)`, i.e., the value is `*`. If you hit
-space, Prolog will try to find other solutions, and display `false.`
-if not other solutions can be found. In this case, `V=*` is the only
+space, Prolog will try to find other solutions, and display `false`
+if no other solutions can be found. In this case, `V=*` is the only
 solution.  However, if the formula contains variables, Prolog will
 find all solutions. E.g.,
 ```
@@ -675,7 +675,7 @@ To test for consequence, use
 ```
 ?- isConseq(luk, [X, imp(X,Y)], Y).
 ```
-Here, the first argument `[X, imp(X,Y)]` is a *list* of formulas, and
+Here, the second argument `[X, imp(X,Y)]` is a *list* of formulas, and
 since in Łukasiewicz logic, $$X, X \to Y \models Y$$, this will result
 in `true`.
 
@@ -685,8 +685,8 @@ You can also test for equivalence of two formulas:
 ```
 Here, the first formula is evaluated according to the operations
 (truth tables) of the first listed logic, and the second formula
-according to the operations. In this case we use the same logic `luk`
-for both.
+according to the operations of the second logic. In this case we use
+the same logic `luk` for both.
 
 To find formulas with various properties, do the following:
 `findFmla(logic, F)` will successively find solutions `F` which are
@@ -724,7 +724,7 @@ that are equivalent to $$X \lor Y$$.
 If you have two logics loaded or defined, you can have MUltlog define
 a new logic as the direct product of the two.
 ```
-?- makeProduct(l1,l2,new).
+?- makeProduct(l1, l2, new).
 ```
 The logic `new` is has truth values that are pairs of truth values of
 the logics `l1` and `l2`, with pairs where both components are
