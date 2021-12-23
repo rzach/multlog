@@ -4,10 +4,10 @@
 %
 \documentclass[
 ]{article}
+\usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+\usepackage{iftex}
+\ifPDFTeX
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -36,7 +36,7 @@
 \IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
 \IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
 \hypersetup{
-  pdftitle={MUltlog 1.16-pre3 \& iLC 1.2 User Manual},
+  pdftitle={MUltlog 1.16 \& iLC 1.2 User Manual},
   hidelinks,
   pdfcreator={LaTeX via pandoc}}
 \urlstyle{same} % disable monospaced font for URLs
@@ -55,8 +55,11 @@
     showstringspaces=true,
     linewidth=\linewidth
 }
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
 
-\title{MUltlog 1.16-pre3 \& iLC 1.2 User Manual}
+\title{MUltlog 1.16 \& iLC 1.2 User Manual}
 \author{}
 \date{}
 
@@ -68,7 +71,8 @@
 \tableofcontents
 }
 This manual is \href{https://logic.at/multlog/multlog.pdf}{available in
-PDF} from the MUltlog website.
+PDF} from the MUltlog website at
+\href{https://logic.at/multlog}{logic.at/multlog}.
 
 MUltlog is a system which takes as input the specification of a
 finitely-valued first-order logic and produces a sequent calculus, a
@@ -361,11 +365,11 @@ where \passthrough{\lstinline!<logname>!} is a string described by the
 regular expression RE1
 
 ({[}
-\passthrough{\lstinline"!\#$\%\&'()*+,./0-9:;<=>?@A-Z[\\]^\_`a-z\{|\}\~-"}{]}
+\passthrough{\lstinline"!\#$\%\&'()*+,./0-9:;<=>?@A-Z[\\]\^\_`a-z\{|\}\~-"}{]}
 \textbar{} \passthrough{\lstinline!""!} )*
 
 of up to 40 characters. In other words, the string may consist of any
-printable ASCII character, where quotes (") have to be doubled.
+printable ASCII character, where quotes (``) have to be doubled.
 \passthrough{\lstinline!<logname>!} may contain LaTeX code (e.g., for
 accented characters), where \passthrough{\lstinline!\\!} does \emph{not}
 need to be escaped.
@@ -401,7 +405,7 @@ regular expression RE2
 
 (
 {[}\passthrough{\lstinline!a!}-\passthrough{\lstinline!z!}{]}{[}\passthrough{\lstinline!A-Za-z0-9\_!}{]}*
-\textbar{} {[}\passthrough{\lstinline!-+*^<>=\~?@\#$\&!}{]}+ \textbar{}
+\textbar{} {[}\passthrough{\lstinline!-+*\^<>=\~?@\#$\&!}{]}+ \textbar{}
 \passthrough{\lstinline!0!} \textbar{}
 {[}\passthrough{\lstinline!1-9!}{]}{[}\passthrough{\lstinline!0-9!}{]}*
 )
@@ -863,6 +867,9 @@ interactively. This feature is expermiental and has not been tested
 extensively. In particular, it does not yet include detailed error
 checks.
 
+\hypertarget{loading-and-saving-logics}{%
+\subsection{Loading and saving logics}\label{loading-and-saving-logics}}
+
 Interactive mode allows you to load the specification files of logics
 and then perform queries and operations on these logics. To load a
 logic, type, e.g.,
@@ -881,6 +888,9 @@ You can save a logic as an \passthrough{\lstinline!.lgc!} file as well:
 ?- saveLogic('name.lgc',id).
 \end{lstlisting}
 
+\hypertarget{displaying-a-logic}{%
+\subsection{Displaying a logic}\label{displaying-a-logic}}
+
 To display the truth values and truth tables of your logic, say
 
 \begin{lstlisting}
@@ -894,11 +904,19 @@ and can be set using, e.g.,
 \passthrough{\lstinline!setColors(luk,plain)!}. By default, logics have
 color scheme \passthrough{\lstinline!all!} which displays different
 values in different colors, with designated values reversed. This
-requires an up-to-date version of SWI Prolog. You can also output the
-truth tables in LaTeX format by saying
+requires an up-to-date version of SWI Prolog. Scheme
+\passthrough{\lstinline!plain!} just displays all truth values in white,
+and \passthrough{\lstinline!designated!} in white, but with designated
+values reversed.
+
+You can also output the truth tables in LaTeX format by saying
 \passthrough{\lstinline!showLogic(luk, tex)!}. This will require some
 definitions included in the preamble of your LaTeX document, which can
 be displayed using \passthrough{\lstinline!showTexDefs!}.
+
+\hypertarget{operating-with-formulas-and-truth-tables}{%
+\subsection{Operating with formulas and truth
+tables}\label{operating-with-formulas-and-truth-tables}}
 
 Formulas of a logic are built using the operator names in the
 \passthrough{\lstinline!.lgc!} file, in operator notation. Prolog
@@ -915,8 +933,8 @@ this formula:
 
 Prolog will display \passthrough{\lstinline!V =  (*)!}, i.e., the value
 is \passthrough{\lstinline!*!}. If you hit space, Prolog will try to
-find other solutions, and display \passthrough{\lstinline!false.!} if
-not other solutions can be found. In this case,
+find other solutions, and display \passthrough{\lstinline!false!} if no
+other solutions can be found. In this case,
 \passthrough{\lstinline!V=*!} is the only solution. However, if the
 formula contains variables, Prolog will find all solutions. E.g.,
 
@@ -981,7 +999,7 @@ To test for consequence, use
 ?- isConseq(luk, [X, imp(X,Y)], Y).
 \end{lstlisting}
 
-Here, the first argument \passthrough{\lstinline![X, imp(X,Y)]!} is a
+Here, the second argument \passthrough{\lstinline![X, imp(X,Y)]!} is a
 \emph{list} of formulas, and since in Łukasiewicz logic,
 \(X, X \to Y \models Y\), this will result in
 \passthrough{\lstinline!true!}.
@@ -994,7 +1012,7 @@ You can also test for equivalence of two formulas:
 
 Here, the first formula is evaluated according to the operations (truth
 tables) of the first listed logic, and the second formula according to
-the operations. In this case we use the same logic
+the operations of the second logic. In this case we use the same logic
 \passthrough{\lstinline!luk!} for both.
 
 To find formulas with various properties, do the following:
@@ -1042,11 +1060,33 @@ will only find formulas of \passthrough{\lstinline!luk2!} (i.e.,
 formulas not containing \passthrough{\lstinline!or!}) that are
 equivalent to \(X \lor Y\).
 
+You can display a formula in a more readable format using
+\passthrough{\lstinline!prettyFmla(F)!} or make a pretty copy of a
+formula using \passthrough{\lstinline!prettyCopy(F, P)!}. For instance,
+to find and print consequences of logic \passthrough{\lstinline!l1!}
+that are invalid in \passthrough{\lstinline!l2!} you could say:
+
+\begin{lstlisting}
+?- findFmla(l1, and(A,B)), isConseq(l1, [A], B), \+ isConseq(l2, [A], B),
+   prettyCopy((A,B), (Ap, Bp)),
+   format('~w entails ~w in ~w but not in ~w~n', [Ap, Bp, l1, l2]).
+\end{lstlisting}
+
+Logic \passthrough{\lstinline!l1!} has to include a binary operator---in
+this case \passthrough{\lstinline!and!}---to find two formulas
+\passthrough{\lstinline!A!} and \passthrough{\lstinline!B!} with shared
+variables. It's assumed that the operators of
+\passthrough{\lstinline!l1!} are also operators of
+\passthrough{\lstinline!l2!}.
+
+\hypertarget{operating-on-logics}{%
+\subsection{Operating on logics}\label{operating-on-logics}}
+
 If you have two logics loaded or defined, you can have MUltlog define a
 new logic as the direct product of the two.
 
 \begin{lstlisting}
-?- makeProduct(l1,l2,new).
+?- makeProduct(l1, l2, new).
 \end{lstlisting}
 
 The logic \passthrough{\lstinline!new!} is has truth values that are
@@ -1057,6 +1097,31 @@ designated in \passthrough{\lstinline!l1!} and
 \passthrough{\lstinline!new!}, and operators defined componentwise. This
 assumes that \passthrough{\lstinline!l1!} and
 \passthrough{\lstinline!l2!} have the same operators defined.
+
+To make a copy of a logic, say:
+
+\begin{lstlisting}
+?- copyLogic(l, new, 'Name').
+\end{lstlisting}
+
+The logic \passthrough{\lstinline!new!} is a copy of logic
+\passthrough{\lstinline!l!} with name ``Name''.
+
+You can change the disignated and undesignated values of a logic this
+way:
+
+\begin{lstlisting}
+?- designateValues(l, [t, f]).
+?- undesignateValues(l, [t, f]).
+\end{lstlisting}
+
+This will change the designated values of Logic
+\passthrough{\lstinline!l!} to include (or exclude) the values
+\passthrough{\lstinline!t!} and \passthrough{\lstinline!f!}.
+
+\hypertarget{congruences-and-homomorphisms}{%
+\subsection{Congruences and
+homomorphisms}\label{congruences-and-homomorphisms}}
 
 To find the congruences of a logic, say
 
@@ -1082,24 +1147,43 @@ Once you have a congruence, you can define a new logic as the factor
 logic of the old one by
 
 \begin{lstlisting}
-?- makeFactor(logic, Part, factor).
+?- makeFactor(logic, part, factor).
 \end{lstlisting}
 
 where \passthrough{\lstinline!logic!} is the ID of the old logic,
-\passthrough{\lstinline!Part!} is the set of sets of truth values that
+\passthrough{\lstinline!part!} is the set of sets of truth values that
 defines the congruence (displayed by \passthrough{\lstinline!showCong!})
 and \passthrough{\lstinline!factor!} is the ID of the new logic.
 
-MUltlog can test if two logics are isomorphic:
+MUltlog can test if two logics are isomorphic, or if there is a
+homomorphism from one to another:
 
 \begin{lstlisting}
 ?- isIso(Iso, log1, log2).
+?- isHom(Hom, log1, log2).
 \end{lstlisting}
 
-will succeed with \passthrough{\lstinline!Iso!} bound to a list of pairs
-of truth values of logics \passthrough{\lstinline!log1!} and
-\passthrough{\lstinline!log2!} which represents an isomorphism, and fail
-if no isomorphism exists.
+will succeed with \passthrough{\lstinline!Iso!}
+(\passthrough{\lstinline!Hom!}) bound to a list of pairs of truth values
+of logics \passthrough{\lstinline!log1!} and
+\passthrough{\lstinline!log2!} which represents an isomorphism
+(homomorphism), and fail if no isomorphism exists.
+
+\begin{lstlisting}
+?- showHom(Hom, log1, log2).
+\end{lstlisting}
+
+will display the homomorphism \passthrough{\lstinline!Hom!} in a nicer
+format. To find and show all homomorhisms between
+\passthrough{\lstinline!log1!} and \passthrough{\lstinline!log2!}, say:
+
+\begin{lstlisting}
+?- isHom(Hom, log1, log2), showHom(Hom, log1, log2), fail.
+\end{lstlisting}
+
+(The \passthrough{\lstinline!fail!} at the end will automatically find
+all of them; otherwise you'll have to hit space to backtrack after
+each.)
 
 \hypertarget{troubleshooting}{%
 \section{Troubleshooting}\label{troubleshooting}}

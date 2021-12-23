@@ -3,7 +3,8 @@ title: MUltlog $ml_version$ & iLC $ilc_version$ User Manual
 ---
 
 This manual is [available in
-PDF](https://logic.at/multlog/multlog.pdf) from the MUltlog website. 
+PDF](https://logic.at/multlog/multlog.pdf) from the MUltlog
+website at [logic.at/multlog](https://logic.at/multlog). 
 
 MUltlog is a system which takes as input the specification of a
 finitely-valued first-order logic and produces a sequent calculus, a
@@ -591,6 +592,8 @@ files.  This makes it possible to use MUltlog interactively.  This
 feature is expermiental and has not been tested extensively. In
 particular, it does not yet include detailed error checks.
 
+## Loading and saving logics
+
 Interactive mode allows you to load the specification files of logics
 and then perform queries and operations on these logics. To load a
 logic, type, e.g.,
@@ -605,6 +608,8 @@ You can save a logic as an `.lgc` file as well:
 ?- saveLogic('name.lgc',id).
 ```
 
+## Displaying a logic
+
 To display the truth values and truth tables of your logic, say
 ```
 ?- showLogic(luk).
@@ -614,10 +619,15 @@ scheme. Color schemes are `plain`, `designated`, and `all` and can be
 set using, e.g., `setColors(luk,plain)`. By default, logics have color
 scheme `all` which displays different values in different colors, with
 designated values reversed. This requires an up-to-date version of SWI
-Prolog.  You can also output the truth tables in LaTeX format by
+Prolog. Scheme `plain` just displays all truth values in white, and
+`designated` in white, but with designated values reversed.
+
+You can also output the truth tables in LaTeX format by
 saying `showLogic(luk, tex)`.  This will require some definitions
 included in the preamble of your LaTeX document, which can be
 displayed using `showTexDefs`.
+
+## Operating with formulas and truth tables
 
 Formulas of a logic are built using the operator names in the `.lgc`
 file, in operator notation.  Prolog variables are used for
@@ -721,6 +731,21 @@ Now
 will only find formulas of `luk2` (i.e., formulas not containing `or`)
 that are equivalent to $$X \lor Y$$.
 
+You can display a formula in a more readable format using
+`prettyFmla(F)` or make a pretty copy of a formula using
+`prettyCopy(F, P)`.  For instance, to find and print consequences of
+logic `l1` that are invalid in `l2` you could say:
+```
+?- findFmla(l1, and(A,B)), isConseq(l1, [A], B), \+ isConseq(l2, [A], B),
+   prettyCopy((A,B), (Ap, Bp)),
+   format('~w entails ~w in ~w but not in ~w~n', [Ap, Bp, l1, l2]).
+```
+Logic `l1` has to include a binary operator—in this case `and`—to
+find two formulas `A` and `B` with shared variables. It's assumed that
+the operators of `l1` are also operators of `l2`.
+
+## Operating on logics
+
 If you have two logics loaded or defined, you can have MUltlog define
 a new logic as the direct product of the two.
 ```
@@ -731,6 +756,23 @@ the logics `l1` and `l2`, with pairs where both components are
 designated in `l1` and `l2` being designated in `new`, and operators
 defined componentwise. This assumes that `l1` and `l2` have the same
 operators defined.
+
+To make a copy of a logic, say:
+```
+?- copyLogic(l, new, 'Name').
+```
+The logic `new` is a copy of logic `l` with name "Name".
+
+You can change the disignated and undesignated values of a logic this
+way:
+```
+?- designateValues(l, [t, f]).
+?- undesignateValues(l, [t, f]).
+```
+This will change the designated values of Logic `l` to include (or
+exclude) the values `t` and `f`.
+
+## Congruences and homomorphisms
 
 To find the congruences of a logic, say
 ```
@@ -754,19 +796,31 @@ equivalent to itself.)
 Once you have a congruence, you can define a new logic as the factor
 logic of the old one by
 ```
-?- makeFactor(logic, Part, factor).
+?- makeFactor(logic, part, factor).
 ```
-where `logic` is the ID of the old logic, `Part` is the set of sets of
+where `logic` is the ID of the old logic, `part` is the set of sets of
 truth values that defines the congruence (displayed by `showCong`) and
 `factor` is the ID of the new logic.
 
-MUltlog can test if two logics are isomorphic:
+MUltlog can test if two logics are isomorphic, or if there is a
+homomorphism from one to another:
 ```
 ?- isIso(Iso, log1, log2).
+?- isHom(Hom, log1, log2).
 ```
-will succeed with `Iso` bound to a list of pairs of truth values of
-logics `log1` and `log2` which represents an isomorphism, and fail if no
-isomorphism exists.
+will succeed with `Iso` (`Hom`) bound to a list of pairs of truth
+values of logics `log1` and `log2` which represents an isomorphism
+(homomorphism), and fail if no isomorphism exists.
+```
+?- showHom(Hom, log1, log2).
+```
+will display the homomorphism `Hom` in a nicer format.  To find and
+show all homomorhisms between `log1` and `log2`, say:
+```
+?- isHom(Hom, log1, log2), showHom(Hom, log1, log2), fail.
+```
+(The `fail` at the end will automatically find all of them; otherwise
+you'll have to hit space to backtrack after each.)
 
 # Troubleshooting
 

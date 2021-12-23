@@ -95,12 +95,63 @@ ftv([T]) --> ftv(T), !.
 ftv([T|Ts]) --> ftv(T), "_", ftv(Ts), !.
 ftv(T) --> str(T), !.
 
+% deleteLogic(Lg) -- delete the definition of Lg.
+
 deleteLogic(Lg) :-
     retractall(logName(Lg, _)),
     retractall(logTVs(Lg, _)),
     retractall(logDTVs(Lg, _)),
     retractall(logNDTVs(Lg, _)),
+    retractall(logColors(Lg, _)),
     retractall(logOp(Lg, _, _)).
+
+% copyLogic(Lg, LgCopy, LN) -- make LgCopy be a copy of Lg with name
+% LN.
+
+copyLogic(Lg, LgCopy, LN) :-
+    logTVs(Lg, TVs),
+    logDTVs(Lg, DTVs),
+    logNDTVs(Lg, NDTVs),
+    logColors(Lg, Cols),
+    deleteLogic(LgCopy),
+    assertz(logName(LgCopy, LN)),
+    assertz(logTVs(LgCopy, TVs)),
+    assertz(logDTVs(LgCopy, DTVs)),
+    assertz(logNDTVs(LgCopy, NDTVs)),
+    assertz(logColors(LgCopy, Cols)),
+    (   logOp(Lg, Op/Ar, Map),
+        assertz(logOp(LgCopy, Op/Ar, Map)),
+        fail ; 
+        true
+    ), !.
+
+% designateTVs(Lg, Vs) --
+% undesignateTVs(Lg, Vs) - add Vs to the designated/undesignated truth
+% values of Lg.
+
+designateTVs(Lg, Vs) :- 
+    logTVs(Lg, TVs),
+    logDTVs(Lg, DTVs),
+    logNDTVs(Lg, NDTVs),
+    subtract(NDTVs, Vs, NDTVsNew),
+    intersection(Vs, TVs, Vs1),
+    union(DTVs, Vs1, DTVsNew),
+    retractall(logDTVs(Lg, DTVs)),
+    retractall(logNDTVs(Lg, NDTVs)),
+    assertz(logDTVs(Lg, DTVsNew)),
+    assertz(logNDTVs(Lg, NDTVsNew)).
+
+undesignateTVs(Lg, Vs) :- 
+    logTVs(Lg, TVs),
+    logDTVs(Lg, DTVs),
+    logNDTVs(Lg, NDTVs),
+    subtract(DTVs, Vs, NDTVsNew),
+    intersection(Vs, TVs, Vs1),
+    union(NDTVs, Vs1, DTVsNew),
+    retract(logDTVs(Lg, DTVs)),
+    retract(logNDTVs(Lg, NDTVs)),
+    assertz(logDTVs(Lg, DTVsNew)),
+    assertz(logNDTVs(Lg, NDTVsNew)).
 
 % addOp(Lg, Op/Ar, Map) -- add Op/Ar to logic L with mapping Map.
 % if Ar/Op already defined, it is replaced.
@@ -323,6 +374,15 @@ prettyFmla(F, Vars) :-
     length(Vars, N),
     varList(N,Vars),
     write_term(F, [nl]), nl.
+
+% prettyCopy(+F, -Fr) -- Fr is a readable version of F (variables
+% instantiated by 'v-N').
+
+prettyCopy(F, Fr) :-
+    copy_term(F, Fr),
+    term_variables(Fr, Vars),
+    length(Vars, N),
+    varList(N,Vars).
 
 varList(N,Vars) :-
     numlist(1,N,Nums),
@@ -589,7 +649,6 @@ checkIso(Iso, Domain, DIso, DTVs1, Lg1, Lg2) :-
 memberrest(B, [B|R], R).
 memberrest(X, [B|Bs], [B|R]) :-
     memberrest(X, Bs, R).
-
 
 % sortIso(Lg, Iso) -- assuming Iso is a map onto the truth values of
 % Lg, sort the truth values of Lg in the same way they appear in Iso
