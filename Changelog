@@ -1,4 +1,10 @@
 Changes to MUltlog:
+1.16, 23.12.2021
+- Add homomorphism testing/finding.
+- Fix error in isConseq to make sure we evaluate variables in both
+  premises and conclusion
+- add copyLogic, designateTVs, undesignateTVs, and prettyCopy
+- Update manual  
 1.16-pre3, 17.06.2021
 - change how explicit sequents are processed (previous way didn't
 allow more than 9 truth values).
