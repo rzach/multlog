@@ -1,4 +1,7 @@
 Changes to MUltlog:
+1.16a, 23.07.2022
+- Fix a bug in undesignateTVs
+- Fix manual to give correct names to designateTVs and undesignateTVs
 1.16, 23.12.2021
 - Add homomorphism testing/finding.
 - Fix error in isConseq to make sure we evaluate variables in both

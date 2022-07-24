@@ -766,8 +766,8 @@ The logic `new` is a copy of logic `l` with name "Name".
 You can change the disignated and undesignated values of a logic this
 way:
 ```
-?- designateValues(l, [t, f]).
-?- undesignateValues(l, [t, f]).
+?- designateTVs(l, [t, f]).
+?- undesignateTVs(l, [t, f]).
 ```
 This will change the designated values of Logic `l` to include (or
 exclude) the values `t` and `f`.

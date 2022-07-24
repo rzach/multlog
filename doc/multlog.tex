@@ -33,13 +33,6 @@
   \KOMAoptions{parskip=half}}
 \makeatother
 \usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  pdftitle={MUltlog 1.16 \& iLC 1.2 User Manual},
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
 \usepackage{listings}
 \newcommand{\passthrough}[1]{#1}
 \lstset{defaultdialect=[5.3]Lua}
@@ -58,8 +51,15 @@
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={MUltlog 1.16a \& iLC 1.2 User Manual},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
 
-\title{MUltlog 1.16 \& iLC 1.2 User Manual}
+\title{MUltlog 1.16a \& iLC 1.2 User Manual}
 \author{}
 \date{}
 
@@ -1111,8 +1111,8 @@ You can change the disignated and undesignated values of a logic this
 way:
 
 \begin{lstlisting}
-?- designateValues(l, [t, f]).
-?- undesignateValues(l, [t, f]).
+?- designateTVs(l, [t, f]).
+?- undesignateTVs(l, [t, f]).
 \end{lstlisting}
 
 This will change the designated values of Logic
