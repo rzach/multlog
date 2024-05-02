@@ -9,7 +9,7 @@
 
 
 
-:- set_prolog_flag(double_quotes, codes).
+:- set_prolog_flag(double_quotes, string).
 :- dynamic	cached/1, msqFN/1, msqCFN/1, msqTVno/2, msqOpno/2, msqQuno/2,
 						msqCounter/1, msqName/2, msqPrefix/1, msqInfix/1, msqExtra/2.
 
@@ -48,18 +48,18 @@ msq_out(FN, CFN) :-
 	lgcDTVs(DTVs),
 	format("designated_truth_values(~w).\n", [DTVs]),
 	(member(TV,TVs),
-		texName(TV,TexTV),
-		format("tex_tv(~w,~s).\n", [TV,TexTV]),
+		getTexName(TV,TexTV),
+		format("tex_tv(~w,[~W]).\n", [TV,TexTV,[quoted(true)]]),
 		fail
 	; true),
 	(lgcOp(Op/Ar,_),
-		texName(Op,TexN),
+		getTexName(Op,TexN),
 		% write operator format for Op
 		(texPrefix(Op) ->
-			format("tex_op(~w(A), [\"~w\", A]).\n", [Op, TexN])
+			format("tex_op(~w(A), [~W, \" \", A]).\n", [Op, TexN, [quoted(true)]])
 		;
 		texInfix(Op) ->
-			format("tex_op(~w(A, B), [\"(\", A, \"~w\", B, \")\"]).\n", [Op, TexN])
+			format("tex_op(~w(A, B), [\"(\", A, ~W, \" \", B, \")\"]).\n", [Op, TexN, [quoted(true)]])
 		;
 			formatOpTex(Op/Ar)),
 		% write rules for Op
@@ -87,10 +87,15 @@ formatOpTex(Op/Ar) :-
 	formatOp(Op/Ar),
 	texName(Op, TexN),
 	findall(X,between(1,Ar,X),L),
-	format(", [\"~s(\", ",[TexN]),
+	format(", [~W, \"(\", ",[TexN, [quoted(true)]]),
 	formatVarList(L, ', \",\",'),
 	format(", \")\"]).\n",[]).
 
+getTexName(X,TexN) :-
+	(texName(X,\\TN) -> 
+		atom_string(TN,TNS), 
+		string_concat("\\", TNS, TexN) 
+	; texName(X,TexN)).
 
 formatVarList([], _).
 formatVarList([X|Xs], Sep) :-
