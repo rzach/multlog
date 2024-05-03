@@ -238,9 +238,13 @@ do
 done
 
 echo "pdfLaTeXing the manual."
-pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
-pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
-$rm -f $mldoc/multlog.aux $mldoc/multlog.log $mldoc/multlog.toc $mldoc/multlog.out
+
+if $ltxpdf; then
+   $pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
+   $pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
+   $rm -f $mldoc/multlog.aux $mldoc/multlog.log $mldoc/multlog.toc $mldoc/multlog.out
+fi
+# TODO: Generate documenation via latex/dvips/ps2pdf if there is no pdflatex
 
 $rm -f $sedscript
 $rm -f $distdir/bin/$deinstall
