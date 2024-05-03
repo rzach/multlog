@@ -82,11 +82,17 @@ To run the installation script, change to the installation directory
     ./ml_install
 
 The script will
+
 - determine the location of some Unix commands
+
 - ask the user for the Prolog to use
+
 - ask the user for the place where to put MUltlog
+
 - generate the deinstallation script `ml_deinstall`
+
 - insert the correct paths in some of MUltlog's files
+
 - copy the MUltlog files in the right places.
 
 In case of problems see the section on

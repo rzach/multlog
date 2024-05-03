@@ -240,6 +240,8 @@ done
 echo "pdfLaTeXing the manual."
 
 if $ltxpdf; then
+   # Needs three runs to get cross-references right
+   $pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
    $pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
    $pdflatex -output-directory $mldoc $mldoc/multlog.tex >/dev/null
    $rm -f $mldoc/multlog.aux $mldoc/multlog.log $mldoc/multlog.toc $mldoc/multlog.out
