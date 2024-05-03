@@ -1,17 +1,11 @@
-%%% Filename : ml.pl
-%%% Contents : Root module of MUltlog
-%%% Author   : Gernot Salzer
+%%% Filename : ml_msq.pl
+%%% Contents : Conversion of Multlog to Multseq files
+%%% Author   : Richard Zach
 %%% Interface:
-%%%            lgc2msq(In,Out,Cnf). Translates LGC-file "In" to msq-file "Out"
-%%%                                 using configuration in "Cnf"
-%%%
-%%% 2021/05/14, GS: output of stripped cfg file added
-
-
+%%%            lgc2msq(In,Out,Cnf). Translates Multlog .lgc file "In" to %%%               Multseq file "Out" using configuration in "Cnf"
 
 :- set_prolog_flag(double_quotes, string).
-:- dynamic	cached/1, msqFN/1, msqCFN/1, msqTVno/2, msqOpno/2, msqQuno/2,
-						msqCounter/1, msqName/2, msqPrefix/1, msqInfix/1, msqExtra/2.
+:- dynamic cached/1.
 
 lgc2msq(In, Out, CFN) :-
 	init_errors,
@@ -25,21 +19,17 @@ lgc2msq(In, Out, CFN) :-
 	lgc_in(In),
 	atom_concat(In, '.stripped', InStripped),
 	lgc_stripped(In, InStripped),
-	atom_concat(In, '.cache', Cache),
+%	atom_concat(In, '.cache', Cache),
 %	cache_in(Cache),
 	check,
 	kernel,
 %	cache_out(Cache),
-	msq_out(Out, CFN).
-
-msqDatabase([msqFN/1, msqCFN/1, msqTVno/2, msqOpno/2, msqQuno/2, msqCounter/1,
-             texName/2, texPrefix/1, texInfix/1, texExtra/2]).
+	msq_out(Out, CFN),
+	!.
 
 msq_out(FN, CFN) :-
 	\+ errOccurred(_,_),
-	clear(msqDatabase),
 	ml_if(nonvar(CFN), read_texCfg(CFN), true),
-	asserta(msqFN(FN)),
 	tell(FN),
 	lgcLN(LN),
 	format("% ~w - MSeq specification of logic '~s'\n", [FN, LN]),
@@ -53,15 +43,6 @@ msq_out(FN, CFN) :-
 		fail
 	; true),
 	(lgcOp(Op/Ar,_),
-		getTexName(Op,TexN),
-		% write operator format for Op
-		(texPrefix(Op) ->
-			format("tex_op(~w(A), [~W, \" \", A]).\n", [Op, TexN, [quoted(true)]])
-		;
-		texInfix(Op) ->
-			format("tex_op(~w(A, B), [\"(\", A, ~W, \" \", B, \")\"]).\n", [Op, TexN, [quoted(true)]])
-		;
-			formatOpTex(Op/Ar)),
 		% write rules for Op
 		(krnOpIntro(Op/Ar, T, Cnf),
 			format("rule(", []),
@@ -71,26 +52,45 @@ msq_out(FN, CFN) :-
 			format("], ~w_~w).\n", [Op, T]),
 			fail
 		; true),
+		% write LaTeX codes for TVs and Ops
+		getTexName(Op,TexN),
+		% write operator format for Op
+		(texPrefix(Op) ->
+			format("op(500,fx,~w).\n", [Op]),
+			format("tex_op(~w(A), [~W, \" \", A]).\n", [Op, TexN, [quoted(true)]])
+		;
+		texInfix(Op) ->
+			format("op(700,xfx,~w).\n", [Op]),
+			format("tex_op(~w(A, B), [\"(\", A, ~W, \" \", B, \")\"]).\n", [Op, TexN, [quoted(true)]])
+		;
+			formatOpTex(Op/Ar)),
 		fail
 	; true),
 	told,
 	!.
 
 formatOp(Op/Ar) :-
-	format("~w(",[Op]),
-	findall(X,between(1,Ar,X),L),
-	formatVarList(L, ','),
-	format(")", []).
+	(Ar = 0 ->
+		format("~w", [Op])
+	;
+		format("~w(",[Op]),
+		findall(X,between(1,Ar,X),L),
+		formatVarList(L, ','),
+		format(")", [])).
 
 formatOpTex(Op/Ar) :-
 	format("tex_op(", []),
 	formatOp(Op/Ar),
-	texName(Op, TexN),
-	findall(X,between(1,Ar,X),L),
-	format(", [~W, \"(\", ",[TexN, [quoted(true)]]),
-	formatVarList(L, ', \",\",'),
-	format(", \")\"]).\n",[]).
+	getTexName(Op, TexN),
+	(Ar = 0 ->
+		format(", [~W]).\n", [TexN, [quoted(true)]])
+	;
+		findall(X,between(1,Ar,X),L),
+		format(", [~W, \"(\", ",[TexN, [quoted(true)]]),
+		formatVarList(L, ', \",\",'),
+		format(", \")\"]).\n",[])), !.
 
+% always use string "\\neg" even if config file has bare \\neg
 getTexName(X,TexN) :-
 	(texName(X,\\TN) -> 
 		atom_string(TN,TNS), 
