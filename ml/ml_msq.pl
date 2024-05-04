@@ -43,6 +43,7 @@ msq_out(FN, CFN) :-
 		fail
 	; true),
 	(lgcOp(Op/Ar,_),
+		format("\noperator(~w, ~w).\n", [Op, Ar]),
 		% write rules for Op
 		(krnOpIntro(Op/Ar, T, Cnf),
 			format("rule(", []),
@@ -54,6 +55,7 @@ msq_out(FN, CFN) :-
 		; true),
 		% write LaTeX codes for TVs and Ops
 		getTexName(Op,TexN),
+		format("operator_tex(~w) --> ~W.\n", [Op, TexN, [quoted(true)]]),
 		% write operator format for Op
 		(texPrefix(Op) ->
 			format("op(500,fx,~w).\n", [Op]),
@@ -95,7 +97,7 @@ getTexName(X,TexN) :-
 	(texName(X,\\TN) -> 
 		atom_string(TN,TNS), 
 		string_concat("\\", TNS, TexN) 
-	; texName(X,TexN)).
+	; texName(X,TexN)), !.
 
 formatVarList([], _).
 formatVarList([X|Xs], Sep) :-
