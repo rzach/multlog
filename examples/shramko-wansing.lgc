@@ -23,7 +23,7 @@ operator(negt/1, mapping {
 	 (nft) : ntb,
 	 (nfb) : ftb,
 	 (ntb) : nft,
-	 (ftb) : ntb,
+	 (ftb) : nfb,
 	 (a  ) : a  
 	}
 ).
@@ -40,7 +40,7 @@ operator(negf/1, mapping {
 	 (ft ) : nb ,
 	 (fb ) : nt ,
 	 (tb ) : tb ,
-	 (nft) : nft,
+	 (nft) : nfb,
 	 (nfb) : nft,
 	 (ntb) : ftb,
 	 (ftb) : ntb,

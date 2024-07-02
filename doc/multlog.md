@@ -828,6 +828,16 @@ show all homomorhisms between `log1` and `log2`, say:
 (The `fail` at the end will automatically find all of them; otherwise
 you'll have to hit space to backtrack after each.)
 
+# Creating sequent rule files for MUltseq
+
+The sequent prover [MUltseq](https://www.logic.at/multseq) requires
+`.msq` files containing the sequent rules for a logic. MUltlog can
+generate such files from logic specification (`.lgc`) and
+configuration (`.cfg`) files. Just say
+```
+lgc2msq <name>
+```
+
 # Troubleshooting
 
 ## Installation errors

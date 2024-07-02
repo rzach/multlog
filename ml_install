@@ -173,7 +173,7 @@ for d in "$mldoc" "$mllib"; do
    echo "echo '   directory $d'" >> "$deinstall"
    echo "$rm -rf '$d'" >> "$deinstall"
 done
-for f in * lgc2pdf lgc2dvi
+for f in * lgc2pdf lgc2dvi lgc2msq multlog
 do
    echo "echo '   file $mlbin/$f'" >> $deinstall
    echo "$rm '$mlbin/$f'" >> $deinstall

@@ -2,28 +2,52 @@
 
 logic "\L ukasiewicz".
 
-truth_values {f,*,t}.
+truth_values {f,u,t}.
 
 designated_truth_values {t}.
 
-ordering(linear, "f < * < t").
+ordering(linear, "f < u < t").
 
 operator(neg  /1, mapping { (t): f,
-                            (*): *,
+                            (u): u,
                             (f): t
                           }
         ).
 
 operator(imp  /2, mapping { (t,t): t,
-                            (t,*): *,
+                            (t,u): u,
                             (t,f): f,
-                            (*,t): t,
-                            (*,*): t,
-                            (*,f): *,
+                            (u,t): t,
+                            (u,u): t,
+                            (u,f): u,
                             (f,t): t,
-                            (f,*): t,
+                            (f,u): t,
                             (f,f): t
                           }
+        ).
+
+operator(sand  /2, mapping {   (f,f):f,
+                                (f,u):f,
+                                (f,t):f,
+                                (u,f):f,
+                                (u,u):f,
+                                (u,t):u,
+                                (t,f):f,
+                                (t,u):u,
+                                (t,t):t
+                        }
+        ).
+
+operator(sor  /2, mapping {    (f,f):f,
+                                (f,u):u,
+                                (f,t):t,
+                                (u,f):u,
+                                (u,u):t,
+                                (u,t):t,
+                                (t,f):t,
+                                (t,u):t,
+                                (t,t):t
+                        }
         ).
 
 operator(and  /2, inf(linear)).
@@ -31,4 +55,3 @@ operator(or   /2, sup(linear)).
 
 quantifier(forall, induced_by inf(linear)).
 quantifier(exists, induced_by sup(linear)).
-

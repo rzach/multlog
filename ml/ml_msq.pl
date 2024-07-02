@@ -19,11 +19,11 @@ lgc2msq(In, Out, CFN) :-
 	lgc_in(In),
 	atom_concat(In, '.stripped', InStripped),
 	lgc_stripped(In, InStripped),
-%	atom_concat(In, '.cache', Cache),
-%	cache_in(Cache),
+	atom_concat(In, '.cache', Cache),
+	cache_in(Cache),
 	check,
 	kernel,
-%	cache_out(Cache),
+	cache_out(Cache),
 	msq_out(Out, CFN),
 	!.
 
@@ -52,6 +52,12 @@ msq_out(FN, CFN) :-
 			format("^~w, [", [T]),
 			formatCnf(Cnf),
 			format("], ~w_~w).\n", [Op, T]),
+			getTexName(T, TexT),
+			format("tex_rn(~w_~w, [\"{\", ", [Op, T]),
+			write_term(TexN, [quoted(true)]),
+			format(", \"}_{\", ", []),
+			write_term(TexT, [quoted(true)]),
+			format(", \"}\"]).\n", []),
 			fail
 		; true),
 		% write LaTeX codes for TVs and Ops
@@ -59,11 +65,13 @@ msq_out(FN, CFN) :-
 		% write operator format for Op
 		(texPrefix(Op) ->
 			format("op(500,fx,~w).\n", [Op]),
-			format("tex_op(~w(A), [~W, \" \", A]).\n", [Op, TexN, [quoted(true)]])
+			format("tex_op(~w(A), [~W, \" \", A]).\n",
+				[Op, TexN, [quoted(true)]])
 		;
 		texInfix(Op) ->
 			format("op(700,xfx,~w).\n", [Op]),
-			format("tex_op(~w(A, B), [\"(\", A, ~W, \" \", B, \")\"]).\n", [Op, TexN, [quoted(true)]])
+			format("tex_op(~w(A, B), [\"(\", A, ~W, \" \", B, \")\"]).\n",
+				[Op, TexN, [quoted(true)]])
 		;
 			formatOpTex(Op/Ar)),
 		fail
@@ -93,11 +101,11 @@ formatOpTex(Op/Ar) :-
 		format(", \")\"]).\n",[])), !.
 
 % always use string "\\neg" even if config file has bare \\neg
-getTexName(X,TexN) :-
-	(texName(X,\\TN) -> 
-		atom_string(TN,TNS), 
-		string_concat("\\", TNS, TexN) 
-	; texName(X,TexN)), !.
+getTexName(X, TexN) :-
+	(texName(X, \\TN) ->
+		atom_string(TN, TNS),
+		string_concat("\\", TNS, TexN)
+	; texName(X, TexN)), !.
 
 formatVarList([], _).
 formatVarList([X|Xs], Sep) :-
@@ -118,3 +126,4 @@ formatCnf([C|Cs]) :-
 	format("]",[]),
 	(Cs = [_|_] -> format(", ", []); true),
 	formatCnf(Cs).
+

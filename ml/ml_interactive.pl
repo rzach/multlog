@@ -278,9 +278,14 @@ isConseq(Lg, Fs, F) :-
 % values of Lg1 are also truth values of Lg2.
 
 areEquiv(Lg1, F1, Lg2, F2) :-
-    forall(hasValue(Lg1, F1, V),
-        hasValue(Lg2, F2, V)
-           ).
+    logTVs(Lg1, TVs),
+    term_variables((F1,F2), Vars),
+    forall(listOfTVs(Vars, TVs),
+        (hasValue(Lg1, F1, V) ->
+            hasValue(Lg2, F2, V)
+    )).
+
+areEquiv(Lg, F1, F2) :- areEquiv(Lg, F1, Lg, F2).
 
 % findEquiv(Lg1, F1, Lg2, -F2) -- find a formula F2 equivalent to F1.
 

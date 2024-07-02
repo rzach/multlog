@@ -18,6 +18,7 @@
 :- ['@mlpath@/propres_compact'].
 :- ['@mlpath@/ml_minimize'].
 :- ['@mlpath@/ml_compactrepr'].
+:- ['@mlpath@/ml_msq'].
 
 :- dynamic cached/1.
 
